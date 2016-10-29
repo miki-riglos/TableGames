@@ -7,11 +7,5 @@ namespace TableGames.Web.Controllers
         public ActionResult Index() {
             return View();
         }
-
-        public ActionResult About() {
-            ViewBag.Message = "Table Games web application.";
-
-            return View();
-        }
     }
 }

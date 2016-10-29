@@ -2,28 +2,32 @@
     ViewBag.Title = "Home";
 }
 
-<div class="row">
-    <div class="col-sm-3">
-        Col 1 (sm3)
+<div id="tgContainer">
+    <div class="row">
+        <div class="col-sm-3">
+            </div>
+        <div class="col-sm-9">
+        </div>
     </div>
-    <div class="col-sm-9">
-        Col 2 (sm9)
-    </div>
+
 </div>
 
-<div id="results"></div>
+<div id="tgNotification">
+    <div class="form-inline">
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Message" data-bind="value: message, enable: isLoggedIn" />
+        </div>
+        <button type="button" class="btn btn-default" data-bind="click: sendMessage">Send</button>
+    </div>
+
+    <ul data-bind="foreach: messages">
+        <li>
+            <span data-bind="text: userName"></span>:<span data-bind="text: message"></span>
+        </li>
+    </ul>
+</div>
+
 
 @section scripts {
-    <script type="text/javascript">
-        $(function() {
-            var hub = $.connection.tableGamesHub;
-            hub.client.hello = function(message) {
-                $('#results').append('<div>' + message + '</div>');
-            };
-
-            $.connection.hub.start().done(function() {
-                hub.server.hello();
-            });
-        });
-    </script>
+    <script type="text/javascript" src="~/Scripts/require.js" data-main="@Url.Content("~/TG.Scripts/main")"></script>
 }
