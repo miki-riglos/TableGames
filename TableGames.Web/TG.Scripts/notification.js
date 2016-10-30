@@ -9,7 +9,10 @@
         self.messages = ko.observableArray();
 
         self.sendMessage = function() {
-            hub.server.sendMessage(authentication.userName(), self.message());
+            if (self.message()) {
+                hub.server.sendMessage(authentication.userName(), self.message());
+                self.message(null);
+            }
         };
 
         hub.client.addMessage = function(userName, message) {
