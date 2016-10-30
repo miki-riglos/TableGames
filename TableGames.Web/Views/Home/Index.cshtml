@@ -15,7 +15,7 @@
 <div id="tgNotification">
     <div class="form-inline">
         <div class="form-group">
-            <input type="text" class="form-control" placeholder="Message" data-bind="value: message, enable: isLoggedIn" />
+            <input type="text" class="form-control" placeholder="Message" data-bind="value: message, enable: isLoggedIn, event: { keyup: sendMessage }" />
         </div>
         <button type="button" class="btn btn-default" data-bind="click: sendMessage">Send</button>
     </div>
