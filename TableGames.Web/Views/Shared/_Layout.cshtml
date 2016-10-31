@@ -26,7 +26,7 @@
 
                 <div id="tgAuthentication" class="navbar-form navbar-right">
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Name" data-bind="value: userName, enable: !isLoggedIn(), event: { keyup: toggleLogin }" />
+                        <input type="text" class="form-control" placeholder="Name" data-bind="value: userName, enable: !isLoggedIn(), onEnter: toggleLogin" />
                     </div>
                     <button type="button" class="btn btn-default" data-bind="text: toggleLogin.label, click: toggleLogin">Login</button>
                 </div>
