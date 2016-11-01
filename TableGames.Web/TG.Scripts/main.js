@@ -7,19 +7,22 @@
 
 define('jquery', function() { return jQuery; });    // already loaded in _layout.cshtml
 
-require(['ko-ext', 'jquery', 'authentication', 'notification'], function(ko, $, Authentication, Notification) {
+require(['ko-ext', 'jquery', 'notification', 'authentication', 'chat', 'manager'], function(ko, $, Notification, Authentication, Chat, Manager) {
 
     var hub = $.connection.tableGamesHub;
 
-    var authentication = new Authentication(hub);
-    var notification = new Notification(hub, authentication);
-    var state = {
-        messages: ko.observableArray()
-    };
+    var notification = new Notification();
+    var authentication = new Authentication(hub, notification);
+    var chat = new Chat(hub, authentication);
+    var manager = new Manager(hub, notification, authentication);
 
-    $.connection.hub.start();
+    $.connection.hub.start().then(function() {
+        hub.server.getState().then(function(currentState) {
+            manager.initialize(currentState);
+        });
+    });
 
     ko.applyBindings(authentication, document.getElementById('tgAuthentication'));
-    ko.applyBindings(notification, document.getElementById('tgNotification'));
-    ko.applyBindings(state, document.getElementById('tgContainer'));
+    ko.applyBindings(chat, document.getElementById('tgChat'));
+    ko.applyBindings(manager, document.getElementById('tgContainer'));
 });

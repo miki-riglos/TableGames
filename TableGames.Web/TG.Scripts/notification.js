@@ -1,23 +1,20 @@
 ﻿define(['knockout'], function(ko) {
 
-    function Notification(hub, authentication) {
+    function Notification() {
         var self = this;
-
-        self.isLoggedIn = authentication.isLoggedIn;
-        self.message = ko.observable();
 
         self.messages = ko.observableArray();
 
-        self.sendMessage = function() {
-            if (self.message()) {
-                hub.server.sendMessage(authentication.userName(), self.message());
-                self.message(null);
-            }
+        self.addInfo = function(message) {
+            self.messages.push({
+                type: 'info',
+                message: message
+            });
         };
 
-        hub.client.addMessage = function(userName, message) {
+        self.addError = function(message) {
             self.messages.push({
-                userName: userName,
+                type: 'error',
                 message: message
             });
         };

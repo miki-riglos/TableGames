@@ -1,6 +1,6 @@
 ﻿define(['knockout'], function(ko) {
 
-    function Authentication(hub) {
+    function Authentication(hub, notification) {
         var self = this;
 
         self.userName = ko.observable();
@@ -9,12 +9,24 @@
         self.toggleLogin = function() {
             if (!self.isLoggedIn()) {
                 if (self.userName()) {
-                    self.isLoggedIn(true);
-                    self.toggleLogin.label('Logout');
+                    hub.server.login(self.userName())
+                        .then(function() {
+                            self.isLoggedIn(true);
+                            self.toggleLogin.label('Logout');
+                        })
+                        .catch(function(err) {
+                            notification.addError(err.message);
+                        });
                 }
             } else {
-                self.isLoggedIn(false);
-                self.toggleLogin.label('Login');
+                hub.server.logout(self.userName())
+                    .then(function() {
+                        self.isLoggedIn(false);
+                        self.toggleLogin.label('Login');
+                    })
+                    .catch(function(err) {
+                        notification.addError(err.message);
+                    });
             }
         };
         self.toggleLogin.label = ko.observable('Login');

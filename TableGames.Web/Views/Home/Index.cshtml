@@ -4,18 +4,43 @@
 
 <div id="tgContainer">
     <div class="row">
-        <div class="col-sm-3">
+        <div class="col-sm-6">
+            <div class="form-inline">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="New Room" data-bind="value: roomToAdd, enable: isLoggedIn, onEnter: addRoom" />
+                </div>
+                <button type="button" class="btn btn-default" data-bind="click: addRoom">Add</button>
             </div>
-        <div class="col-sm-9">
+
+            <ul data-bind="foreach: players">
+                <li>
+                    <span data-bind="text: name"></span>
+                    <ul data-bind="foreach: rooms">
+                        <li>
+                            <span data-bind="text: name"></span>(<span data-bind="text: attendance"></span>)
+                            <button type="button" class="btn btn-danger" data-bind="click: $root.removeRoom, visible: $root.removeRoom.isAllowed($data)">Remove</button>
+                            <button type="button" class="btn btn-primary" data-bind="click: $root.enterRoom">Enter</button>
+                            <button type="button" class="btn btn-primary" data-bind="click: $root.leaveRoom">Leave</button>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div class="col-sm-6">
+            <ul data-bind="foreach: messages">
+                <li>
+                    <span data-bind="text: type"></span>:<span data-bind="text: message"></span>
+                </li>
+            </ul>
         </div>
     </div>
 
 </div>
 
-<div id="tgNotification">
+<div id="tgChat">
     <div class="form-inline">
         <div class="form-group">
-            <input type="text" class="form-control" placeholder="Message" data-bind="value: message, enable: isLoggedIn, onEnter: sendMessage" />
+            <input type="text" class="form-control" placeholder="Message" data-bind="value: messageToSend, enable: isLoggedIn, onEnter: sendMessage" />
         </div>
         <button type="button" class="btn btn-default" data-bind="click: sendMessage">Send</button>
     </div>

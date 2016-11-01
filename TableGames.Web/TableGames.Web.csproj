@@ -147,6 +147,8 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Entities\Room.cs" />
+    <Compile Include="Entities\Player.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -192,8 +194,12 @@
     <Content Include="Scripts\respond.matchmedia.addListener.min.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\_references.js" />
-    <Content Include="TG.Scripts\extensions\ko-extended.js" />
     <Content Include="TG.Scripts\notification.js" />
+    <Content Include="TG.Scripts\room.js" />
+    <Content Include="TG.Scripts\player.js" />
+    <Content Include="TG.Scripts\extensions\ko-extended.js" />
+    <Content Include="TG.Scripts\manager.js" />
+    <Content Include="TG.Scripts\chat.js" />
     <Content Include="TG.Scripts\authentication.js" />
     <Content Include="TG.Scripts\main.js" />
     <Content Include="Web.config" />
