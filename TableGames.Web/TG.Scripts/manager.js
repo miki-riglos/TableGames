@@ -20,26 +20,28 @@
 
         // ... login
         self.login = function() {
-            if (!authentication.isLoggedIn() && authentication.userName()) {
-                hub.server.login(authentication.userName())
-                .then(function() {
-                    authentication.isLoggedIn(true);
-                })
-                .catch(function(err) {
-                    notification.addError(err.message);
-                });
+            if (!authentication.isLoggedIn() && authentication.nameToLogin()) {
+                hub.server.login(authentication.nameToLogin())
+                    .then(function() {
+                        authentication.isLoggedIn(true);
+                        authentication.userName(authentication.nameToLogin());
+                    })
+                    .catch(function(err) {
+                        notification.addError(err.message);
+                    });
             }
         };
 
         hub.client.onLoggedIn = function(userName) {
             players.push(new Player({ name: userName }));
-            notification.addInfo(userName + ' just joined.');
+            notification.addInfo(userName + ' just logged in.');
         };
 
         // ... logout
         self.logout = function() {
             hub.server.logout(authentication.userName())
                 .then(function() {
+                    authentication.nameToLogin(null);
                     authentication.isLoggedIn(false);
                     authentication.userName(null);
                 })
@@ -50,7 +52,21 @@
 
         hub.client.onLoggedOut = function(userName) {
             players.remove(getPlayer(userName));
-            notification.addInfo(userName + ' just left.');
+            notification.addInfo(userName + ' just logged out.');
+        };
+
+        // ... player re-login
+        // ...... logout in old session
+        hub.client.playerLogout = function() {
+            authentication.nameToLogin(null);
+            authentication.isLoggedIn(false);
+            authentication.userName(null);
+            notification.addInfo('Logged out, another session was started.');
+        };
+
+        // ...... login in old session
+        hub.client.onPlayerLoggedIn = function(playerState) {
+            notification.addInfo(playerState.name + ' just reconnected.');
         };
 
         // Chat
@@ -58,7 +74,7 @@
         self.chat = chat;
 
         self.sendMessage = function() {
-            if (authentication.isLoggedIn() && authentication.userName() && chat.messageToSend()) {
+            if (authentication.isLoggedIn() && chat.messageToSend()) {
                 hub.server.sendMessage(authentication.userName(), chat.messageToSend())
                     .then(function() {
                         chat.messageToSend(null);
@@ -72,12 +88,12 @@
 
         // User Player
         self.userPlayer = ko.computed(function() {
-            return ko.utils.arrayFirst(players(), function(player) { return player.name === authentication.userName(); });;
+            return ko.utils.arrayFirst(players(), function(player) { return player.name === authentication.userName(); });
         });
 
         // Other Players
         self.otherPlayers = ko.computed(function() {
-            return ko.utils.arrayFilter(players(), function(player) { return player.name !== authentication.userName(); });;
+            return ko.utils.arrayFilter(players(), function(player) { return player.name !== authentication.userName(); });
         });
 
         // Rooms

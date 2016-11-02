@@ -6,15 +6,18 @@
     <div class="col-sm-6">
         <!-- User Player -->
         <div data-bind="if: userPlayer">
-            <div class="tg-player" data-bind="with: userPlayer">
-                <span data-bind="text: name"></span>
-                <ul data-bind="foreach: rooms">
-                    <li>
-                        <span data-bind="text: name"></span>(<span data-bind="text: attendance"></span>)
-                        <button type="button" class="btn btn-danger" data-bind="click: $root.removeRoom">Remove</button>
-                    </li>
-                </ul>
+            <div class="list-group" data-bind="with: userPlayer">
+                <div class="list-group-item tg-player">
+                    <div data-bind="text: name"></div>
+                    <div class="tg-player-rooms" data-bind="foreach: rooms">
+                        <div>
+                            <span data-bind="text: name"></span>(<span data-bind="text: attendance"></span>)
+                            <button type="button" class="btn btn-danger btn-xs" data-bind="click: $root.removeRoom">Remove</button>
+                        </div>
+                    </div>
+                </div>
             </div>
+            <!-- Add Room -->
             <div class="form-inline">
                 <div class="form-group">
                     <input type="text" class="form-control" placeholder="New Room" data-bind="value: roomToAdd, enable: authentication.isLoggedIn(), onEnter: addRoom" />
@@ -24,16 +27,16 @@
         </div>
 
         <!-- Other Players -->
-        <div data-bind="foreach: otherPlayers">
-            <div class="tg-player">
-                <span data-bind="text: name"></span>
-                <ul data-bind="foreach: rooms">
-                    <li>
+        <div class="list-group" data-bind="foreach: otherPlayers">
+            <div class="list-group-item tg-player">
+                <div data-bind="text: name"></div>
+                <div class="tg-player-rooms" data-bind="foreach: rooms">
+                    <div>
                         <span data-bind="text: name"></span>(<span data-bind="text: attendance"></span>)
-                        <button type="button" class="btn btn-primary" data-bind="click: $root.enterRoom">Enter</button>
-                        <button type="button" class="btn btn-primary" data-bind="click: $root.leaveRoom">Leave</button>
-                    </li>
-                </ul>
+                        <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.enterRoom">Enter</button>
+                        <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.leaveRoom">Leave</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

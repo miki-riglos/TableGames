@@ -31,12 +31,23 @@ namespace TableGames.Web.Hubs
 
         // Authentication
         public void Login(string userName) {
-            var player = new Player(userName, Context.ConnectionId);
-            if (_players.TryAdd(userName, player)) {
-                Clients.All.onLoggedIn(userName);
+            Player player;
+            if (_players.TryGetValue(userName, out player)) {
+                // player already exists
+                // ... logout in old session
+                Clients.Client(player.ConnectionId).playerLogout();
+                // ... login in new session
+                player.ConnectionId = Context.ConnectionId;
+                Clients.All.onPlayerLoggedIn(player.ToClient());
             }
             else {
-                throw new HubException("Login error.");
+                player = new Player(userName, Context.ConnectionId);
+                if (_players.TryAdd(userName, player)) {
+                    Clients.All.onLoggedIn(userName);
+                }
+                else {
+                    throw new HubException("Login error.");
+                }
             }
         }
 

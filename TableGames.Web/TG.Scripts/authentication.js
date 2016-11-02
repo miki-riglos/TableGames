@@ -3,8 +3,9 @@
     function Authentication() {
         var self = this;
 
-        self.userName = ko.observable();
+        self.nameToLogin = ko.observable();
         self.isLoggedIn = ko.observable(false);
+        self.userName = ko.observable();
     }
 
     return Authentication;

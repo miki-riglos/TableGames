@@ -25,7 +25,7 @@
 
                 <div class="navbar-form navbar-right" style="display: none;" data-bind="visible: true">
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Name" data-bind="value: authentication.userName, enable: !authentication.isLoggedIn(), onEnter: login" />
+                        <input type="text" class="form-control" placeholder="Name" data-bind="value: authentication.nameToLogin, enable: !authentication.isLoggedIn(), onEnter: login" />
                     </div>
                     <button type="button" class="btn btn-default" data-bind="click: login, visible: !authentication.isLoggedIn()">Login</button>
                     <button type="button" class="btn btn-default" data-bind="click: logout, visible: authentication.isLoggedIn">Logout</button>
