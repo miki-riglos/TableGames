@@ -73,7 +73,7 @@ namespace TableGames.Web.Hubs
                 Groups.Remove(attendee, room.GroupId);
             }
             room.Attendees.Clear();
-            player.RemoveRoom(room);
+            player.RemoveRoom(roomName);
 
             Clients.All.onRoomRemoved(userName, room.ToClient());
         }
