@@ -194,13 +194,13 @@
     <Content Include="Scripts\respond.matchmedia.addListener.min.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\_references.js" />
+    <Content Include="TG.Scripts\authentication.js" />
     <Content Include="TG.Scripts\notification.js" />
     <Content Include="TG.Scripts\room.js" />
     <Content Include="TG.Scripts\player.js" />
     <Content Include="TG.Scripts\extensions\ko-extended.js" />
     <Content Include="TG.Scripts\manager.js" />
     <Content Include="TG.Scripts\chat.js" />
-    <Content Include="TG.Scripts\authentication.js" />
     <Content Include="TG.Scripts\main.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">

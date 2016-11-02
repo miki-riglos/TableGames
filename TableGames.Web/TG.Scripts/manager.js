@@ -1,40 +1,80 @@
-﻿define(['knockout', 'player'], function(ko, Player) {
+﻿define(['knockout', 'player', 'notification', 'authentication', 'chat'], function(ko, Player, Notification, Authentication, Chat) {
 
-    function Manager(hub, notification, authentication) {
+    function Manager(hub) {
         var self = this;
 
-        self.isLoggedIn = authentication.isLoggedIn;
-
         self.players = ko.observableArray();
-
-        self.messages = notification.messages;
 
         self.initialize = function(currentState) {
             self.players(currentState.players.map(function(playerState) { return new Player(playerState); }));
         };
 
+        var _getPlayer = function(playerName) { return ko.utils.arrayFirst(self.players(), function(player) { return player.name === playerName; }); };
 
-        function _getPlayer(playerName) {
-            return ko.utils.arrayFirst(self.players(), function(player) { return player.name === playerName; });
-        }
+        // Notification
+        var notification = new Notification();
+        self.notification = notification;
 
         // Authentication
+        var authentication = new Authentication();
+        self.authentication = authentication;
+
+        // ... login
+        self.login = function() {
+            if (!authentication.isLoggedIn() && authentication.userName()) {
+                hub.server.login(authentication.userName())
+                .then(function() {
+                    authentication.isLoggedIn(true);
+                })
+                .catch(function(err) {
+                    notification.addError(err.message);
+                });
+            }
+        };
+
         hub.client.onLoggedIn = function(userName) {
             self.players.push(new Player({ name: userName }));
             notification.addInfo(userName + ' just joined.');
         };
 
+        // ... logout
+        self.logout = function() {
+            hub.server.logout(authentication.userName())
+                .then(function() {
+                    authentication.isLoggedIn(false);
+                    authentication.userName(null);
+                })
+                .catch(function(err) {
+                    notification.addError(err.message);
+                });
+        };
+
         hub.client.onLoggedOut = function(userName) {
-            self.players.remove(function(player) {
-                return player.name === userName;
-            });
+            self.players.remove(_getPlayer(userName));
             notification.addInfo(userName + ' just left.');
         };
 
+        // Chat
+        var chat = new Chat();
+        self.chat = chat;
+
+        self.sendMessage = function() {
+            if (authentication.isLoggedIn() && authentication.userName() && chat.messageToSend()) {
+                hub.server.sendMessage(authentication.userName(), chat.messageToSend())
+                    .then(function() {
+                        chat.messageToSend(null);
+                    });
+            }
+        };
+
+        hub.client.onMessageSent = function(userName, message) {
+            chat.addMessage(userName, message);
+        };
+
         // Rooms
-        // ... add
         self.roomToAdd = ko.observable();
 
+        // ... add
         self.addRoom = function() {
             if (self.roomToAdd()) {
                 hub.server.addRoom(authentication.userName(), self.roomToAdd());

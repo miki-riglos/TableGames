@@ -20,20 +20,20 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a href="#">Room A</a></li>
-                    <li><a href="#">Room B</a></li>
+                    <li><a href="#">About Us</a></li>
                 </ul>
 
-                <div id="tgAuthentication" class="navbar-form navbar-right">
+                <div class="navbar-form navbar-right" style="display: none;" data-bind="visible: true">
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Name" data-bind="value: userName, enable: !isLoggedIn(), onEnter: toggleLogin" />
+                        <input type="text" class="form-control" placeholder="Name" data-bind="value: authentication.userName, enable: !authentication.isLoggedIn(), onEnter: login" />
                     </div>
-                    <button type="button" class="btn btn-default" data-bind="text: toggleLogin.label, click: toggleLogin">Login</button>
+                    <button type="button" class="btn btn-default" data-bind="click: login, visible: !authentication.isLoggedIn()">Login</button>
+                    <button type="button" class="btn btn-default" data-bind="click: logout, visible: authentication.isLoggedIn">Logout</button>
                 </div>
             </div>
         </div>
     </div>
-    <div class="container">
+    <div class="container" style="display: none;" data-bind="visible: true">
         @RenderBody()
     </div>
 
