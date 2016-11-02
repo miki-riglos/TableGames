@@ -6,9 +6,10 @@
         var players = ko.observableArray();
         var getPlayer = function(playerName) { return ko.utils.arrayFirst(players(), function(player) { return player.name === playerName; }); };
 
-        self.initialize = function(currentState) {
-            players(currentState.players.map(function(playerState) { return new Player(playerState); }));
-        };
+        self.userPlayer = ko.computed(function() { return ko.utils.arrayFirst(players(), function(player) { return player.name === authentication.userName(); }); });
+        self.roomToAdd = ko.observable();
+        self.otherPlayers = ko.computed(function() { return ko.utils.arrayFilter(players(), function(player) { return player.name !== authentication.userName(); }); });
+        self.attendedRooms = ko.observableArray();
 
         // Notification
         var notification = new Notification();
@@ -25,6 +26,11 @@
                     .then(function() {
                         authentication.isLoggedIn(true);
                         authentication.userName(authentication.nameToLogin());
+                        // enter hosted rooms (when player re-login)
+                        var player = getPlayer(authentication.userName());
+                        if (player) {
+                            self.attendedRooms(player.rooms());
+                        }
                     })
                     .catch(function(err) {
                         notification.addError(err.message);
@@ -64,7 +70,7 @@
             notification.addInfo('Logged out, another session was started.');
         };
 
-        // ...... login in old session
+        // ...... login in new session
         hub.client.onPlayerLoggedIn = function(playerState) {
             notification.addInfo(playerState.name + ' just reconnected.');
         };
@@ -86,19 +92,7 @@
             chat.addMessage(userName, message);
         };
 
-        // User Player
-        self.userPlayer = ko.computed(function() {
-            return ko.utils.arrayFirst(players(), function(player) { return player.name === authentication.userName(); });
-        });
-
-        // Other Players
-        self.otherPlayers = ko.computed(function() {
-            return ko.utils.arrayFilter(players(), function(player) { return player.name !== authentication.userName(); });
-        });
-
         // Rooms
-        self.roomToAdd = ko.observable();
-
         // ... add
         self.addRoom = function() {
             if (self.roomToAdd()) {
@@ -109,8 +103,12 @@
 
         hub.client.onRoomAdded = function(playerName, roomState) {
             var player = getPlayer(playerName);
-            player.addRoom(roomState);
+            var room = player.addRoom(roomState);
             notification.addInfo(playerName + ' added room ' + roomState.name + '.');
+            // enter room if host
+            if (authentication.userName() === playerName) {
+                self.enterRoom(room);
+            }
         };
 
         // ... remove
@@ -124,11 +122,18 @@
             var player = getPlayer(playerName);
             player.removeRoom(roomState);
             notification.addInfo(playerName + ' removed room ' + roomState.name + '.');
+            // remove from attended rooms
+            self.attendedRooms.remove(function(room) { return room.name === roomState.name; });
         };
 
         // ... enter
         self.enterRoom = function(room) {
-            hub.server.enterRoom(room.hostName, room.name);
+            if (self.attendedRooms.indexOf(room) === -1) {
+                hub.server.enterRoom(room.hostName, room.name)
+                    .then(function() {
+                        self.attendedRooms.push(room);
+                    });
+            }
         };
 
         hub.client.onRoomEntered = function(hostName, roomState, attendeeName) {
@@ -140,7 +145,10 @@
         // ... leave
         self.leaveRoom = function(room) {
             if (authentication.userName() !== room.hostName) {
-                hub.server.leaveRoom(room.hostName, room.name);
+                hub.server.leaveRoom(room.hostName, room.name)
+                    .then(function() {
+                        self.attendedRooms.remove(room);
+                    });
             }
         };
 
@@ -148,6 +156,11 @@
             var room = getPlayer(hostName).getRoom(roomState.name);
             room.attendance(roomState.attendance);
             notification.addInfo((attendeeName || 'Attendee') + ' left ' + hostName + '/' + roomState.name + '.');
+        };
+
+        // initialize state
+        self.initialize = function(currentState) {
+            players(currentState.players.map(function(playerState) { return new Player(playerState); }));
         };
     }
 

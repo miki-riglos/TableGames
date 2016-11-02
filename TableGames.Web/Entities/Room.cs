@@ -14,7 +14,6 @@ namespace TableGames.Web.Entities
             Host = host;
 
             Attendees = new List<string>();
-            Attendees.Add(host.ConnectionId);
         }
 
         public object ToClient() {

@@ -7,7 +7,9 @@
         self.rooms = ko.observableArray((playerState.rooms || []).map(function(roomState) { return new Room(roomState); }));
 
         self.addRoom = function(roomState) {
-            self.rooms.push(new Room(roomState));
+            var room = new Room(roomState);
+            self.rooms.push(room);
+            return room;
         };
 
         self.removeRoom = function(roomState) {

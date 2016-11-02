@@ -3,7 +3,7 @@
 }
 
 <div class="row">
-    <div class="col-sm-6">
+    <div class="col-sm-4">
         <!-- User Player -->
         <div data-bind="if: userPlayer">
             <div class="list-group" data-bind="with: userPlayer">
@@ -34,14 +34,23 @@
                     <div>
                         <span data-bind="text: name"></span>(<span data-bind="text: attendance"></span>)
                         <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.enterRoom">Enter</button>
-                        <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.leaveRoom">Leave</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="col-sm-6">
+    <div class="col-sm-4">
+        <!-- Attended Rooms -->
+        <div data-bind="foreach: attendedRooms">
+            <div>
+                <span data-bind="text: name"></span>(<span data-bind="text: attendance"></span>)
+                <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.leaveRoom">Leave</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-4">
         <!-- Other Players -->
         <div data-bind="foreach: notification.messages">
             <div class="tg-notification">
