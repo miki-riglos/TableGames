@@ -3,13 +3,12 @@
     function Manager(hub) {
         var self = this;
 
-        self.players = ko.observableArray();
+        var players = ko.observableArray();
+        var getPlayer = function(playerName) { return ko.utils.arrayFirst(players(), function(player) { return player.name === playerName; }); };
 
         self.initialize = function(currentState) {
-            self.players(currentState.players.map(function(playerState) { return new Player(playerState); }));
+            players(currentState.players.map(function(playerState) { return new Player(playerState); }));
         };
-
-        var _getPlayer = function(playerName) { return ko.utils.arrayFirst(self.players(), function(player) { return player.name === playerName; }); };
 
         // Notification
         var notification = new Notification();
@@ -33,7 +32,7 @@
         };
 
         hub.client.onLoggedIn = function(userName) {
-            self.players.push(new Player({ name: userName }));
+            players.push(new Player({ name: userName }));
             notification.addInfo(userName + ' just joined.');
         };
 
@@ -50,7 +49,7 @@
         };
 
         hub.client.onLoggedOut = function(userName) {
-            self.players.remove(_getPlayer(userName));
+            players.remove(getPlayer(userName));
             notification.addInfo(userName + ' just left.');
         };
 
@@ -71,6 +70,16 @@
             chat.addMessage(userName, message);
         };
 
+        // User Player
+        self.userPlayer = ko.computed(function() {
+            return ko.utils.arrayFirst(players(), function(player) { return player.name === authentication.userName(); });;
+        });
+
+        // Other Players
+        self.otherPlayers = ko.computed(function() {
+            return ko.utils.arrayFilter(players(), function(player) { return player.name !== authentication.userName(); });;
+        });
+
         // Rooms
         self.roomToAdd = ko.observable();
 
@@ -83,21 +92,20 @@
         };
 
         hub.client.onRoomAdded = function(playerName, roomState) {
-            var player = _getPlayer(playerName);
+            var player = getPlayer(playerName);
             player.addRoom(roomState);
             notification.addInfo(playerName + ' added room ' + roomState.name + '.');
         };
 
         // ... remove
         self.removeRoom = function(room) {
-            hub.server.removeRoom(authentication.userName(), room.name);
-        };
-        self.removeRoom.isAllowed = function(room) {
-            return authentication.userName() === room.hostName;
+            if (authentication.userName() === room.hostName) {
+                hub.server.removeRoom(authentication.userName(), room.name);
+            }
         };
 
         hub.client.onRoomRemoved = function(playerName, roomState) {
-            var player = _getPlayer(playerName);
+            var player = getPlayer(playerName);
             player.removeRoom(roomState);
             notification.addInfo(playerName + ' removed room ' + roomState.name + '.');
         };
@@ -107,21 +115,23 @@
             hub.server.enterRoom(room.hostName, room.name);
         };
 
-        hub.client.onRoomEntered = function(hostName, roomState) {
-            var room = _getPlayer(hostName).getRoom(roomState.name);
+        hub.client.onRoomEntered = function(hostName, roomState, attendeeName) {
+            var room = getPlayer(hostName).getRoom(roomState.name);
             room.attendance(roomState.attendance);
-            notification.addInfo('Attendee entered ' + hostName + '/' + roomState.name + '.');
+            notification.addInfo((attendeeName || 'Attendee') + ' entered ' + hostName + '/' + roomState.name + '.');
         };
 
         // ... leave
         self.leaveRoom = function(room) {
-            hub.server.leaveRoom(room.hostName, room.name);
+            if (authentication.userName() !== room.hostName) {
+                hub.server.leaveRoom(room.hostName, room.name);
+            }
         };
 
-        hub.client.onRoomLeft = function(hostName, roomState) {
-            var room = _getPlayer(hostName).getRoom(roomState.name);
+        hub.client.onRoomLeft = function(hostName, roomState, attendeeName) {
+            var room = getPlayer(hostName).getRoom(roomState.name);
             room.attendance(roomState.attendance);
-            notification.addInfo('Attendee left ' + hostName + '/' + roomState.name + '.');
+            notification.addInfo((attendeeName || 'Attendee') + ' left ' + hostName + '/' + roomState.name + '.');
         };
     }
 

@@ -7,6 +7,7 @@ namespace TableGames.Web.Entities
     {
         public string Name { get; set; }
         public string ConnectionId { get; set; }
+        //TODO: use ConcurrentDictionary<string, Room>
         public List<Room> Rooms { get; set; }
 
         public Player(string name, string connectionId) {

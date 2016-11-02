@@ -17,7 +17,10 @@ namespace TableGames.Web.Hubs
             else {
                 throw new HubException($"Player {userName} not found.");
             }
+        }
 
+        private static Player _getPlayerByConnectionId(string connectionId) {
+            return _players.Values.FirstOrDefault(p => p.ConnectionId == connectionId);
         }
 
         public object GetState() {
@@ -77,20 +80,22 @@ namespace TableGames.Web.Hubs
 
         public void EnterRoom(string hostName, string roomName) {
             var room = _getPlayer(hostName).GetRoom(roomName);
+            var attendeePlayer = _getPlayerByConnectionId(Context.ConnectionId);
 
             Groups.Add(Context.ConnectionId, room.GroupId);
             room.Attendees.Add(Context.ConnectionId);
 
-            Clients.All.onRoomEntered(hostName, room.ToClient());
+            Clients.All.onRoomEntered(hostName, room.ToClient(), attendeePlayer?.Name);
         }
 
         public void LeaveRoom(string hostName, string roomName) {
             var room = _getPlayer(hostName).GetRoom(roomName);
+            var attendeePlayer = _getPlayerByConnectionId(Context.ConnectionId);
 
             Groups.Remove(Context.ConnectionId, room.GroupId);
             room.Attendees.Remove(Context.ConnectionId);
 
-            Clients.All.onRoomLeft(hostName, room.ToClient());
+            Clients.All.onRoomLeft(hostName, room.ToClient(), attendeePlayer?.Name);
         }
     }
 }
