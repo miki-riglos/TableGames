@@ -108,5 +108,39 @@ namespace TableGames.Web.Hubs
 
             Clients.All.onRoomLeft(hostName, room.ToClient(), attendeePlayer?.Name);
         }
+
+        // Games
+        public void OpenGame(string hostName, string roomName, string gameName) {
+            var room = _getPlayer(hostName).GetRoom(roomName);
+
+            room.OpenGame(gameName);
+
+            Clients.Group(room.GroupId).onGameOpened(hostName, roomName, room.Game.ToClient());
+        }
+
+        public void JoinGame(string hostName, string roomName, string playerName) {
+            var room = _getPlayer(hostName).GetRoom(roomName);
+            var player = _getPlayer(playerName);
+
+            room.Game.AddPlayer(player);
+
+            Clients.Group(room.GroupId).onGamePlayerJoined(hostName, roomName, playerName);
+        }
+
+        public void StartGame(string hostName, string roomName) {
+            var room = _getPlayer(hostName).GetRoom(roomName);
+
+            room.Game.Start();
+
+            Clients.Group(room.GroupId).onGameStarted(hostName, roomName);
+        }
+
+        public void EndGame(string hostName, string roomName) {
+            var room = _getPlayer(hostName).GetRoom(roomName);
+
+            room.Game = null;
+
+            Clients.Group(room.GroupId).onGameEnded(hostName, roomName);
+        }
     }
 }

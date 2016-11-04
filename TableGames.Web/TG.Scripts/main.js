@@ -15,7 +15,7 @@ require(['ko-ext', 'jquery', 'manager'], function(ko, $, Manager) {
 
     $.connection.hub.start().then(function() {
         hub.server.getState().then(function(currentState) {
-            manager.initialize(currentState);
+            manager.setState(currentState);
         });
     });
 

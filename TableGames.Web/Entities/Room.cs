@@ -8,6 +8,7 @@ namespace TableGames.Web.Entities
         public Player Host { get; set; }
         public string GroupId { get { return $"{Host.Name}/{Name}"; } }
         public List<string> Attendees { get; set; }
+        public Game Game { get; set; }
 
         public Room(string name, Player host) {
             Name = name;
@@ -16,11 +17,17 @@ namespace TableGames.Web.Entities
             Attendees = new List<string>();
         }
 
+        public void OpenGame(string gameName) {
+            Game = new Game();
+            Game.Name = gameName;
+        }
+
         public object ToClient() {
             return new {
                 name = Name,
                 hostName = Host.Name,
-                attendance = Attendees.Count
+                attendance = Attendees.Count,
+                game = Game?.ToClient()
             };
         }
     }

@@ -10,6 +10,11 @@
         self.roomToAdd = ko.observable();
         self.otherPlayers = ko.computed(function() { return ko.utils.arrayFilter(players(), function(player) { return player.name !== authentication.userName(); }); });
         self.attendedRooms = ko.observableArray();
+        self.games = {};
+
+        self.setState = function(currentState) {
+            players(currentState.players.map(function(playerState) { return new Player(playerState); }));
+        };
 
         // Notification
         var notification = new Notification();
@@ -24,12 +29,11 @@
             if (!authentication.isLoggedIn() && authentication.nameToLogin()) {
                 hub.server.login(authentication.nameToLogin())
                     .then(function() {
-                        authentication.isLoggedIn(true);
-                        authentication.userName(authentication.nameToLogin());
+                        authentication.login();
                         // enter hosted rooms (when player re-login)
                         var player = getPlayer(authentication.userName());
                         if (player) {
-                            self.attendedRooms(player.rooms());
+                            player.rooms().forEach(self.attendedRooms.push);
                         }
                     })
                     .catch(function(err) {
@@ -47,9 +51,7 @@
         self.logout = function() {
             hub.server.logout(authentication.userName())
                 .then(function() {
-                    authentication.nameToLogin(null);
-                    authentication.isLoggedIn(false);
-                    authentication.userName(null);
+                    authentication.logout();
                 })
                 .catch(function(err) {
                     notification.addError(err.message);
@@ -64,9 +66,7 @@
         // ... player re-login
         // ...... logout in old session
         hub.client.playerLogout = function() {
-            authentication.nameToLogin(null);
-            authentication.isLoggedIn(false);
-            authentication.userName(null);
+            authentication.logout();
             notification.addInfo('Logged out, another session was started.');
         };
 
@@ -128,12 +128,10 @@
 
         // ... enter
         self.enterRoom = function(room) {
-            if (self.attendedRooms.indexOf(room) === -1) {
-                hub.server.enterRoom(room.hostName, room.name)
-                    .then(function() {
-                        self.attendedRooms.push(room);
-                    });
-            }
+            hub.server.enterRoom(room.hostName, room.name)
+                .then(function() {
+                    self.attendedRooms.push(room);
+                });
         };
 
         hub.client.onRoomEntered = function(hostName, roomState, attendeeName) {
@@ -158,9 +156,29 @@
             notification.addInfo((attendeeName || 'Attendee') + ' left ' + hostName + '/' + roomState.name + '.');
         };
 
-        // initialize state
-        self.initialize = function(currentState) {
-            players(currentState.players.map(function(playerState) { return new Player(playerState); }));
+        // Games
+        // ... open
+        self.openGame = function(room) {
+            hub.server.openGame(room.hostName, room.name, 'gameName');
+        };
+
+        hub.client.onGameOpened = function(hostName, roomName, gameState) {
+            var room = getPlayer(hostName).getRoom(roomName);
+            room.openGame(gameState);
+            notification.addInfo(gameState.name + ' opened in room ' + hostName + '/' + roomName + '.');
+        };
+
+        // ... join
+        self.joinGame = function(room) {
+            hub.server.joinGame(room.hostName, room.name, authentication.userName());
+        };
+
+        hub.client.onGamePlayerJoined = function(hostName, roomName, playerName) {
+            var room = getPlayer(hostName).getRoom(roomName);
+            var game = room.game();
+
+            game.addPlayerName(playerName);
+            notification.addInfo(playerName + ' joined game ' + game.name + ' in room ' + hostName + '/' + roomName + '.');
         };
     }
 

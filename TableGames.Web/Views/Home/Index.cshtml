@@ -46,6 +46,18 @@
             <div>
                 <span data-bind="text: name"></span>(<span data-bind="text: attendance"></span>)
                 <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.leaveRoom">Leave</button>
+
+                <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.openGame">Open</button>
+
+                <div data-bind="with: game">
+                    <span data-bind="text: name"></span>(<span data-bind="text: status"></span>)
+
+                    <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.joinGame.bind($root, $parent)">Join</button>
+
+                    <div data-bind="foreach: playerNames">
+                        <div data-bind="text: $data"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
