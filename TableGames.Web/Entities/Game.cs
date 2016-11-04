@@ -15,7 +15,8 @@ namespace TableGames.Web.Entities
         public GameStatus Status { get; set; }
         public List<Player> Players { get; set; }
 
-        public Game() {
+        public Game(string name) {
+            Name = name;
             Status = GameStatus.Open;
             Players = new List<Player>();
         }

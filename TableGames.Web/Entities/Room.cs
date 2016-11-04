@@ -18,8 +18,7 @@ namespace TableGames.Web.Entities
         }
 
         public void OpenGame(string gameName) {
-            Game = new Game();
-            Game.Name = gameName;
+            Game = new Game(gameName);
         }
 
         public object ToClient() {

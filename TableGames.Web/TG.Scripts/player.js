@@ -12,12 +12,12 @@
             return room;
         };
 
-        self.removeRoom = function(roomState) {
-            self.rooms.remove(function(room) { return room.name === roomState.name; });
-        };
-
         self.getRoom = function(roomName) {
             return ko.utils.arrayFirst(self.rooms(), function(room) { return room.name === roomName; });
+        };
+
+        self.removeRoom = function(roomState) {
+            self.rooms.remove(function(room) { return room.name === roomState.name; });
         };
     }
 
