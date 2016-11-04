@@ -7,10 +7,14 @@
         self.hostName = roomState.hostName;
         self.attendance = ko.observable(roomState.attendance);
 
-        self.game = ko.observable(roomState.game ? new Game(roomState.game) : null);
+        self.game = ko.observable();
 
-        self.openGame = function(gameState) {
-            self.game(new Game(gameState));
+        self.createGame = function(gameState) {
+            self.game(new Game(gameState, self));
+        };
+
+        self.destroyGame = function() {
+            self.game(null);
         };
     }
 

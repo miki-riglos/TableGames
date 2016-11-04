@@ -50,7 +50,7 @@ namespace TableGames.Web.Entities
         public object ToClient() {
             return new {
                 name = Name,
-                rooms = Rooms.Values.Select(hr => hr.ToClient())
+                rooms = Rooms.Values.Select(r => r.ToClient())
             };
         }
 

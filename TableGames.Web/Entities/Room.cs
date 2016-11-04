@@ -17,7 +17,7 @@ namespace TableGames.Web.Entities
             Attendees = new List<string>();
         }
 
-        public void OpenGame(string gameName) {
+        public void CreateGame(string gameName) {
             Game = new Game(gameName);
         }
 
@@ -25,8 +25,7 @@ namespace TableGames.Web.Entities
             return new {
                 name = Name,
                 hostName = Host.Name,
-                attendance = Attendees.Count,
-                game = Game?.ToClient()
+                attendance = Attendees.Count
             };
         }
     }

@@ -89,7 +89,7 @@ namespace TableGames.Web.Hubs
             Clients.All.onRoomRemoved(userName, room.ToClient());
         }
 
-        public void EnterRoom(string hostName, string roomName) {
+        public object EnterRoom(string hostName, string roomName) {
             var room = _getPlayer(hostName).GetRoom(roomName);
             var attendeePlayer = _getPlayerByConnectionId(Context.ConnectionId);
 
@@ -97,6 +97,8 @@ namespace TableGames.Web.Hubs
             room.Attendees.Add(Context.ConnectionId);
 
             Clients.All.onRoomEntered(hostName, room.ToClient(), attendeePlayer?.Name);
+
+            return room.Game?.ToClient();
         }
 
         public void LeaveRoom(string hostName, string roomName) {
@@ -110,12 +112,12 @@ namespace TableGames.Web.Hubs
         }
 
         // Games
-        public void OpenGame(string hostName, string roomName, string gameName) {
+        public void CreateGame(string hostName, string roomName, string gameName) {
             var room = _getPlayer(hostName).GetRoom(roomName);
 
-            room.OpenGame(gameName);
+            room.CreateGame(gameName);
 
-            Clients.Group(room.GroupId).onGameOpened(hostName, roomName, room.Game.ToClient());
+            Clients.Group(room.GroupId).onGameCreated(hostName, roomName, room.Game.ToClient());
         }
 
         public void JoinGame(string hostName, string roomName, string playerName) {
@@ -132,15 +134,15 @@ namespace TableGames.Web.Hubs
 
             room.Game.Start();
 
-            Clients.Group(room.GroupId).onGameStarted(hostName, roomName);
+            Clients.Group(room.GroupId).onGameStarted(hostName, roomName, room.Game.ToClient());
         }
 
-        public void EndGame(string hostName, string roomName) {
+        public void DestroyGame(string hostName, string roomName) {
             var room = _getPlayer(hostName).GetRoom(roomName);
 
             room.Game = null;
 
-            Clients.Group(room.GroupId).onGameEnded(hostName, roomName);
+            Clients.Group(room.GroupId).onGameDestroyed(hostName, roomName);
         }
     }
 }

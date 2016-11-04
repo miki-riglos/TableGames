@@ -47,17 +47,20 @@
                 <span data-bind="text: name"></span>(<span data-bind="text: attendance"></span>)
                 <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.leaveRoom">Leave</button>
 
-                <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.openGame">Open</button>
+                <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.createGame">Open</button>
 
                 <div data-bind="with: game">
                     <span data-bind="text: name"></span>(<span data-bind="text: status"></span>)
 
-                    <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.joinGame.bind($root, $parent)">Join</button>
+                    <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.joinGame">Join</button>
 
                     <div data-bind="foreach: playerNames">
                         <div data-bind="text: $data"></div>
                     </div>
+
+                    <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.startGame">Start</button>
                 </div>
+                <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.destroyGame">End</button>
             </div>
         </div>
     </div>
@@ -74,15 +77,15 @@
 
 
 <!-- Chat -->
-<div>
+<div data-bind="with: chat">
     <div class="form-inline">
         <div class="form-group">
-            <input type="text" class="form-control" placeholder="Message" data-bind="value: chat.messageToSend, enable: authentication.isLoggedIn, onEnter: sendMessage" />
+            <input type="text" class="form-control" placeholder="Message" data-bind="value: messageToSend, enable: authentication.isLoggedIn, onEnter: sendMessage" />
         </div>
         <button type="button" class="btn btn-default" data-bind="click: sendMessage">Send</button>
     </div>
 
-    <div data-bind="foreach: chat.messages">
+    <div data-bind="foreach: messages">
         <div class="tg-message">
             <span data-bind="text: userName"></span>:<span data-bind="text: message"></span>
         </div>

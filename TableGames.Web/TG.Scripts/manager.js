@@ -10,7 +10,6 @@
         self.roomToAdd = ko.observable();
         self.otherPlayers = ko.computed(function() { return ko.utils.arrayFilter(players(), function(player) { return player.name !== authentication.userName(); }); });
         self.attendedRooms = ko.observableArray();
-        self.games = {};
 
         self.setState = function(currentState) {
             players(currentState.players.map(function(playerState) { return new Player(playerState); }));
@@ -32,9 +31,9 @@
                         authentication.login();
                         // enter hosted rooms (when player re-login)
                         var player = getPlayer(authentication.userName());
-                        if (player) {
-                            player.rooms().forEach(self.attendedRooms.push);
-                        }
+                        player.rooms().forEach(function(room) {
+                            self.enterRoom(room);
+                        });
                     })
                     .catch(function(err) {
                         notification.addError(err.message);
@@ -51,6 +50,7 @@
         self.logout = function() {
             hub.server.logout(authentication.userName())
                 .then(function() {
+                    self.attendedRooms.removeAll();
                     authentication.logout();
                 })
                 .catch(function(err) {
@@ -76,17 +76,10 @@
         };
 
         // Chat
-        var chat = new Chat();
+        var chat = new Chat(authentication);
         self.chat = chat;
 
-        self.sendMessage = function() {
-            if (authentication.isLoggedIn() && chat.messageToSend()) {
-                hub.server.sendMessage(authentication.userName(), chat.messageToSend())
-                    .then(function() {
-                        chat.messageToSend(null);
-                    });
-            }
-        };
+        chat.sendMessageToServer = hub.server.sendMessage;
 
         hub.client.onMessageSent = function(userName, message) {
             chat.addMessage(userName, message);
@@ -129,7 +122,10 @@
         // ... enter
         self.enterRoom = function(room) {
             hub.server.enterRoom(room.hostName, room.name)
-                .then(function() {
+                .then(function(gameState) {
+                    if (gameState) {
+                        room.createGame(gameState);
+                    }
                     self.attendedRooms.push(room);
                 });
         };
@@ -145,6 +141,7 @@
             if (authentication.userName() !== room.hostName) {
                 hub.server.leaveRoom(room.hostName, room.name)
                     .then(function() {
+                        room.destroyGame();
                         self.attendedRooms.remove(room);
                     });
             }
@@ -157,20 +154,20 @@
         };
 
         // Games
-        // ... open
-        self.openGame = function(room) {
-            hub.server.openGame(room.hostName, room.name, 'gameName');
+        // ... create
+        self.createGame = function(room) {
+            hub.server.createGame(room.hostName, room.name, 'gameName');
         };
 
-        hub.client.onGameOpened = function(hostName, roomName, gameState) {
+        hub.client.onGameCreated = function(hostName, roomName, gameState) {
             var room = getPlayer(hostName).getRoom(roomName);
-            room.openGame(gameState);
+            room.createGame(gameState);
             notification.addInfo(gameState.name + ' opened in room ' + hostName + '/' + roomName + '.');
         };
 
         // ... join
-        self.joinGame = function(room) {
-            hub.server.joinGame(room.hostName, room.name, authentication.userName());
+        self.joinGame = function(game) {
+            hub.server.joinGame(game.room.hostName, game.room.name, authentication.userName());
         };
 
         hub.client.onGamePlayerJoined = function(hostName, roomName, playerName) {
@@ -179,6 +176,30 @@
 
             game.addPlayerName(playerName);
             notification.addInfo(playerName + ' joined game ' + game.name + ' in room ' + hostName + '/' + roomName + '.');
+        };
+
+        // ... start
+        self.startGame = function(game) {
+            hub.server.startGame(game.room.hostName, game.room.name);
+        };
+
+        hub.client.onGameStarted = function(hostName, roomName, gameState) {
+            var room = getPlayer(hostName).getRoom(roomName);
+            var game = room.game();
+
+            game.status(gameState.status);
+            notification.addInfo('Game ' + game.name + ' in room ' + hostName + '/' + roomName + ' just started.');
+        };
+
+        // ... destroy
+        self.destroyGame = function(room) {
+            hub.server.destroyGame(room.hostName, room.name);
+        };
+
+        hub.client.onGameDestroyed = function(hostName, roomName) {
+            var room = getPlayer(hostName).getRoom(roomName);
+            room.destroyGame();
+            notification.addInfo('Game in room ' + hostName + '/' + roomName + ' just finished.');
         };
     }
 
