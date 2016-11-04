@@ -53,7 +53,7 @@ namespace TableGames.Web.Hubs
 
         public void Logout(string userName) {
             Player player;
-            if (_players.TryRemove(userName, out player)) {
+            if (_players.TryGetValue(userName, out player)) {
                 Clients.All.onLoggedOut(userName);
             }
             else {
@@ -78,42 +78,59 @@ namespace TableGames.Web.Hubs
 
         public void RemoveRoom(string userName, string roomName) {
             var player = _getPlayer(userName);
-            var room = player.GetRoom(roomName);
+            if (player.ConnectionId == Context.ConnectionId) {
+                var room = player.GetRoom(roomName);
 
-            foreach (var attendee in room.Attendees) {
-                Groups.Remove(attendee, room.GroupId);
+                foreach (var attendee in room.Attendees) {
+                    Groups.Remove(attendee, room.GroupId);
+                }
+                room.Attendees.Clear();
+                player.RemoveRoom(roomName);
+
+                Clients.All.onRoomRemoved(userName, room.ToClient());
             }
-            room.Attendees.Clear();
-            player.RemoveRoom(roomName);
-
-            Clients.All.onRoomRemoved(userName, room.ToClient());
+            else {
+                throw new HubException("RemoveRoom error.");
+            }
         }
 
         public object EnterRoom(string hostName, string roomName) {
             var room = _getPlayer(hostName).GetRoom(roomName);
-            var attendeePlayer = _getPlayerByConnectionId(Context.ConnectionId);
 
-            Groups.Add(Context.ConnectionId, room.GroupId);
-            room.Attendees.Add(Context.ConnectionId);
+            if (!room.Attendees.Contains(Context.ConnectionId)) {
+                var attendeePlayer = _getPlayerByConnectionId(Context.ConnectionId);
 
-            Clients.All.onRoomEntered(hostName, room.ToClient(), attendeePlayer?.Name);
+                Groups.Add(Context.ConnectionId, room.GroupId);
+                room.Attendees.Add(Context.ConnectionId);
 
-            return room.Game?.ToClient();
+                Clients.All.onRoomEntered(hostName, room.ToClient(), attendeePlayer?.Name);
+
+                return room.Game?.ToClient();
+            }
+            else {
+                throw new HubException("EnterRoom error.");
+            }
         }
 
         public void LeaveRoom(string hostName, string roomName) {
             var room = _getPlayer(hostName).GetRoom(roomName);
-            var attendeePlayer = _getPlayerByConnectionId(Context.ConnectionId);
 
-            Groups.Remove(Context.ConnectionId, room.GroupId);
-            room.Attendees.Remove(Context.ConnectionId);
+            if (room.Attendees.Contains(Context.ConnectionId)) {
+                var attendeePlayer = _getPlayerByConnectionId(Context.ConnectionId);
 
-            Clients.All.onRoomLeft(hostName, room.ToClient(), attendeePlayer?.Name);
+                Groups.Remove(Context.ConnectionId, room.GroupId);
+                room.Attendees.Remove(Context.ConnectionId);
+
+                Clients.All.onRoomLeft(hostName, room.ToClient(), attendeePlayer?.Name);
+            }
+            else {
+                throw new HubException("LeaveRoom error.");
+            }
         }
 
         // Games
         public void CreateGame(string hostName, string roomName, string gameName) {
-            var room = _getPlayer(hostName).GetRoom(roomName);
+            var room = _getPlayer(hostName).GetRoom(roomName);  // will throw if player is not host
 
             room.CreateGame(gameName);
 
@@ -124,13 +141,17 @@ namespace TableGames.Web.Hubs
             var room = _getPlayer(hostName).GetRoom(roomName);
             var player = _getPlayer(playerName);
 
-            room.Game.AddPlayer(player);
-
-            Clients.Group(room.GroupId).onGamePlayerJoined(hostName, roomName, playerName);
+            if (!room.Game.Players.Contains(player)) {
+                room.Game.AddPlayer(player);
+                Clients.Group(room.GroupId).onGamePlayerJoined(hostName, roomName, playerName);
+            }
+            else {
+                throw new HubException("JoinGame error.");
+            }
         }
 
         public void StartGame(string hostName, string roomName) {
-            var room = _getPlayer(hostName).GetRoom(roomName);
+            var room = _getPlayer(hostName).GetRoom(roomName);  // will throw if player is not host
 
             room.Game.Start();
 
@@ -138,7 +159,7 @@ namespace TableGames.Web.Hubs
         }
 
         public void DestroyGame(string hostName, string roomName) {
-            var room = _getPlayer(hostName).GetRoom(roomName);
+            var room = _getPlayer(hostName).GetRoom(roomName);  // will throw if player is not host
 
             room.Game = null;
 

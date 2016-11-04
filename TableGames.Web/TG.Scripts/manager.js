@@ -28,6 +28,7 @@
             if (!authentication.isLoggedIn() && authentication.nameToLogin()) {
                 hub.server.login(authentication.nameToLogin())
                     .then(function() {
+                        // login
                         authentication.login();
                         // enter hosted rooms (when player re-login)
                         var player = getPlayer(authentication.userName());
@@ -50,7 +51,6 @@
         self.logout = function() {
             hub.server.logout(authentication.userName())
                 .then(function() {
-                    self.attendedRooms.removeAll();
                     authentication.logout();
                 })
                 .catch(function(err) {
@@ -59,7 +59,6 @@
         };
 
         hub.client.onLoggedOut = function(userName) {
-            players.remove(getPlayer(userName));
             notification.addInfo(userName + ' just logged out.');
         };
 
@@ -89,8 +88,12 @@
         // ... add
         self.addRoom = function() {
             if (self.roomToAdd()) {
-                hub.server.addRoom(authentication.userName(), self.roomToAdd());
-                self.roomToAdd(null);
+                if (!ko.utils.arrayFirst(self.userPlayer().rooms(), function(room) { return room.name === self.roomToAdd(); })) {
+                    hub.server.addRoom(authentication.userName(), self.roomToAdd());
+                    self.roomToAdd(null);
+                } else {
+                    notification.addError('Room Name already exists.')
+                }
             }
         };
 
@@ -113,21 +116,23 @@
 
         hub.client.onRoomRemoved = function(playerName, roomState) {
             var player = getPlayer(playerName);
-            player.removeRoom(roomState);
+            var room = player.getRoom(roomState.name);
+            self.attendedRooms.remove(room);
+            player.removeRoom(room);
             notification.addInfo(playerName + ' removed room ' + roomState.name + '.');
-            // remove from attended rooms
-            self.attendedRooms.remove(function(room) { return room.name === roomState.name; });
         };
 
         // ... enter
         self.enterRoom = function(room) {
-            hub.server.enterRoom(room.hostName, room.name)
-                .then(function(gameState) {
-                    if (gameState) {
-                        room.createGame(gameState);
-                    }
-                    self.attendedRooms.push(room);
-                });
+            if (self.attendedRooms.indexOf(room) === -1) {
+                hub.server.enterRoom(room.hostName, room.name)
+                    .then(function(gameState) {
+                        if (gameState) {
+                            room.createGame(gameState);
+                        }
+                        self.attendedRooms.push(room);
+                    });
+            }
         };
 
         hub.client.onRoomEntered = function(hostName, roomState, attendeeName) {
@@ -138,7 +143,7 @@
 
         // ... leave
         self.leaveRoom = function(room) {
-            if (authentication.userName() !== room.hostName) {
+            if (self.attendedRooms.indexOf(room) !== -1) {
                 hub.server.leaveRoom(room.hostName, room.name)
                     .then(function() {
                         room.destroyGame();
@@ -156,7 +161,9 @@
         // Games
         // ... create
         self.createGame = function(room) {
-            hub.server.createGame(room.hostName, room.name, 'gameName');
+            if (authentication.userName() === room.hostName) {
+                hub.server.createGame(room.hostName, room.name, 'gameName');
+            }
         };
 
         hub.client.onGameCreated = function(hostName, roomName, gameState) {
@@ -167,7 +174,9 @@
 
         // ... join
         self.joinGame = function(game) {
-            hub.server.joinGame(game.room.hostName, game.room.name, authentication.userName());
+            if (game.playerNames.indexOf(authentication.userName()) === -1) {
+                hub.server.joinGame(game.room.hostName, game.room.name, authentication.userName());
+            }
         };
 
         hub.client.onGamePlayerJoined = function(hostName, roomName, playerName) {
@@ -180,7 +189,9 @@
 
         // ... start
         self.startGame = function(game) {
-            hub.server.startGame(game.room.hostName, game.room.name);
+            if (authentication.userName() === game.room.hostName) {
+                hub.server.startGame(game.room.hostName, game.room.name);
+            }
         };
 
         hub.client.onGameStarted = function(hostName, roomName, gameState) {
@@ -193,7 +204,9 @@
 
         // ... destroy
         self.destroyGame = function(room) {
-            hub.server.destroyGame(room.hostName, room.name);
+            if (authentication.userName() === game.room.hostName) {
+                hub.server.destroyGame(room.hostName, room.name);
+            }
         };
 
         hub.client.onGameDestroyed = function(hostName, roomName) {

@@ -16,8 +16,8 @@
             return ko.utils.arrayFirst(self.rooms(), function(room) { return room.name === roomName; });
         };
 
-        self.removeRoom = function(roomState) {
-            self.rooms.remove(function(room) { return room.name === roomState.name; });
+        self.removeRoom = function(room) {
+            self.rooms.remove(room);
         };
     }
 
