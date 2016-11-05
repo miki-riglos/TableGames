@@ -27,20 +27,27 @@
         self.login = function() {
             if (!authentication.isLoggedIn() && authentication.nameToLogin()) {
                 hub.server.login(authentication.nameToLogin())
-                    .then(function() {
+                    .then(function(attendedRoomState) {
                         // leave rooms attended anonymously
                         return $.when.apply($, self.attendedRooms().map(function(room) {
                             return self.leaveRoom(room);
-                        }));
+                        })).then(function() {
+                            return attendedRoomState;
+                        });
                     })
-                    .then(function() {
+                    .then(function(attendedRoomState) {
                         // login
                         authentication.login();
-                        // enter hosted rooms (when player re-login)
+                        // enter attended roomNames
                         var player = getPlayer(authentication.userName());
                         if (player) {
-                            player.rooms().forEach(function(room) {
-                                self.enterRoom(room);
+                            attendedRoomState.forEach(function(roomState) {
+                                var host = getPlayer(roomState.hostName);
+                                var room = host ? host.getRoom(roomState.name) : null;
+                                if (room) {
+                                    self.enterRoom(room);
+
+                                }
                             });
                         }
                     })
@@ -61,11 +68,13 @@
         self.logout = function() {
             hub.server.logout(authentication.userName())
                 .then(function() {
+                    // leave rooms attended
+                    return $.when.apply($, self.attendedRooms().map(function(room) {
+                        return self.leaveRoom(room);
+                    }));
+                })
+                .then(function() {
                     authentication.logout();
-                    // leave rooms as anonymous, player attendees stay in rooms
-                    self.attendedRooms().forEach(function(room) {
-                        self.leaveRoom(room);
-                    });
                 })
                 .catch(function(err) {
                     notification.addError(err.message);

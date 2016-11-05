@@ -26,7 +26,7 @@ namespace TableGames.Web.Hubs
         }
 
         // Authentication
-        public void Login(string userName) {
+        public object Login(string userName) {
             Player player;
             if (_players.TryGetValue(userName, out player)) {
                 Groups.Add(Context.ConnectionId, userName);
@@ -42,6 +42,11 @@ namespace TableGames.Web.Hubs
                     throw new HubException("Login error.");
                 }
             }
+            var attendedRoom = _players.Values.SelectMany(p => p.Rooms.Values)
+                                    .Where(r => r.PlayerAttendees.Any(p => p.Name == userName))
+                                    .Select(r => r.ToClient())
+                                    .ToList();
+            return attendedRoom;
         }
 
         public void Logout(string userName) {
@@ -97,7 +102,7 @@ namespace TableGames.Web.Hubs
                 room.AnonymousAttendees.Add(Context.ConnectionId);
                 Clients.All.onRoomEntered(hostName, room.ToClient(), null, null);
                 // for anonymous attendee
-                Clients.Client(Context.ConnectionId).onRoomAttended(hostName, room.ToClient(), userName, room.Game?.ToClient());
+                Clients.Client(Context.ConnectionId).onRoomAttended(hostName, room.ToClient(), room.Game?.ToClient());
             }
         }
 
@@ -110,7 +115,6 @@ namespace TableGames.Web.Hubs
                     room.PlayerAttendees.Remove(playerAttendee);
                     Clients.All.onRoomLeft(hostName, room.ToClient(), userName);
                 }
-                return;
             }
             else {
                 if (room.AnonymousAttendees.Contains(Context.ConnectionId)) {
@@ -119,10 +123,8 @@ namespace TableGames.Web.Hubs
                     Clients.All.onRoomLeft(hostName, room.ToClient(), null);
                     // for anonymous attendee
                     Clients.Client(Context.ConnectionId).onRoomUnattended(hostName, room.ToClient());
-                    return;
                 }
             }
-            throw new HubException("LeaveRoom error.");
         }
 
         // Games
