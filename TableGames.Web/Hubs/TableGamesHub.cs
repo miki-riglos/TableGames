@@ -19,10 +19,6 @@ namespace TableGames.Web.Hubs
             }
         }
 
-        private static Player _getPlayerByConnectionId(string connectionId) {
-            return _players.Values.FirstOrDefault(p => p.ConnectionId == connectionId);
-        }
-
         public object GetState() {
             return new {
                 players = _players.Values.Select(p => p.ToClient())
@@ -33,16 +29,13 @@ namespace TableGames.Web.Hubs
         public void Login(string userName) {
             Player player;
             if (_players.TryGetValue(userName, out player)) {
-                // player already exists
-                // ... logout in old session
-                Clients.Client(player.ConnectionId).playerLogout();
-                // ... login in new session
-                player.ConnectionId = Context.ConnectionId;
-                Clients.All.onPlayerLoggedIn(player.ToClient());
+                Groups.Add(Context.ConnectionId, userName);
+                Clients.All.onLoggedIn(userName);
             }
             else {
-                player = new Player(userName, Context.ConnectionId);
+                player = new Player(userName);
                 if (_players.TryAdd(userName, player)) {
+                    Groups.Add(Context.ConnectionId, userName);
                     Clients.All.onLoggedIn(userName);
                 }
                 else {
@@ -54,6 +47,7 @@ namespace TableGames.Web.Hubs
         public void Logout(string userName) {
             Player player;
             if (_players.TryGetValue(userName, out player)) {
+                Groups.Remove(Context.ConnectionId, userName);
                 Clients.All.onLoggedOut(userName);
             }
             else {
@@ -71,61 +65,64 @@ namespace TableGames.Web.Hubs
             var player = _getPlayer(userName);
             var room = player.AddRoom(roomName);
 
-            Groups.Add(player.ConnectionId, room.GroupId);
-
             Clients.All.onRoomAdded(userName, room.ToClient());
         }
 
         public void RemoveRoom(string userName, string roomName) {
             var player = _getPlayer(userName);
-            if (player.ConnectionId == Context.ConnectionId) {
-                var room = player.GetRoom(roomName);
+            var room = player.GetRoom(roomName);    // will throw if player is not host
 
-                foreach (var attendee in room.Attendees) {
-                    Groups.Remove(attendee, room.GroupId);
+            foreach (var attendee in room.AnonymousAttendees) {
+                Groups.Remove(attendee, room.GroupId);
+            }
+            room.AnonymousAttendees.Clear();
+            room.PlayerAttendees.Clear();
+            player.RemoveRoom(roomName);
+
+            Clients.All.onRoomRemoved(userName, room.ToClient());
+        }
+
+        public void EnterRoom(string hostName, string roomName, string userName) {
+            var room = _getPlayer(hostName).GetRoom(roomName);  // will throw if player is not host
+
+            if (userName != null) {
+                var playerAttendee = _getPlayer(userName);
+                if (!room.PlayerAttendees.Contains(playerAttendee)) {
+                    room.PlayerAttendees.Add(playerAttendee);
                 }
-                room.Attendees.Clear();
-                player.RemoveRoom(roomName);
-
-                Clients.All.onRoomRemoved(userName, room.ToClient());
+                Clients.All.onRoomEntered(hostName, room.ToClient(), userName, room.Game?.ToClient());
             }
             else {
-                throw new HubException("RemoveRoom error.");
-            }
-        }
-
-        public object EnterRoom(string hostName, string roomName) {
-            var room = _getPlayer(hostName).GetRoom(roomName);
-
-            if (!room.Attendees.Contains(Context.ConnectionId)) {
-                var attendeePlayer = _getPlayerByConnectionId(Context.ConnectionId);
-
                 Groups.Add(Context.ConnectionId, room.GroupId);
-                room.Attendees.Add(Context.ConnectionId);
-
-                Clients.All.onRoomEntered(hostName, room.ToClient(), attendeePlayer?.Name);
-
-                return room.Game?.ToClient();
-            }
-            else {
-                throw new HubException("EnterRoom error.");
+                room.AnonymousAttendees.Add(Context.ConnectionId);
+                Clients.All.onRoomEntered(hostName, room.ToClient(), null, null);
+                // for anonymous attendee
+                Clients.Client(Context.ConnectionId).onRoomAttended(hostName, room.ToClient(), userName, room.Game?.ToClient());
             }
         }
 
-        public void LeaveRoom(string hostName, string roomName) {
-            var room = _getPlayer(hostName).GetRoom(roomName);
+        public void LeaveRoom(string hostName, string roomName, string userName) {
+            var room = _getPlayer(hostName).GetRoom(roomName);  // will throw if player is not host
 
-            if (room.Attendees.Contains(Context.ConnectionId)) {
-                var attendeePlayer = _getPlayerByConnectionId(Context.ConnectionId);
-
-                Groups.Remove(Context.ConnectionId, room.GroupId);
-                room.Attendees.Remove(Context.ConnectionId);
-
-                Clients.All.onRoomLeft(hostName, room.ToClient(), attendeePlayer?.Name);
+            if (userName != null) {
+                var playerAttendee = _getPlayer(userName);
+                if (room.PlayerAttendees.Contains(playerAttendee)) {
+                    room.PlayerAttendees.Remove(playerAttendee);
+                    Clients.All.onRoomLeft(hostName, room.ToClient(), userName);
+                }
+                return;
             }
             else {
-                throw new HubException("LeaveRoom error.");
+                if (room.AnonymousAttendees.Contains(Context.ConnectionId)) {
+                    Groups.Remove(Context.ConnectionId, room.GroupId);
+                    room.AnonymousAttendees.Remove(Context.ConnectionId);
+                    Clients.All.onRoomLeft(hostName, room.ToClient(), null);
+                    // for anonymous attendee
+                    Clients.Client(Context.ConnectionId).onRoomUnattended(hostName, room.ToClient());
+                    return;
+                }
             }
+            throw new HubException("LeaveRoom error.");
         }
 
         // Games
@@ -134,7 +131,9 @@ namespace TableGames.Web.Hubs
 
             room.CreateGame(gameName);
 
-            Clients.Group(room.GroupId).onGameCreated(hostName, roomName, room.Game.ToClient());
+            room.GetGroups().ForEach(groupId => {
+                Clients.Group(groupId).onGameCreated(hostName, roomName, room.Game.ToClient());
+            });
         }
 
         public void JoinGame(string hostName, string roomName, string playerName) {
@@ -143,7 +142,9 @@ namespace TableGames.Web.Hubs
 
             if (!room.Game.Players.Contains(player)) {
                 room.Game.AddPlayer(player);
-                Clients.Group(room.GroupId).onGamePlayerJoined(hostName, roomName, playerName);
+                room.GetGroups().ForEach(groupId => {
+                    Clients.Group(groupId).onGamePlayerJoined(hostName, roomName, playerName);
+                });
             }
             else {
                 throw new HubException("JoinGame error.");
@@ -155,7 +156,9 @@ namespace TableGames.Web.Hubs
 
             room.Game.Start();
 
-            Clients.Group(room.GroupId).onGameStarted(hostName, roomName, room.Game.ToClient());
+            room.GetGroups().ForEach(groupId => {
+                Clients.Group(groupId).onGameStarted(hostName, roomName, room.Game.ToClient());
+            });
         }
 
         public void DestroyGame(string hostName, string roomName) {
@@ -163,7 +166,9 @@ namespace TableGames.Web.Hubs
 
             room.Game = null;
 
-            Clients.Group(room.GroupId).onGameDestroyed(hostName, roomName);
+            room.GetGroups().ForEach(groupId => {
+                Clients.Group(groupId).onGameDestroyed(hostName, roomName);
+            });
         }
     }
 }

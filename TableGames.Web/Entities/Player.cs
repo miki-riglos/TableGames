@@ -7,12 +7,10 @@ namespace TableGames.Web.Entities
     public class Player
     {
         public string Name { get; set; }
-        public string ConnectionId { get; set; }
         public ConcurrentDictionary<string, Room> Rooms { get; set; }
 
-        public Player(string name, string connectionId) {
+        public Player(string name) {
             Name = name;
-            ConnectionId = connectionId;
             Rooms = new ConcurrentDictionary<string, Room>();
         }
 
