@@ -12,6 +12,10 @@
         self.addPlayerName = function(playerName) {
             self.playerNames.push(playerName);
         };
+
+        self.hasStarted = ko.computed(function() {
+            return self.status() === 'Started';
+        });
     }
 
     return Game;

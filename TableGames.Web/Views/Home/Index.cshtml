@@ -12,10 +12,9 @@
         padding-left: 5px;
     }
 
-    .tg-player-room .btn {
-        margin-right: 5px;
-    }
-
+        .tg-player-room .btn {
+            margin-right: 5px;
+        }
 </style>
 
 <template id="playerTemplate">
@@ -41,20 +40,68 @@
     </div>
 </template>
 
-<template id="chatTemplate">
-    <div class="form-inline">
-        <div class="form-group">
-            <input type="text" class="form-control" placeholder="Message" data-bind="value: messageToSend, enable: authentication.isLoggedIn, onEnter: sendMessage" />
-        </div>
-        <button type="button" class="btn btn-default" data-bind="click: sendMessage">Send</button>
-    </div>
+<style>
+    .tg-chat .list-group-item, .tg-chat .form-control {
+        padding-top: 4px;
+        padding-bottom: 4px;
+        font-size: small;
+    }
 
-    <div data-bind="foreach: messages">
-        <div>
-            <span data-bind="text: userName"></span>:<span data-bind="text: message"></span>
+    .tg-chat .form-control {
+        border: none;
+    }
+
+    .tg-chat-username {
+        font-weight: bold;
+    }
+
+    .tg-chat-message {
+        padding-left: 5px;
+    }
+</style>
+
+<style>
+    .tg-chat .list-group-item, .tg-chat .form-control {
+        padding-top: 4px;
+        padding-bottom: 4px;
+        font-size: small;
+    }
+
+    .tg-chat .form-control {
+        border: none;
+    }
+
+    .tg-chat-username {
+        font-weight: bold;
+    }
+
+    .tg-chat-message {
+        padding-left: 5px;
+    }
+</style>
+
+<template id="chatTemplate">
+    <div class="panel panel-warning tg-chat">
+        <div class="panel-heading">Chat</div>
+        <div class="list-group" data-bind="foreach: messages">
+            <div class="list-group-item">
+                <span class="tg-chat-username" data-bind="text: userName"></span>:
+                <span class="tg-chat-message" data-bind="text: message"></span>
+            </div>
         </div>
+        <!-- ko if: authentication.isLoggedIn -->
+        <input type="text" class="form-control" placeholder="Message" data-bind="value: messageToSend, onEnter: sendMessage" />
+        <!-- /ko -->
     </div>
 </template>
+
+<style>
+    .tg-notification .list-group-item {
+        padding-top: 4px;
+        padding-bottom: 4px;
+        font-size: small;
+    }
+</style>
 
 <div class="row">
     <div class="col-sm-4">
@@ -65,7 +112,7 @@
                 <!-- ko template: { name: 'playerTemplate', data: userPlayer } --><!-- /ko -->
                 <!-- add room -->
                 <div class="list-group-item">
-                    <input type="text" class="form-control" placeholder="New Room" maxlength="15" data-bind="value: roomToAdd, enable: authentication.isLoggedIn(), onEnter: addRoom" />
+                    <input type="text" class="form-control" placeholder="New Room" maxlength="20" data-bind="value: roomToAdd, enable: authentication.isLoggedIn(), onEnter: addRoom" />
                 </div>
             </div>
         </div>
@@ -83,29 +130,40 @@
     <div class="col-sm-8">
         <!-- attended rooms -->
         <div data-bind="foreach: attendedRooms">
-            <div class="row">
-                <div class="col-sm-6">
-                    <span data-bind="text: hostName"></span>/<span data-bind="text: name"></span>(<span data-bind="text: attendance"></span>)
-                    <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.leaveRoom">Leave</button>
+            <div class="row panel panel-primary">
+                <div class="panel-heading">
+                    <span data-bind="text: hostName"></span>/<span data-bind="text: name"></span>
+                    <button type="button" class="close" data-bind="click: $root.leaveRoom" title="Leave Room">
+                        <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+                    </button>
+                </div>
 
-                    <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.createGame">Open</button>
-
-                    <div data-bind="with: game">
-                        <span data-bind="text: name"></span>(<span data-bind="text: status"></span>)
-
-                        <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.joinGame">Join</button>
-
-                        <div data-bind="foreach: playerNames">
-                            <div data-bind="text: $data"></div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-sm-6" data-bind="if: game">
+                            <div class="panel panel-default" data-bind="with: game">
+                                <div class="panel-heading">
+                                    <span class="badge pull-right" data-bind="text: status"></span>
+                                    <span data-bind="text: name"></span>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="panel-body" data-bind="foreach: playerNames">
+                                        <div data-bind="text: $data"></div>
+                                    </div>
+                                    <button type="button" class="btn btn-default" data-bind="visible: !hasStarted(), click: $root.joinGame">Join</button>
+                                    <!-- ko if: room.hostName === $root.authentication.userName() -->
+                                    <button type="button" class="btn btn-primary" data-bind="visible: !hasStarted(), click: $root.startGame">Start</button>
+                                    <!-- /ko -->
+                                </div>
+                            </div>
                         </div>
 
-                        <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.startGame">Start</button>
+                        <!-- room chat -->
+                        <div class="col-sm-6" data-bind="template: { name: 'chatTemplate', data: chat }"></div>
                     </div>
-
-                    <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.destroyGame">End</button>
+                    <button type="button" class="btn btn-primary" data-bind="click: $root.createGame">Open</button>
+                    <button type="button" class="btn btn-danger pull-right" data-bind="click: $root.destroyGame">End</button>
                 </div>
-                <!-- room chat -->
-                <div class="col-sm-6" data-bind="template: { name: 'chatTemplate', data: chat }"></div>
             </div>
         </div>
     </div>
@@ -119,9 +177,12 @@
 
     <div class="col-sm-6">
         <!-- notification -->
-        <div data-bind="foreach: notification.messages">
-            <div>
-                <span data-bind="text: type"></span>:<span data-bind="text: message"></span>
+        <div class="panel panel-info tg-notification">
+            <div class="panel-heading">Notifications</div>
+            <div class="list-group" data-bind="foreach: notification.messages">
+                <div class="list-group-item">
+                    <span data-bind="text: type"></span>:<span data-bind="text: message"></span>
+                </div>
             </div>
         </div>
     </div>

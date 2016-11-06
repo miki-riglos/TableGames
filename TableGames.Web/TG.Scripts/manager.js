@@ -11,15 +11,17 @@
         self.otherPlayers = ko.computed(function() { return ko.utils.arrayFilter(players(), function(player) { return player.name !== authentication.userName(); }); });
         self.attendedRooms = ko.observableArray();
 
-        self.setState = function(currentState) {
-            players(currentState.players.map(function(playerState) { return new Player(playerState); }));
-        };
-
-        // Notification
+        // notification
         var notification = new Notification();
         self.notification = notification;
 
-        // Authentication
+        // set state
+        self.setState = function(currentState) {
+            players(currentState.players.map(function(playerState) { return new Player(playerState); }));
+            notification.addInfo('Connected.')
+        };
+
+        // authentication
         var authentication = new Authentication();
         self.authentication = authentication;
 
@@ -85,7 +87,7 @@
             notification.addInfo(userName + ' just logged out.');
         };
 
-        // Chat
+        // chat
         var chat = new Chat(authentication, hub.server.sendMessage);
         self.chat = chat;
 
@@ -93,7 +95,7 @@
             chat.addMessage(userName, message);
         };
 
-        // Rooms
+        // rooms
         // ... add
         self.addRoom = function() {
             if (self.roomToAdd()) {
@@ -244,7 +246,7 @@
 
         // ... destroy
         self.destroyGame = function(room) {
-            if (authentication.userName() === game.room.hostName) {
+            if (authentication.userName() === room.hostName) {
                 hub.server.destroyGame(room.hostName, room.name);
             }
         };
