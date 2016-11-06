@@ -7,6 +7,7 @@
         self.hostName = roomState.hostName;
         self.attendance = ko.observable(roomState.attendance);
 
+        self.isAttended = ko.observable(false);
         self.chat = ko.observable();
         self.game = ko.observable();
 
@@ -18,6 +19,7 @@
         };
 
         self.attend = function(chatConfig, gameState) {
+            self.isAttended(true);
             self.chat(new Chat(chatConfig.authentication, chatConfig.sendMessageToServer));
             if (gameState) {
                 self.createGame(gameState);
@@ -25,6 +27,7 @@
         };
 
         self.unattend = function() {
+            self.isAttended(false);
             self.chat(null);
             self.destroyGame();
         };

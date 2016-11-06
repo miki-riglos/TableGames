@@ -2,49 +2,86 @@
     ViewBag.Title = "Home";
 }
 
+<style>
+    .tg-player-name {
+        font-weight: bold;
+    }
+
+    .tg-player-room {
+        padding-top: 5px;
+        padding-left: 5px;
+    }
+
+    .tg-player-room .btn {
+        margin-right: 5px;
+    }
+
+</style>
+
+<template id="playerTemplate">
+    <div class="list-group-item">
+        <div class="tg-player-name" data-bind="text: name"></div>
+        <div data-bind="foreach: rooms">
+            <div class="tg-player-room">
+                <span class="badge pull-right" data-bind="text: attendance" title="Attendance"></span>
+
+                <button type="button" class="btn btn-primary btn-xs pull-right" data-bind="visible: !isAttended(), click: $root.enterRoom" title="Enter">
+                    <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
+                </button>
+
+                <!-- ko if: hostName === $root.authentication.userName() -->
+                <button type="button" class="btn btn-danger btn-xs pull-right" data-bind="visible: !isAttended(), click: $root.removeRoom" title="Remove">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                </button>
+                <!-- /ko -->
+
+                <span data-bind="text: name"></span>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="chatTemplate">
+    <div class="form-inline">
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Message" data-bind="value: messageToSend, enable: authentication.isLoggedIn, onEnter: sendMessage" />
+        </div>
+        <button type="button" class="btn btn-default" data-bind="click: sendMessage">Send</button>
+    </div>
+
+    <div data-bind="foreach: messages">
+        <div>
+            <span data-bind="text: userName"></span>:<span data-bind="text: message"></span>
+        </div>
+    </div>
+</template>
+
 <div class="row">
     <div class="col-sm-4">
         <!-- ko if: userPlayer -->
         <div class="panel panel-default">
             <div class="panel-heading">My Rooms</div>
             <div class="list-group">
-                <div class="list-group-item tg-player" data-bind="with: userPlayer">
-                    <div data-bind="text: name"></div>
-                    <div class="tg-player-rooms" data-bind="foreach: rooms">
-                        <div style="padding-top: 5px; padding-left: 5px;">
-                            <span data-bind="text: name"></span>(<span data-bind="text: attendance"></span>)
-                            <button type="button" class="btn btn-danger btn-xs" data-bind="click: $root.removeRoom">Remove</button>
-                        </div>
-                    </div>
-                </div>
-                <!-- Add Room -->
+                <!-- ko template: { name: 'playerTemplate', data: userPlayer } --><!-- /ko -->
+                <!-- add room -->
                 <div class="list-group-item">
-                    <input type="text" class="form-control" placeholder="New Room" data-bind="value: roomToAdd, enable: authentication.isLoggedIn(), onEnter: addRoom" />
+                    <input type="text" class="form-control" placeholder="New Room" maxlength="15" data-bind="value: roomToAdd, enable: authentication.isLoggedIn(), onEnter: addRoom" />
                 </div>
             </div>
         </div>
         <!-- /ko -->
-
         <!-- ko if: otherPlayers().length -->
         <div class="panel panel-default">
             <div class="panel-heading">Other Rooms</div>
             <div class="list-group" data-bind="foreach: otherPlayers">
-                <div class="list-group-item tg-player">
-                    <div data-bind="text: name"></div>
-                    <div class="tg-player-rooms" data-bind="foreach: rooms">
-                        <div style="padding-top: 5px; padding-left: 5px;">
-                            <span data-bind="text: name"></span>(<span data-bind="text: attendance"></span>)
-                            <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.enterRoom">Enter</button>
-                        </div>
-                    </div>
-                </div>
+                <!-- ko template: 'playerTemplate' --><!-- /ko -->
             </div>
         </div>
         <!-- /ko -->
     </div>
 
     <div class="col-sm-8">
-        <!-- Attended Rooms -->
+        <!-- attended rooms -->
         <div data-bind="foreach: attendedRooms">
             <div class="row">
                 <div class="col-sm-6">
@@ -67,7 +104,7 @@
 
                     <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.destroyGame">End</button>
                 </div>
-                <!-- Room Chat -->
+                <!-- room chat -->
                 <div class="col-sm-6" data-bind="template: { name: 'chatTemplate', data: chat }"></div>
             </div>
         </div>
@@ -76,34 +113,19 @@
 
 <div class="row">
     <div class="col-sm-6">
-        <!-- Chat -->
+        <!-- chat -->
         <div data-bind="template: { name: 'chatTemplate', data: chat }"></div>
     </div>
 
     <div class="col-sm-6">
-        <!-- Notification -->
+        <!-- notification -->
         <div data-bind="foreach: notification.messages">
-            <div class="tg-notification">
+            <div>
                 <span data-bind="text: type"></span>:<span data-bind="text: message"></span>
             </div>
         </div>
     </div>
 </div>
-
-<template id="chatTemplate">
-    <div class="form-inline">
-        <div class="form-group">
-            <input type="text" class="form-control" placeholder="Message" data-bind="value: messageToSend, enable: authentication.isLoggedIn, onEnter: sendMessage" />
-        </div>
-        <button type="button" class="btn btn-default" data-bind="click: sendMessage">Send</button>
-    </div>
-
-    <div data-bind="foreach: messages">
-        <div class="tg-message">
-            <span data-bind="text: userName"></span>:<span data-bind="text: message"></span>
-        </div>
-    </div>
-</template>
 
 @section scripts {
     <script type="text/javascript" src="~/Scripts/require.js" data-main="@Url.Content("~/TG.Scripts/main")"></script>
