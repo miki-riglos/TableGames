@@ -157,12 +157,13 @@
         hub.client.onRoomAttended = function(hostName, roomState, gameState) {
             var room = getPlayer(hostName).getRoom(roomState.name);
             if (self.attendedRooms.indexOf(room) === -1) {
-                room.createChat(authentication, function(userName, messageToSend) {
-                    return hub.server.sendRoomMessage(room.hostName, room.name, userName, messageToSend);
-                });
-                if (gameState) {
-                    room.createGame(gameState);
-                }
+                var chatConfig = {
+                    authentication: authentication,
+                    sendMessageToServer: function(userName, messageToSend) {
+                        return hub.server.sendRoomMessage(room.hostName, room.name, userName, messageToSend);
+                    }
+                };
+                room.attend(chatConfig, gameState);
                 self.attendedRooms.push(room);
             }
         };
@@ -194,8 +195,7 @@
         hub.client.onRoomUnattended = function(hostName, roomState) {
             var room = getPlayer(hostName).getRoom(roomState.name);
             self.attendedRooms.remove(room);
-            room.destroyChat();
-            room.destroyGame();
+            room.unattend();
         };
 
         // Games

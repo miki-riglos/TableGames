@@ -48,7 +48,7 @@
         <div data-bind="foreach: attendedRooms">
             <div class="row">
                 <div class="col-sm-6">
-                    <span data-bind="text: name"></span>(<span data-bind="text: attendance"></span>)
+                    <span data-bind="text: hostName"></span>/<span data-bind="text: name"></span>(<span data-bind="text: attendance"></span>)
                     <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.leaveRoom">Leave</button>
 
                     <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.createGame">Open</button>

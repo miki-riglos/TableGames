@@ -7,22 +7,26 @@
         self.hostName = roomState.hostName;
         self.attendance = ko.observable(roomState.attendance);
 
-        // chat
         self.chat = ko.observable();
-        self.createChat = function(authentication, sendMessageToServer) {
-            self.chat(new Chat(authentication, sendMessageToServer));
-        };
-        self.destroyChat = function() {
-            self.chat(null);
-        };
-
-        // game
         self.game = ko.observable();
+
         self.createGame = function(gameState) {
             self.game(new Game(gameState, self));
         };
         self.destroyGame = function() {
             self.game(null);
+        };
+
+        self.attend = function(chatConfig, gameState) {
+            self.chat(new Chat(chatConfig.authentication, chatConfig.sendMessageToServer));
+            if (gameState) {
+                self.createGame(gameState);
+            }
+        };
+
+        self.unattend = function() {
+            self.chat(null);
+            self.destroyGame();
         };
     }
 
