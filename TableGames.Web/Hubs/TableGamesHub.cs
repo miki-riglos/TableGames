@@ -106,6 +106,13 @@ namespace TableGames.Web.Hubs
             }
         }
 
+        public void SendRoomMessage(string hostName, string roomName, string userName, string message) {
+            var room = _getPlayer(hostName).GetRoom(roomName);  // will throw if player is not host
+            room.GetGroups().ForEach(groupId => {
+                Clients.Group(groupId).onRoomMessageSent(hostName, roomName, userName, message);
+            });
+        }
+
         public void LeaveRoom(string hostName, string roomName, string userName) {
             var room = _getPlayer(hostName).GetRoom(roomName);  // will throw if player is not host
 

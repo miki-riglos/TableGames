@@ -86,10 +86,8 @@
         };
 
         // Chat
-        var chat = new Chat(authentication);
+        var chat = new Chat(authentication, hub.server.sendMessage);
         self.chat = chat;
-
-        chat.sendMessageToServer = hub.server.sendMessage;
 
         hub.client.onMessageSent = function(userName, message) {
             chat.addMessage(userName, message);
@@ -159,11 +157,20 @@
         hub.client.onRoomAttended = function(hostName, roomState, gameState) {
             var room = getPlayer(hostName).getRoom(roomState.name);
             if (self.attendedRooms.indexOf(room) === -1) {
+                room.createChat(authentication, function(userName, messageToSend) {
+                    return hub.server.sendRoomMessage(room.hostName, room.name, userName, messageToSend);
+                });
                 if (gameState) {
                     room.createGame(gameState);
                 }
                 self.attendedRooms.push(room);
             }
+        };
+
+        // ... room chat
+        hub.client.onRoomMessageSent = function(hostName, roomName, userName, message) {
+            var room = getPlayer(hostName).getRoom(roomName);
+            room.chat().addMessage(userName, message);
         };
 
         // ... leave
@@ -186,8 +193,9 @@
 
         hub.client.onRoomUnattended = function(hostName, roomState) {
             var room = getPlayer(hostName).getRoom(roomState.name);
-            room.destroyGame();
             self.attendedRooms.remove(room);
+            room.destroyChat();
+            room.destroyGame();
         };
 
         // Games

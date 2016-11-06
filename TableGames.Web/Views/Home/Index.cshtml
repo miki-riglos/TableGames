@@ -40,33 +40,45 @@
         </div>
     </div>
 
-    <div class="col-sm-4">
+    <div class="col-sm-8">
         <!-- Attended Rooms -->
         <div data-bind="foreach: attendedRooms">
-            <div>
-                <span data-bind="text: name"></span>(<span data-bind="text: attendance"></span>)
-                <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.leaveRoom">Leave</button>
+            <div class="row">
+                <div class="col-sm-6">
+                    <span data-bind="text: name"></span>(<span data-bind="text: attendance"></span>)
+                    <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.leaveRoom">Leave</button>
 
-                <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.createGame">Open</button>
+                    <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.createGame">Open</button>
 
-                <div data-bind="with: game">
-                    <span data-bind="text: name"></span>(<span data-bind="text: status"></span>)
+                    <div data-bind="with: game">
+                        <span data-bind="text: name"></span>(<span data-bind="text: status"></span>)
 
-                    <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.joinGame">Join</button>
+                        <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.joinGame">Join</button>
 
-                    <div data-bind="foreach: playerNames">
-                        <div data-bind="text: $data"></div>
+                        <div data-bind="foreach: playerNames">
+                            <div data-bind="text: $data"></div>
+                        </div>
+
+                        <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.startGame">Start</button>
                     </div>
 
-                    <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.startGame">Start</button>
+                    <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.destroyGame">End</button>
                 </div>
-                <button type="button" class="btn btn-primary btn-xs" data-bind="click: $root.destroyGame">End</button>
+                <!-- Room Chat -->
+                <div class="col-sm-6" data-bind="template: { name: 'chatTemplate', data: chat }"></div>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="col-sm-4">
-        <!-- Other Players -->
+<div class="row">
+    <div class="col-sm-6">
+        <!-- Chat -->
+        <div data-bind="template: { name: 'chatTemplate', data: chat }"></div>
+    </div>
+
+    <div class="col-sm-6">
+        <!-- Notification -->
         <div data-bind="foreach: notification.messages">
             <div class="tg-notification">
                 <span data-bind="text: type"></span>:<span data-bind="text: message"></span>
@@ -75,9 +87,7 @@
     </div>
 </div>
 
-
-<!-- Chat -->
-<div data-bind="with: chat">
+<template id="chatTemplate">
     <div class="form-inline">
         <div class="form-group">
             <input type="text" class="form-control" placeholder="Message" data-bind="value: messageToSend, enable: authentication.isLoggedIn, onEnter: sendMessage" />
@@ -90,8 +100,7 @@
             <span data-bind="text: userName"></span>:<span data-bind="text: message"></span>
         </div>
     </div>
-</div>
-
+</template>
 
 @section scripts {
     <script type="text/javascript" src="~/Scripts/require.js" data-main="@Url.Content("~/TG.Scripts/main")"></script>
