@@ -20,5 +20,7 @@
         };
     }
 
+    Notification.instance = new Notification();
+
     return Notification;
 });

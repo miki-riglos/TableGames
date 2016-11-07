@@ -1,8 +1,8 @@
-﻿define(['knockout', 'jquery'], function(ko, $) {
+﻿define(['knockout', 'jquery', 'authentication'], function(ko, $, Authentication) {
 
-    function Chat(authentication, sendMessageToServer) {
+    function Chat(config) {
         var self = this;
-
+        var authentication = Authentication.instance;
         self.authentication = authentication;
 
         self.messageToSend = ko.observable();
@@ -10,7 +10,7 @@
 
         self.sendMessage = function() {
             if (authentication.isLoggedIn() && self.messageToSend()) {
-                sendMessageToServer(authentication.userName(), self.messageToSend())
+                config.sendMessageToServer(authentication.userName(), self.messageToSend())
                     .then(function() {
                         self.messageToSend(null);
                     });

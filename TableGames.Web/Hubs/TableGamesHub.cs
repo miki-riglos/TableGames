@@ -160,6 +160,21 @@ namespace TableGames.Web.Hubs
             }
         }
 
+        public void LeaveGame(string hostName, string roomName, string playerName) {
+            var room = _getPlayer(hostName).GetRoom(roomName);
+            var player = _getPlayer(playerName);
+
+            if (room.Game.Players.Contains(player) && room.Game.Status == GameStatus.Open) {
+                room.Game.RemovePlayer(player);
+                room.GetGroups().ForEach(groupId => {
+                    Clients.Group(groupId).onGamePlayerLeft(hostName, roomName, playerName);
+                });
+            }
+            else {
+                throw new HubException("LeaveGame error.");
+            }
+        }
+
         public void StartGame(string hostName, string roomName) {
             var room = _getPlayer(hostName).GetRoom(roomName);  // will throw if player is not host
 

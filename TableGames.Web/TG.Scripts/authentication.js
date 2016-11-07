@@ -19,5 +19,7 @@
         };
     }
 
+    Authentication.instance = new Authentication();
+
     return Authentication;
 });

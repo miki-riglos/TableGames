@@ -25,6 +25,10 @@ namespace TableGames.Web.Entities
             Players.Add(player);
         }
 
+        public void RemovePlayer(Player player) {
+            Players.Remove(player);
+        }
+
         public void Start() {
             Status = GameStatus.Started;
         }

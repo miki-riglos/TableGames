@@ -5,7 +5,7 @@
 }
 });
 
-define('jquery', function() { return jQuery; });    // already loaded in _layout.cshtml
+define('jquery', function() { return window.jQuery; });    // already loaded in _layout.cshtml
 
 require(['ko-ext', 'jquery', 'manager'], function(ko, $, Manager) {
 

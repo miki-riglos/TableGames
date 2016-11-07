@@ -28,7 +28,7 @@
                     <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
                 </button>
 
-                <!-- ko if: hostName === $root.authentication.userName() -->
+                <!-- ko if: isHost -->
                 <button type="button" class="btn btn-danger btn-xs pull-right" data-bind="visible: !isAttended(), click: $root.removeRoom" title="Remove">
                     <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
                 </button>
@@ -80,6 +80,21 @@
     }
 </style>
 
+<style>
+    .tg-attendedroom > .panel-body {
+        padding-bottom: 0;
+    }
+    .tg-attendedroom-actions {
+        padding-bottom: 15px;
+    }
+    .tg-attendedroom-game, .tg-attendedroom .tg-chat {
+        margin-bottom: 15px;
+    }
+    .tg-attendedroom-game-players {
+        padding-bottom: 15px;
+    }
+</style>
+
 <template id="chatTemplate">
     <div class="panel panel-warning tg-chat">
         <div class="panel-heading">Chat</div>
@@ -112,7 +127,7 @@
                 <!-- ko template: { name: 'playerTemplate', data: userPlayer } --><!-- /ko -->
                 <!-- add room -->
                 <div class="list-group-item">
-                    <input type="text" class="form-control" placeholder="New Room" maxlength="20" data-bind="value: roomToAdd, enable: authentication.isLoggedIn(), onEnter: addRoom" />
+                    <input type="text" class="form-control" placeholder="New Room" maxlength="20" data-bind="value: roomToAdd, onEnter: addRoom" />
                 </div>
             </div>
         </div>
@@ -130,7 +145,7 @@
     <div class="col-sm-8">
         <!-- attended rooms -->
         <div data-bind="foreach: attendedRooms">
-            <div class="row panel panel-primary">
+            <div class="panel panel-primary tg-attendedroom">
                 <div class="panel-heading">
                     <span data-bind="text: hostName"></span>/<span data-bind="text: name"></span>
                     <button type="button" class="close" data-bind="click: $root.leaveRoom" title="Leave Room">
@@ -139,21 +154,26 @@
                 </div>
 
                 <div class="panel-body">
+                    <div class="tg-attendedroom-actions" data-bind="visible: isHost">
+                        <button type="button" class="btn btn-primary" data-bind="enable: canCreateGame, click: $root.createGame">Open</button>
+                        <button type="button" class="btn btn-danger pull-right" data-bind="enable: canDestroyGame, click: $root.destroyGame">End</button>
+                    </div>
+
                     <div class="row">
+                        <!-- game -->
                         <div class="col-sm-6" data-bind="if: game">
-                            <div class="panel panel-default" data-bind="with: game">
+                            <div class="panel panel-default tg-attendedroom-game" data-bind="with: game">
                                 <div class="panel-heading">
                                     <span class="badge pull-right" data-bind="text: status"></span>
                                     <span data-bind="text: name"></span>
                                 </div>
                                 <div class="panel-body">
-                                    <div class="panel-body" data-bind="foreach: playerNames">
+                                    <div class="tg-attendedroom-game-players" data-bind="foreach: playerNames">
                                         <div data-bind="text: $data"></div>
                                     </div>
-                                    <button type="button" class="btn btn-default" data-bind="visible: !hasStarted(), click: $root.joinGame">Join</button>
-                                    <!-- ko if: room.hostName === $root.authentication.userName() -->
-                                    <button type="button" class="btn btn-primary" data-bind="visible: !hasStarted(), click: $root.startGame">Start</button>
-                                    <!-- /ko -->
+                                    <button type="button" class="btn btn-default" data-bind="visible: !hasJoined(), enable: canJoin, click: $root.joinGame">Join</button>
+                                    <button type="button" class="btn btn-default" data-bind="visible: hasJoined, enable: canLeave, click: $root.leaveGame">Leave</button>
+                                    <button type="button" class="btn btn-primary" data-bind="visible: room.isHost, enable: !hasStarted(), click: $root.startGame">Start</button>
                                 </div>
                             </div>
                         </div>
@@ -161,8 +181,6 @@
                         <!-- room chat -->
                         <div class="col-sm-6" data-bind="template: { name: 'chatTemplate', data: chat }"></div>
                     </div>
-                    <button type="button" class="btn btn-primary" data-bind="click: $root.createGame">Open</button>
-                    <button type="button" class="btn btn-danger pull-right" data-bind="click: $root.destroyGame">End</button>
                 </div>
             </div>
         </div>

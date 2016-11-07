@@ -12,17 +12,17 @@
         self.attendedRooms = ko.observableArray();
 
         // notification
-        var notification = new Notification();
+        var notification = Notification.instance;
         self.notification = notification;
 
         // set state
         self.setState = function(currentState) {
             players(currentState.players.map(function(playerState) { return new Player(playerState); }));
-            notification.addInfo('Connected.')
+            notification.addInfo('Connection established.')
         };
 
         // authentication
-        var authentication = new Authentication();
+        var authentication = Authentication.instance;
         self.authentication = authentication;
 
         // ... login
@@ -88,7 +88,7 @@
         };
 
         // chat
-        var chat = new Chat(authentication, hub.server.sendMessage);
+        var chat = new Chat({ sendMessageToServer: hub.server.sendMessage });
         self.chat = chat;
 
         hub.client.onMessageSent = function(userName, message) {
@@ -160,7 +160,6 @@
             var room = getPlayer(hostName).getRoom(roomState.name);
             if (self.attendedRooms.indexOf(room) === -1) {
                 var chatConfig = {
-                    authentication: authentication,
                     sendMessageToServer: function(userName, messageToSend) {
                         return hub.server.sendRoomMessage(room.hostName, room.name, userName, messageToSend);
                     }
@@ -227,6 +226,21 @@
 
             game.addPlayerName(playerName);
             notification.addInfo(playerName + ' joined game ' + game.name + ' in room ' + hostName + '/' + roomName + '.');
+        };
+
+        // ... leave
+        self.leaveGame = function(game) {
+            if (game.playerNames.indexOf(authentication.userName()) !== -1) {
+                hub.server.leaveGame(game.room.hostName, game.room.name, authentication.userName());
+            }
+        };
+
+        hub.client.onGamePlayerLeft = function(hostName, roomName, playerName) {
+            var room = getPlayer(hostName).getRoom(roomName);
+            var game = room.game();
+
+            game.removePlayerName(playerName);
+            notification.addInfo(playerName + ' left game ' + game.name + ' in room ' + hostName + '/' + roomName + '.');
         };
 
         // ... start
