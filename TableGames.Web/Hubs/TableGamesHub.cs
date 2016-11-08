@@ -21,7 +21,7 @@ namespace TableGames.Web.Hubs
 
         public object GetState() {
             return new {
-                players = _players.Values.Select(p => p.ToClient())
+                players = _players.Values.Where(p => p.Rooms.Any()).Select(p => p.ToClient())
             };
         }
 

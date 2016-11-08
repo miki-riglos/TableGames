@@ -64,12 +64,15 @@
     .tg-attendedroom > .panel-body {
         padding-bottom: 0;
     }
+
     .tg-attendedroom-actions {
         padding-bottom: 15px;
     }
+
     .tg-attendedroom-game, .tg-attendedroom .tg-chat {
         margin-bottom: 15px;
     }
+
     .tg-attendedroom-game-players {
         padding-bottom: 15px;
     }
@@ -112,14 +115,14 @@
             </div>
         </div>
         <!-- /ko -->
-        <!-- ko if: otherPlayers().length -->
+
+        <!-- other players -->
         <div class="panel panel-default">
             <div class="panel-heading">Other Rooms</div>
             <div class="list-group" data-bind="foreach: otherPlayers">
                 <!-- ko template: 'playerTemplate' --><!-- /ko -->
             </div>
         </div>
-        <!-- /ko -->
     </div>
 
     <div class="col-sm-8">

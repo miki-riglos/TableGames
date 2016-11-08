@@ -18,7 +18,7 @@
         // set state
         self.setState = function(currentState) {
             players(currentState.players.map(function(playerState) { return new Player(playerState); }));
-            notification.addInfo('Connection established.')
+            notification.addInfo('Connection established.');
         };
 
         // authentication
@@ -42,16 +42,16 @@
                         authentication.login();
                         // enter attended roomNames
                         var player = getPlayer(authentication.userName());
-                        if (player) {
-                            attendedRoomState.forEach(function(roomState) {
-                                var host = getPlayer(roomState.hostName);
-                                var room = host ? host.getRoom(roomState.name) : null;
-                                if (room) {
-                                    self.enterRoom(room);
-
-                                }
-                            });
+                        if (!player) {
+                            players.push(new Player({ name: authentication.userName() }));
                         }
+                        attendedRoomState.forEach(function(roomState) {
+                            var host = getPlayer(roomState.hostName);
+                            var room = host ? host.getRoom(roomState.name) : null;
+                            if (room) {
+                                self.enterRoom(room);
+                            }
+                        });
                     })
                     .catch(function(err) {
                         notification.addError(err.message);
@@ -60,9 +60,6 @@
         };
 
         hub.client.onLoggedIn = function(userName) {
-            if (!ko.utils.arrayFirst(players(), function(player) { return player.name === userName; })) {
-                players.push(new Player({ name: userName }));
-            }
             notification.addInfo(userName + ' just logged in.');
         };
 
@@ -105,13 +102,17 @@
                             notification.addError(err.message);
                         });
                 } else {
-                    notification.addError('Room Name already exists.')
+                    notification.addError('Room Name already exists.');
                 }
             }
         };
 
         hub.client.onRoomAdded = function(userName, roomState) {
             var player = getPlayer(userName);
+            if (!player) {
+                player = new Player({ name: userName });
+                players.push(player);
+            }
             var room = player.addRoom(roomState);
             notification.addInfo(userName + ' added room ' + roomState.name + '.');
             // enter room if host
@@ -136,6 +137,9 @@
             var room = player.getRoom(roomState.name);
             self.attendedRooms.remove(room);
             player.removeRoom(room);
+            if (player.rooms().length === 0) {
+                players.remove(player);
+            }
             notification.addInfo(userName + ' removed room ' + roomState.name + '.');
         };
 
