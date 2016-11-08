@@ -21,21 +21,12 @@
             self.playerNames.remove(playerName);
         };
 
-        self.hasJoined = ko.computed(function() {
-            return self.playerNames().indexOf(authentication.userName()) !== -1;
-        });
+        self.hasJoined = ko.computed(function() { return self.playerNames.contains(authentication.userName()); });
 
-        self.canJoin = ko.computed(function() {
-            return authentication.isLoggedIn() && !self.hasStarted() && !self.hasJoined();
-        });
+        self.canJoin = ko.computed(function() { return authentication.isLoggedIn() && !self.hasStarted() && !self.hasJoined(); });
+        self.canLeave = ko.computed(function() { return authentication.isLoggedIn() && !self.hasStarted() && self.hasJoined(); });
 
-        self.canLeave = ko.computed(function() {
-            return authentication.isLoggedIn() && !self.hasStarted() && self.hasJoined();
-        });
-
-        self.canStart = ko.computed(function() {
-            return self.room.isHost() && !self.hasStarted();
-        });
+        self.canStart = ko.computed(function() { return self.room.isHost() && !self.hasStarted(); });
     }
 
     return Game;

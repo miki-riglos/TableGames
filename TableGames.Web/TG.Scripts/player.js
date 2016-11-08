@@ -13,7 +13,7 @@
         };
 
         self.getRoom = function(roomName) {
-            return ko.utils.arrayFirst(self.rooms(), function(room) { return room.name === roomName; });
+            return self.rooms.first(function(room) { return room.name === roomName; });
         };
 
         self.removeRoom = function(room) {

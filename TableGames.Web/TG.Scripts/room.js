@@ -19,16 +19,12 @@
         self.createGame = function(gameState) {
             self.game(new Game(gameState, self));
         };
-        self.canCreateGame = ko.computed(function() {
-            return self.isHost() && !self.game();
-        });
+        self.canCreateGame = ko.computed(function() { return self.isHost() && !self.game(); });
 
         self.destroyGame = function() {
             self.game(null);
         };
-        self.canDestroyGame = ko.computed(function() {
-            return self.isHost() && self.game();
-        });
+        self.canDestroyGame = ko.computed(function() { return self.isHost() && self.game(); });
 
         self.attend = function(chatConfig, gameState) {
             self.isAttended(true);

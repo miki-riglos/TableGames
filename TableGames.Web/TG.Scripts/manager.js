@@ -4,11 +4,12 @@
         var self = this;
 
         var players = ko.observableArray();
-        var getPlayer = function(playerName) { return ko.utils.arrayFirst(players(), function(player) { return player.name === playerName; }); };
+        var getPlayer = function(playerName) { return players.first(function(player) { return player.name === playerName; }); };
 
-        self.userPlayer = ko.computed(function() { return ko.utils.arrayFirst(players(), function(player) { return player.name === authentication.userName(); }); });
+        // main
+        self.userPlayer = ko.computed(function() { return players.first(function(player) { return player.name === authentication.userName(); }); });
         self.roomToAdd = ko.observable();
-        self.otherPlayers = ko.computed(function() { return ko.utils.arrayFilter(players(), function(player) { return player.name !== authentication.userName(); }); });
+        self.otherPlayers = ko.computed(function() { return players.filter(function(player) { return player.name !== authentication.userName(); }); });
         self.attendedRooms = ko.observableArray();
 
         // notification
@@ -96,7 +97,7 @@
         // ... add
         self.addRoom = function() {
             if (self.roomToAdd()) {
-                if (!ko.utils.arrayFirst(self.userPlayer().rooms(), function(room) { return room.name === self.roomToAdd(); })) {
+                if (!self.userPlayer().getRoom(self.roomToAdd())) {
                     hub.server.addRoom(authentication.userName(), self.roomToAdd())
                         .catch(function(err) {
                             notification.addError(err.message);
@@ -145,7 +146,7 @@
 
         // ... enter
         self.enterRoom = function(room) {
-            if (self.attendedRooms.indexOf(room) === -1) {
+            if (!self.attendedRooms.contains(room)) {
                 hub.server.enterRoom(room.hostName, room.name, authentication.userName());
             }
         };
@@ -162,7 +163,7 @@
 
         hub.client.onRoomAttended = function(hostName, roomState, gameState) {
             var room = getPlayer(hostName).getRoom(roomState.name);
-            if (self.attendedRooms.indexOf(room) === -1) {
+            if (!self.attendedRooms.contains(room)) {
                 var chatConfig = {
                     sendMessageToServer: function(userName, messageToSend) {
                         return hub.server.sendRoomMessage(room.hostName, room.name, userName, messageToSend);
@@ -181,7 +182,7 @@
 
         // ... leave
         self.leaveRoom = function(room) {
-            if (self.attendedRooms.indexOf(room) !== -1) {
+            if (self.attendedRooms.contains(room)) {
                 return hub.server.leaveRoom(room.hostName, room.name, authentication.userName());
             }
             return $.Deferred().resolve();
@@ -219,7 +220,7 @@
 
         // ... join
         self.joinGame = function(game) {
-            if (game.playerNames.indexOf(authentication.userName()) === -1) {
+            if (game.canJoin()) {
                 hub.server.joinGame(game.room.hostName, game.room.name, authentication.userName());
             }
         };
@@ -234,7 +235,7 @@
 
         // ... leave
         self.leaveGame = function(game) {
-            if (game.playerNames.indexOf(authentication.userName()) !== -1) {
+            if (game.canLeave()) {
                 hub.server.leaveGame(game.room.hostName, game.room.name, authentication.userName());
             }
         };
