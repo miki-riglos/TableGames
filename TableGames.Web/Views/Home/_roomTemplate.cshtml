@@ -1,0 +1,41 @@
+﻿<style>
+    .tg-room > .panel-body {
+        padding-bottom: 0;
+    }
+
+    .tg-room-actions {
+        padding-bottom: 15px;
+    }
+
+    .tg-room .tg-chat {
+        margin-bottom: 15px;
+    }
+</style>
+
+<template id="roomTemplate">
+    <div class="panel panel-primary tg-room">
+        <div class="panel-heading">
+            <span data-bind="text: hostName"></span>/<span data-bind="text: name"></span>
+            <button type="button" class="close" data-bind="click: $root.leaveRoom" title="Leave Room">
+                <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+            </button>
+        </div>
+
+        <div class="panel-body">
+            <div class="tg-room-actions" data-bind="visible: isHost">
+                <button type="button" class="btn btn-primary" data-bind="enable: canCreateGame, click: $root.createGame">Open</button>
+                <button type="button" class="btn btn-danger pull-right" data-bind="enable: canDestroyGame, click: $root.destroyGame">End</button>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6" data-bind="if: game">
+                    <!-- ko template: { name: 'gameTemplate', data: game } --><!-- /ko -->
+                </div>
+
+                <div class="col-sm-6">
+                    <!-- ko template: { name: 'chatTemplate', data: chat } --><!-- /ko -->
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

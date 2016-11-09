@@ -1,0 +1,37 @@
+﻿<style>
+    .tg-player-name {
+        font-weight: bold;
+    }
+
+    .tg-player-room {
+        padding-top: 5px;
+        padding-left: 5px;
+    }
+
+        .tg-player-room .btn {
+            margin-right: 5px;
+        }
+</style>
+
+<template id="playerTemplate">
+    <div class="list-group-item">
+        <div class="tg-player-name" data-bind="text: name"></div>
+        <div data-bind="foreach: rooms">
+            <div class="tg-player-room">
+                <span class="badge pull-right" data-bind="text: attendance" title="Attendance"></span>
+
+                <button type="button" class="btn btn-primary btn-xs pull-right" data-bind="visible: !isAttended(), click: $root.enterRoom" title="Enter">
+                    <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
+                </button>
+
+                <!-- ko if: isHost -->
+                <button type="button" class="btn btn-danger btn-xs pull-right" data-bind="visible: !isAttended(), click: $root.removeRoom" title="Remove">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                </button>
+                <!-- /ko -->
+
+                <span data-bind="text: name"></span>
+            </div>
+        </div>
+    </div>
+</template>

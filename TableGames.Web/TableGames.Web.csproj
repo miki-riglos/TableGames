@@ -216,6 +216,12 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Home\_chatTemplate.cshtml" />
+    <Content Include="Views\Home\_playerTemplate.cshtml" />
+    <Content Include="Views\Shared\_about.cshtml" />
+    <Content Include="Views\Home\_notificationTemplate.cshtml" />
+    <Content Include="Views\Home\_roomTemplate.cshtml" />
+    <Content Include="Views\Home\_gameTemplate.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

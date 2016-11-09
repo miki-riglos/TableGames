@@ -2,7 +2,7 @@
     paths: {
         'knockout': '../Scripts/knockout-3.4.0.debug',
         'ko-ext': './extensions/ko-extended'
-}
+    }
 });
 
 define('jquery', function() { return window.jQuery; });    // already loaded in _layout.cshtml
