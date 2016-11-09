@@ -1,4 +1,4 @@
-﻿define(['knockout', 'authentication', 'chat', 'game'], function(ko, Authentication, Chat, Game) {
+﻿define(['knockout', 'authentication', 'chat', 'table'], function(ko, Authentication, Chat, Table) {
 
     function Room(roomState) {
         var self = this;
@@ -13,31 +13,32 @@
         });
 
         self.isAttended = ko.observable(false);
+        self.selectedGameName = ko.observable();
+        self.table = ko.observable();
         self.chat = ko.observable();
-        self.game = ko.observable();
 
-        self.createGame = function(gameState) {
-            self.game(new Game(gameState, self));
+        self.createTable = function(tableState) {
+            self.table(new Table(tableState, self));
         };
-        self.canCreateGame = ko.computed(function() { return self.isHost() && !self.game(); });
+        self.canCreateTable = ko.computed(function() { return self.isHost() && !self.table(); });
 
-        self.destroyGame = function() {
-            self.game(null);
+        self.destroyTable = function() {
+            self.table(null);
         };
-        self.canDestroyGame = ko.computed(function() { return self.isHost() && self.game(); });
+        self.canDestroyTable = ko.computed(function() { return self.isHost() && self.table(); });
 
-        self.attend = function(chatConfig, gameState) {
+        self.attend = function(tableState, chatConfig) {
             self.isAttended(true);
-            self.chat(new Chat(chatConfig));
-            if (gameState) {
-                self.createGame(gameState);
+            if (tableState) {
+                self.createTable(tableState);
             }
+            self.chat(new Chat(chatConfig));
         };
 
         self.unattend = function() {
             self.isAttended(false);
+            self.destroyTable();
             self.chat(null);
-            self.destroyGame();
         };
     }
 

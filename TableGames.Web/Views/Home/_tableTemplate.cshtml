@@ -1,0 +1,26 @@
+﻿<style>
+    .tg-table {
+        margin-bottom: 15px;
+    }
+
+    .tg-table-players {
+        padding-bottom: 15px;
+    }
+</style>
+
+<template id="tableTemplate">
+    <div class="panel panel-default tg-table">
+        <div class="panel-heading">
+            <span class="badge pull-right" data-bind="text: status"></span>
+            <span data-bind="text: gameName"></span>
+        </div>
+        <div class="panel-body">
+            <div class="tg-table-players" data-bind="foreach: playerNames">
+                <div data-bind="text: $data"></div>
+            </div>
+            <button type="button" class="btn btn-default" data-bind="visible: !hasJoined(), enable: canJoin, click: $root.joinTable">Join</button>
+            <button type="button" class="btn btn-default" data-bind="visible: hasJoined, enable: canLeave, click: $root.leaveTable">Leave</button>
+            <button type="button" class="btn btn-primary" data-bind="visible: room.isHost, enable: !hasStarted(), click: $root.startTable">Start</button>
+        </div>
+    </div>
+</template>

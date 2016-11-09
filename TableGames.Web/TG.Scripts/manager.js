@@ -11,6 +11,7 @@
         self.roomToAdd = ko.observable();
         self.otherPlayers = ko.computed(function() { return players.filter(function(player) { return player.name !== authentication.userName(); }); });
         self.attendedRooms = ko.observableArray();
+        self.availableGameNames = ['Michi', 'Yan Ken Po'];
 
         // notification
         var notification = Notification.instance;
@@ -151,17 +152,17 @@
             }
         };
 
-        hub.client.onRoomEntered = function(hostName, roomState, userName, gameState) {
+        hub.client.onRoomEntered = function(hostName, roomState, userName, tableState) {
             var room = getPlayer(hostName).getRoom(roomState.name);
             room.attendance(roomState.attendance);
             notification.addInfo((userName || 'Attendee') + ' entered ' + hostName + '/' + roomState.name + '.');
             // update attendedRooms if is userName, avoid dups when multiple logins
             if (authentication.isLoggedIn() && authentication.userName() === userName) {
-                hub.client.onRoomAttended(hostName, roomState, gameState);
+                hub.client.onRoomAttended(hostName, roomState, tableState);
             }
         };
 
-        hub.client.onRoomAttended = function(hostName, roomState, gameState) {
+        hub.client.onRoomAttended = function(hostName, roomState, tableState) {
             var room = getPlayer(hostName).getRoom(roomState.name);
             if (!self.attendedRooms.contains(room)) {
                 var chatConfig = {
@@ -169,7 +170,7 @@
                         return hub.server.sendRoomMessage(room.hostName, room.name, userName, messageToSend);
                     }
                 };
-                room.attend(chatConfig, gameState);
+                room.attend(tableState, chatConfig);
                 self.attendedRooms.push(room);
             }
         };
@@ -204,76 +205,78 @@
             room.unattend();
         };
 
-        // Games
+        // table
         // ... create
-        self.createGame = function(room) {
-            if (authentication.isLoggedIn() && authentication.userName() === room.hostName) {
-                hub.server.createGame(room.hostName, room.name, 'gameName');
+        self.createTable = function(room) {
+            if (authentication.isLoggedIn() && authentication.userName() === room.hostName && room.selectedGameName()) {
+                hub.server.createTable(room.hostName, room.name, room.selectedGameName());
             }
         };
 
-        hub.client.onGameCreated = function(hostName, roomName, gameState) {
+        hub.client.onTableCreated = function(hostName, roomName, tableState) {
             var room = getPlayer(hostName).getRoom(roomName);
-            room.createGame(gameState);
-            notification.addInfo(gameState.name + ' opened in room ' + hostName + '/' + roomName + '.');
+            room.createTable(tableState);
+            notification.addInfo(tableState.gameName + ' opened in room ' + hostName + '/' + roomName + '.');
         };
 
         // ... join
-        self.joinGame = function(game) {
-            if (game.canJoin()) {
-                hub.server.joinGame(game.room.hostName, game.room.name, authentication.userName());
+        self.joinTable = function(table) {
+            if (table.canJoin()) {
+                hub.server.joinTable(table.room.hostName, table.room.name, authentication.userName());
             }
         };
 
-        hub.client.onGamePlayerJoined = function(hostName, roomName, playerName) {
+        hub.client.onPlayerJoinedTable = function(hostName, roomName, playerName) {
             var room = getPlayer(hostName).getRoom(roomName);
-            var game = room.game();
+            var table = room.table();
 
-            game.addPlayerName(playerName);
-            notification.addInfo(playerName + ' joined game ' + game.name + ' in room ' + hostName + '/' + roomName + '.');
+            table.addPlayerName(playerName);
+            notification.addInfo(playerName + ' joined table ' + table.gameName + ' in room ' + hostName + '/' + roomName + '.');
         };
 
         // ... leave
-        self.leaveGame = function(game) {
-            if (game.canLeave()) {
-                hub.server.leaveGame(game.room.hostName, game.room.name, authentication.userName());
+        self.leaveTable = function(table) {
+            if (table.canLeave()) {
+                hub.server.leaveTable(table.room.hostName, table.room.name, authentication.userName());
             }
         };
 
-        hub.client.onGamePlayerLeft = function(hostName, roomName, playerName) {
+        hub.client.onPlayerLeftTable = function(hostName, roomName, playerName) {
             var room = getPlayer(hostName).getRoom(roomName);
-            var game = room.game();
+            var table = room.table();
 
-            game.removePlayerName(playerName);
-            notification.addInfo(playerName + ' left game ' + game.name + ' in room ' + hostName + '/' + roomName + '.');
+            table.removePlayerName(playerName);
+            notification.addInfo(playerName + ' left table ' + table.gameName + ' in room ' + hostName + '/' + roomName + '.');
         };
 
         // ... start
-        self.startGame = function(game) {
-            if (authentication.userName() === game.room.hostName) {
-                hub.server.startGame(game.room.hostName, game.room.name);
+        self.startTable = function(table) {
+            if (authentication.userName() === table.room.hostName) {
+                hub.server.startTable(table.room.hostName, table.room.name);
             }
         };
 
-        hub.client.onGameStarted = function(hostName, roomName, gameState) {
+        hub.client.onTableStarted = function(hostName, roomName, tableState) {
             var room = getPlayer(hostName).getRoom(roomName);
-            var game = room.game();
+            var table = room.table();
 
-            game.status(gameState.status);
-            notification.addInfo('Game ' + game.name + ' in room ' + hostName + '/' + roomName + ' just started.');
+            table.start(tableState.status);
+            notification.addInfo('Table ' + table.gameName + ' in room ' + hostName + '/' + roomName + ' just started.');
         };
 
         // ... destroy
-        self.destroyGame = function(room) {
+        self.destroyTable = function(room) {
             if (authentication.userName() === room.hostName) {
-                hub.server.destroyGame(room.hostName, room.name);
+                hub.server.destroyTable(room.hostName, room.name);
             }
         };
 
-        hub.client.onGameDestroyed = function(hostName, roomName) {
+        hub.client.onTableDestroyed = function(hostName, roomName) {
             var room = getPlayer(hostName).getRoom(roomName);
-            room.destroyGame();
-            notification.addInfo('Game in room ' + hostName + '/' + roomName + ' just finished.');
+            var gameName = room.table().gameName;
+
+            room.destroyTable();
+            notification.addInfo(gameName + ' closed in room ' + hostName + '/' + roomName + '.');
         };
     }
 

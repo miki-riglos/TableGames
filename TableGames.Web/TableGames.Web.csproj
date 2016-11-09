@@ -147,7 +147,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Entities\Game.cs" />
+    <Compile Include="Entities\Table.cs" />
     <Compile Include="Entities\Room.cs" />
     <Compile Include="Entities\Player.cs" />
     <Compile Include="Global.asax.cs">
@@ -197,7 +197,7 @@
     <Content Include="Scripts\_references.js" />
     <Content Include="TG.Scripts\authentication.js" />
     <Content Include="TG.Scripts\notification.js" />
-    <Content Include="TG.Scripts\game.js" />
+    <Content Include="TG.Scripts\table.js" />
     <Content Include="TG.Scripts\room.js" />
     <Content Include="TG.Scripts\player.js" />
     <Content Include="TG.Scripts\extensions\ko-extended.js" />
@@ -221,7 +221,7 @@
     <Content Include="Views\Shared\_about.cshtml" />
     <Content Include="Views\Home\_notificationTemplate.cshtml" />
     <Content Include="Views\Home\_roomTemplate.cshtml" />
-    <Content Include="Views\Home\_gameTemplate.cshtml" />
+    <Content Include="Views\Home\_tableTemplate.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

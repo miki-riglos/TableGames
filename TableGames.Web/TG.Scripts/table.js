@@ -1,12 +1,12 @@
 ﻿define(['knockout', 'authentication'], function(ko, Authentication) {
 
-    function Game(gameState, room) {
+    function Table(tableState, room) {
         var self = this;
         var authentication = Authentication.instance;
 
-        self.name = gameState.name;
-        self.status = ko.observable(gameState.status);
-        self.playerNames = ko.observableArray(gameState.playerNames);
+        self.gameName = tableState.gameName;
+        self.status = ko.observable(tableState.status);
+        self.playerNames = ko.observableArray(tableState.playerNames);
 
         self.room = room;
 
@@ -26,8 +26,11 @@
         self.canJoin = ko.computed(function() { return authentication.isLoggedIn() && !self.hasStarted() && !self.hasJoined(); });
         self.canLeave = ko.computed(function() { return authentication.isLoggedIn() && !self.hasStarted() && self.hasJoined(); });
 
+        self.start = function(status) {
+            self.status(status);
+        };
         self.canStart = ko.computed(function() { return self.room.isHost() && !self.hasStarted(); });
     }
 
-    return Game;
+    return Table;
 });

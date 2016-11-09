@@ -3,21 +3,21 @@ using System.Linq;
 
 namespace TableGames.Web.Entities
 {
-    public enum GameStatus
+    public enum TableStatus
     {
         Open,
         Started
     }
 
-    public class Game
+    public class Table
     {
-        public string Name { get; set; }
-        public GameStatus Status { get; set; }
+        public string GameName { get; set; }
+        public TableStatus Status { get; set; }
         public List<Player> Players { get; set; }
 
-        public Game(string name) {
-            Name = name;
-            Status = GameStatus.Open;
+        public Table(string gameName) {
+            GameName = gameName;
+            Status = TableStatus.Open;
             Players = new List<Player>();
         }
 
@@ -30,12 +30,12 @@ namespace TableGames.Web.Entities
         }
 
         public void Start() {
-            Status = GameStatus.Started;
+            Status = TableStatus.Started;
         }
 
         public object ToClient() {
             return new {
-                name = Name,
+                gameName = GameName,
                 status = Status.ToString(),
                 playerNames = Players.Select(p => p.Name)
             };

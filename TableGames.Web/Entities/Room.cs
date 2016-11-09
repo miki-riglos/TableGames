@@ -10,7 +10,7 @@ namespace TableGames.Web.Entities
         public string GroupId { get { return $"{Host.Name}/{Name}"; } }
         public List<string> AnonymousAttendees { get; set; }
         public List<Player> PlayerAttendees { get; set; }
-        public Game Game { get; set; }
+        public Table Table { get; set; }
 
         public Room(string name, Player host) {
             Name = name;
@@ -20,8 +20,8 @@ namespace TableGames.Web.Entities
             PlayerAttendees = new List<Player>();
         }
 
-        public void CreateGame(string gameName) {
-            Game = new Game(gameName);
+        public void CreateTable(string gameName) {
+            Table = new Table(gameName);
         }
 
         public List<string> GetGroups() {

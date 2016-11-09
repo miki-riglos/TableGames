@@ -95,14 +95,14 @@ namespace TableGames.Web.Hubs
                 if (!room.PlayerAttendees.Contains(playerAttendee)) {
                     room.PlayerAttendees.Add(playerAttendee);
                 }
-                Clients.All.onRoomEntered(hostName, room.ToClient(), userName, room.Game?.ToClient());
+                Clients.All.onRoomEntered(hostName, room.ToClient(), userName, room.Table?.ToClient());
             }
             else {
                 Groups.Add(Context.ConnectionId, room.GroupId);
                 room.AnonymousAttendees.Add(Context.ConnectionId);
                 Clients.All.onRoomEntered(hostName, room.ToClient(), null, null);
                 // for anonymous attendee
-                Clients.Client(Context.ConnectionId).onRoomAttended(hostName, room.ToClient(), room.Game?.ToClient());
+                Clients.Client(Context.ConnectionId).onRoomAttended(hostName, room.ToClient(), room.Table?.ToClient());
             }
         }
 
@@ -134,64 +134,64 @@ namespace TableGames.Web.Hubs
             }
         }
 
-        // Games
-        public void CreateGame(string hostName, string roomName, string gameName) {
+        // Tables
+        public void CreateTable(string hostName, string roomName, string gameName) {
             var room = _getPlayer(hostName).GetRoom(roomName);  // will throw if player is not host
 
-            room.CreateGame(gameName);
+            room.CreateTable(gameName);
 
             room.GetGroups().ForEach(groupId => {
-                Clients.Group(groupId).onGameCreated(hostName, roomName, room.Game.ToClient());
+                Clients.Group(groupId).onTableCreated(hostName, roomName, room.Table.ToClient());
             });
         }
 
-        public void JoinGame(string hostName, string roomName, string playerName) {
+        public void JoinTable(string hostName, string roomName, string playerName) {
             var room = _getPlayer(hostName).GetRoom(roomName);
             var player = _getPlayer(playerName);
 
-            if (!room.Game.Players.Contains(player)) {
-                room.Game.AddPlayer(player);
+            if (!room.Table.Players.Contains(player)) {
+                room.Table.AddPlayer(player);
                 room.GetGroups().ForEach(groupId => {
-                    Clients.Group(groupId).onGamePlayerJoined(hostName, roomName, playerName);
+                    Clients.Group(groupId).onPlayerJoinedTable(hostName, roomName, playerName);
                 });
             }
             else {
-                throw new HubException("JoinGame error.");
+                throw new HubException("JoinTable error.");
             }
         }
 
-        public void LeaveGame(string hostName, string roomName, string playerName) {
+        public void LeaveTable(string hostName, string roomName, string playerName) {
             var room = _getPlayer(hostName).GetRoom(roomName);
             var player = _getPlayer(playerName);
 
-            if (room.Game.Players.Contains(player) && room.Game.Status == GameStatus.Open) {
-                room.Game.RemovePlayer(player);
+            if (room.Table.Players.Contains(player) && room.Table.Status == TableStatus.Open) {
+                room.Table.RemovePlayer(player);
                 room.GetGroups().ForEach(groupId => {
-                    Clients.Group(groupId).onGamePlayerLeft(hostName, roomName, playerName);
+                    Clients.Group(groupId).onPlayerLeftTable(hostName, roomName, playerName);
                 });
             }
             else {
-                throw new HubException("LeaveGame error.");
+                throw new HubException("LeaveTable error.");
             }
         }
 
-        public void StartGame(string hostName, string roomName) {
+        public void StartTable(string hostName, string roomName) {
             var room = _getPlayer(hostName).GetRoom(roomName);  // will throw if player is not host
 
-            room.Game.Start();
+            room.Table.Start();
 
             room.GetGroups().ForEach(groupId => {
-                Clients.Group(groupId).onGameStarted(hostName, roomName, room.Game.ToClient());
+                Clients.Group(groupId).onTableStarted(hostName, roomName, room.Table.ToClient());
             });
         }
 
-        public void DestroyGame(string hostName, string roomName) {
+        public void DestroyTable(string hostName, string roomName) {
             var room = _getPlayer(hostName).GetRoom(roomName);  // will throw if player is not host
 
-            room.Game = null;
+            room.Table = null;
 
             room.GetGroups().ForEach(groupId => {
-                Clients.Group(groupId).onGameDestroyed(hostName, roomName);
+                Clients.Group(groupId).onTableDestroyed(hostName, roomName);
             });
         }
     }
