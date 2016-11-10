@@ -182,7 +182,7 @@ namespace TableGames.Web.Hubs
             room.Table.Start();
 
             room.GetGroups().ForEach(groupId => {
-                Clients.Group(groupId).onTableStarted(hostName, roomName, room.Table.Status, room.Table.Game.ToClient());
+                Clients.Group(groupId).onTableStarted(hostName, roomName, room.Table.Status.ToString(), room.Table.Game.ToClient());
             });
         }
 
