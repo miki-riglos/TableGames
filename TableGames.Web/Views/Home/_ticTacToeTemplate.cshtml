@@ -2,12 +2,18 @@
     <div>
         <div data-bind="text: playerName1"></div>
         <div data-bind="text: playerName2"></div>
-        <div data-bind="foreach: board">
-            <div>
-                <span data-bind="text: '(' + row + ',' + column + ')'"></span>
-                <span data-bind="text: playerName"></span>
-                <button type="button" data-bind="click: $parent.assign">Assign</button>
+
+        <!-- ko foreach: { data: indices, as: 'row' } -->
+        <div class="row">
+            <!-- ko foreach: { data: $parent.indices, as: 'col' } -->
+            <div class="col-xs-4">
+                <!-- ko with: $parents[1] -->
+                <span data-bind="text: board[row][col]"></span>
+                <button type="button" data-bind="click: assign.bind($data, row, col)">Assign</button>
+                <!-- /ko -->
             </div>
+            <!-- /ko -->
         </div>
+        <!-- /ko -->
     </div>
 </template>

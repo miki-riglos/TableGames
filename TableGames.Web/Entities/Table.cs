@@ -40,7 +40,8 @@ namespace TableGames.Web.Entities
             return new {
                 gameName = GameName,
                 status = Status.ToString(),
-                playerNames = Players.Select(p => p.Name)
+                playerNames = Players.Select(p => p.Name),
+                game = Game?.ToClient()
             };
         }
     }

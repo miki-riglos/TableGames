@@ -1,31 +1,37 @@
 ﻿define(['knockout'], function(ko) {
 
-    function Box(boxState) {
-        this.row = boxState.row;
-        this.column = boxState.column;
-        this.playerName = ko.observable();
-    }
-
     function TicTacToe(gameConfig, gameState, table, userPlayerName) {
         var self = this;
+        var indices = [1, 2, 3];
 
-        self.board = gameState.board.map(function(boxState) { return new Box(boxState) });
 
         self.playerName1 = table.playerNames()[0];
         self.playerName2 = table.playerNames()[1];
 
-        self.assign = function(box) {
+        self.indices = indices;
+
+        self.board = {};
+        indices.forEach(function(row) {
+            self.board[row] = {};
+            indices.forEach(function(col) {
+                self.board[row][col] = null;
+            });
+        });
+        gameState.board.forEach(function(boxState) {
+            self.board[boxState.row][boxState.col] = ko.observable(boxState.playerName);
+        });
+
+        self.assign = function(row, col) {
             var gameChangeParameters = {
-                row: box.row,
-                column: box.column
+                row: row,
+                col: col
             };
             gameConfig.sendChangeToServer('AssignBox', gameChangeParameters);
         }
 
         self.change = function(playerName, eventName, gameChangeResults) {
             if (eventName === 'AssignBox') {
-                var assignedBox = ko.utils.arrayFirst(self.board, function(box) { return box.row === gameChangeResults.row && box.column === gameChangeResults.column; });
-                assignedBox.playerName(playerName);
+                self.board[gameChangeResults.row][gameChangeResults.col](playerName)
             }
         }
     }

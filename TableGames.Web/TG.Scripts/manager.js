@@ -173,6 +173,9 @@
                 };
                 room.attend(tableState, chatConfig);
                 self.attendedRooms.push(room);
+                if (tableState && tableState.game) {
+                    room.table().start(tableState.status, getGameConfig(room), tableState.game);
+                }
             }
         };
 
@@ -257,16 +260,20 @@
             }
         };
 
-        hub.client.onTableStarted = function(hostName, roomName, tableStatus, gameState) {
-            var room = getPlayer(hostName).getRoom(roomName);
-            var table = room.table();
+        function getGameConfig(room) {
             var gameConfig = {
                 sendChangeToServer: function(eventName, gameChangeParameters) {
                     return hub.server.changeGame(room.hostName, room.name, authentication.userName(), eventName, gameChangeParameters);
                 }
             };
+            return gameConfig;
+        }
 
-            table.start(tableStatus, gameConfig, gameState);
+        hub.client.onTableStarted = function(hostName, roomName, tableStatus, gameState) {
+            var room = getPlayer(hostName).getRoom(roomName);
+            var table = room.table();
+
+            table.start(tableStatus, getGameConfig(room), gameState);
             notification.addInfo('Table ' + table.gameName + ' in room ' + hostName + '/' + roomName + ' just started.');
         };
 
