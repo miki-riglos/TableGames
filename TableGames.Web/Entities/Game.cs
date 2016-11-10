@@ -20,18 +20,24 @@ namespace TableGames.Web.Entities
     {
         public string Name { get; set; }
         public Type Type { get; set; }
-        public string TemplateName { get; set; }
+        public string ConstructorFileName { get; set; }
+        public string TemplateFileName { get; set; }
 
         public object ToClient() {
             return new {
                 name = Name,
-                templateName = TemplateName,
-                constructor = "Game"
+                constructorFileName = ConstructorFileName,
+                templateFileName = TemplateFileName
             };
         }
 
         public static GameInfo[] GameInfos = new GameInfo[] {
-            new GameInfo() { Name = "Tic Tac Toe", Type = typeof(TicTacToe), TemplateName = "gameTemplate" }
+            new GameInfo() {
+                Name = "Tic Tac Toe",
+                Type = typeof(TicTacToe),
+                ConstructorFileName = "games/ticTacToe",
+                TemplateFileName = "ticTacToeTemplate"
+            }
         };
     }
 

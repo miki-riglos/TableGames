@@ -1,4 +1,4 @@
-﻿define(['knockout', 'authentication', 'createGame'], function(ko, Authentication, createGame) {
+﻿define(['knockout', 'authentication', 'gameProvider'], function(ko, Authentication, gameProvider) {
 
     function Table(tableState, room) {
         var self = this;
@@ -30,7 +30,10 @@
 
         self.start = function(tableStatus, gameConfig, gameState) {
             self.status(tableStatus);
-            self.game(createGame(self.gameName, gameConfig, gameState, self, authentication.userName()))
+            gameProvider.createGame(self.gameName, gameConfig, gameState)
+                .then(function(game) {
+                    self.game(game);
+                });
         };
         self.canStart = ko.computed(function() { return self.room.isHost() && !self.hasStarted(); });
     }

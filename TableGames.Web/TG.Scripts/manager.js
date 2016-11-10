@@ -1,4 +1,4 @@
-﻿define(['knockout', 'jquery', 'player', 'notification', 'authentication', 'chat'], function(ko, $, Player, Notification, Authentication, Chat) {
+﻿define(['knockout', 'jquery', 'notification', 'authentication', 'chat', 'player', 'gameProvider'], function(ko, $, Notification, Authentication, Chat, Player, gameProvider) {
 
     function Manager(hub) {
         var self = this;
@@ -20,7 +20,8 @@
         // set state
         self.setState = function(currentState) {
             players(currentState.players.map(function(playerState) { return new Player(playerState); }));
-            self.gameNames = currentState.gameNames;
+            self.gameNames = currentState.gameInfos.map(function(gameInfo) { return gameInfo.name; });
+            gameProvider.register(currentState.gameInfos);
             notification.addInfo('Connection established.');
         };
 

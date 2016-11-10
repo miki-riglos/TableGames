@@ -30,24 +30,14 @@
                 col: col
             };
             gameConfig.sendChangeToServer('AssignBox', gameChangeParameters);
-        }
+        };
 
         self.change = function(playerName, eventName, gameChangeResults) {
             if (eventName === 'AssignBox') {
-                self.board[gameChangeResults.row][gameChangeResults.col](playerName)
+                self.board[gameChangeResults.row][gameChangeResults.col](playerName);
             }
-        }
+        };
     }
 
-    function createGame(gameName, gameConfig, gameState) {
-        var game = new TicTacToe(gameConfig, gameState);
-
-        if (!self.change) {
-            self.change = function(eventName, gameChangeResults) { };
-        }
-
-        return game;
-    }
-
-    return createGame;
+    return TicTacToe;
 });
