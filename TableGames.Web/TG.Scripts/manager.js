@@ -11,7 +11,7 @@
         self.roomToAdd = ko.observable();
         self.otherPlayers = ko.computed(function() { return players.filter(function(player) { return player.name !== authentication.userName(); }); });
         self.attendedRooms = ko.observableArray();
-        self.availableGameNames = ['Michi', 'Yan Ken Po'];
+        self.gameNames = [];
 
         // notification
         var notification = Notification.instance;
@@ -20,6 +20,7 @@
         // set state
         self.setState = function(currentState) {
             players(currentState.players.map(function(playerState) { return new Player(playerState); }));
+            self.gameNames = currentState.gameNames;
             notification.addInfo('Connection established.');
         };
 
@@ -256,12 +257,27 @@
             }
         };
 
-        hub.client.onTableStarted = function(hostName, roomName, tableState) {
+        hub.client.onTableStarted = function(hostName, roomName, tableStatus, gameState) {
             var room = getPlayer(hostName).getRoom(roomName);
             var table = room.table();
+            var gameConfig = {
+                sendChangeToServer: function(eventName, gameChangeParameters) {
+                    return hub.server.changeGame(room.hostName, room.name, authentication.userName(), eventName, gameChangeParameters);
+                }
+            };
 
-            table.start(tableState.status);
+            table.start(tableStatus, gameConfig, gameState);
             notification.addInfo('Table ' + table.gameName + ' in room ' + hostName + '/' + roomName + ' just started.');
+        };
+
+        // ... ... games 
+        hub.client.onGameChanged = function(hostName, roomName, playerName, eventName, gameChangeResults) {
+            var room = getPlayer(hostName).getRoom(roomName);
+            var table = room.table();
+            var game = table.game();
+
+            game.change(playerName, eventName, gameChangeResults);
+            notification.addInfo(table.gameName + ' changed in room ' + hostName + '/' + roomName + '.');
         };
 
         // ... destroy

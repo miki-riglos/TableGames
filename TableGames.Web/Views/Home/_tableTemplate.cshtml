@@ -22,5 +22,8 @@
             <button type="button" class="btn btn-default" data-bind="visible: hasJoined, enable: canLeave, click: $root.leaveTable">Leave</button>
             <button type="button" class="btn btn-primary" data-bind="visible: room.isHost, enable: !hasStarted(), click: $root.startTable">Start</button>
         </div>
+        <div data-bind="if: game">
+            <!-- ko template: { name: 'ticTacToeTemplate', data: game } --><!-- /ko -->
+        </div>
     </div>
 </template>

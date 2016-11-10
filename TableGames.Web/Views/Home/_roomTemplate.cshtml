@@ -24,7 +24,7 @@
         <div class="panel-body">
             <div class="tg-room-actions" data-bind="visible: isHost">
                 <div class="form-inline">
-                    <select class="form-control" data-bind="options: $root.availableGameNames, value: selectedGameName, enable: !table()"></select>
+                    <select class="form-control" data-bind="options: $root.gameNames, value: selectedGameName, enable: !table()"></select>
                     <button type="button" class="btn btn-primary" data-bind="enable: canCreateTable, click: $root.createTable">Open</button>
                     <button type="button" class="btn btn-danger pull-right" data-bind="enable: canDestroyTable, click: $root.destroyTable">End</button>
                 </div>

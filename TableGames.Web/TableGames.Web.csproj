@@ -147,9 +147,11 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Entities\Game.cs" />
     <Compile Include="Entities\Table.cs" />
     <Compile Include="Entities\Room.cs" />
     <Compile Include="Entities\Player.cs" />
+    <Compile Include="Games\TicTacToe.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -197,6 +199,7 @@
     <Content Include="Scripts\_references.js" />
     <Content Include="TG.Scripts\authentication.js" />
     <Content Include="TG.Scripts\notification.js" />
+    <Content Include="TG.Scripts\createGame.js" />
     <Content Include="TG.Scripts\table.js" />
     <Content Include="TG.Scripts\room.js" />
     <Content Include="TG.Scripts\player.js" />
@@ -222,6 +225,7 @@
     <Content Include="Views\Home\_notificationTemplate.cshtml" />
     <Content Include="Views\Home\_roomTemplate.cshtml" />
     <Content Include="Views\Home\_tableTemplate.cshtml" />
+    <Content Include="Views\Home\_ticTacToeTemplate.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

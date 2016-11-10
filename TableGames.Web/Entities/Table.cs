@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using TableGames.Web.Games;
 
 namespace TableGames.Web.Entities
 {
@@ -14,6 +15,7 @@ namespace TableGames.Web.Entities
         public string GameName { get; set; }
         public TableStatus Status { get; set; }
         public List<Player> Players { get; set; }
+        public Game Game { get; set; }
 
         public Table(string gameName) {
             GameName = gameName;
@@ -31,6 +33,7 @@ namespace TableGames.Web.Entities
 
         public void Start() {
             Status = TableStatus.Started;
+            Game = new TicTacToe(this);
         }
 
         public object ToClient() {

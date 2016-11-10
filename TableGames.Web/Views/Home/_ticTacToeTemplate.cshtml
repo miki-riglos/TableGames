@@ -1,0 +1,13 @@
+﻿<template id="ticTacToeTemplate">
+    <div>
+        <div data-bind="text: playerName1"></div>
+        <div data-bind="text: playerName2"></div>
+        <div data-bind="foreach: board">
+            <div>
+                <span data-bind="text: '(' + row + ',' + column + ')'"></span>
+                <span data-bind="text: playerName"></span>
+                <button type="button" data-bind="click: $parent.assign">Assign</button>
+            </div>
+        </div>
+    </div>
+</template>

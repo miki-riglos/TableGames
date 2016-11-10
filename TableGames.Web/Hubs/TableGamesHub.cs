@@ -21,7 +21,8 @@ namespace TableGames.Web.Hubs
 
         public object GetState() {
             return new {
-                players = _players.Values.Where(p => p.Rooms.Any()).Select(p => p.ToClient())
+                players = _players.Values.Where(p => p.Rooms.Any()).Select(p => p.ToClient()),
+                gameNames = GameInfo.GameInfos.Select(gi => gi.Name)
             };
         }
 
@@ -181,7 +182,19 @@ namespace TableGames.Web.Hubs
             room.Table.Start();
 
             room.GetGroups().ForEach(groupId => {
-                Clients.Group(groupId).onTableStarted(hostName, roomName, room.Table.ToClient());
+                Clients.Group(groupId).onTableStarted(hostName, roomName, room.Table.Status, room.Table.Game.ToClient());
+            });
+        }
+
+        // ... Games
+        public void ChangeGame(string hostName, string roomName, string playerName, string eventName, object gameChangeParameters) {
+            var room = _getPlayer(hostName).GetRoom(roomName);  // will throw if player is not host
+            var game = room.Table.Game;
+
+            var gameChangeResults = game.Change(playerName, eventName, gameChangeParameters);
+
+            room.GetGroups().ForEach(groupId => {
+                Clients.Group(groupId).onGameChanged(hostName, roomName, playerName, eventName, gameChangeResults);
             });
         }
 
