@@ -23,7 +23,7 @@
             <button type="button" class="btn btn-primary" data-bind="visible: room.isHost, enable: !hasStarted(), click: $root.startTable">Start</button>
         </div>
         <div data-bind="if: game">
-            <!-- ko template: { name: 'ticTacToeTemplate', data: game } --><!-- /ko -->
+            <!-- ko template: { name: game().templateName, data: game } --><!-- /ko -->
         </div>
     </div>
 </template>

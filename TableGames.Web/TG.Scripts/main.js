@@ -1,7 +1,9 @@
 ﻿require.config({
     paths: {
         'knockout': '../Scripts/knockout-3.4.0.debug',
-        'ko-ext': './extensions/ko-extended'
+        'text': '../Scripts/text',
+        'ko-ext': './extensions/ko-extended',
+        'tmpl': './extensions/tmpl'
     }
 });
 

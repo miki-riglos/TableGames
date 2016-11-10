@@ -13,12 +13,14 @@
 
         var gameInfo = registry[gameName];
 
-        require([gameInfo.constructorFileName], function(Constructor) {
+        require([gameInfo.constructorFileName, 'tmpl!' + gameInfo.templateFileName], function(Constructor, templateName) {
             var game = new Constructor(gameConfig, gameState);
 
             if (!game.change) {
                 game.change = function(eventName, gameChangeResults) { };
             }
+
+            game.templateName = templateName;
 
             return dfd.resolve(game);
         });

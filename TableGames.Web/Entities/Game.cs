@@ -36,7 +36,7 @@ namespace TableGames.Web.Entities
                 Name = "Tic Tac Toe",
                 Type = typeof(TicTacToe),
                 ConstructorFileName = "games/ticTacToe",
-                TemplateFileName = "ticTacToeTemplate"
+                TemplateFileName = "games/ticTacToe"
             }
         };
     }
