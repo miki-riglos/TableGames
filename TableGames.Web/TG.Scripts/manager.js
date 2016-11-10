@@ -264,7 +264,9 @@
             var gameConfig = {
                 sendChangeToServer: function(eventName, gameChangeParameters) {
                     return hub.server.changeGame(room.hostName, room.name, authentication.userName(), eventName, gameChangeParameters);
-                }
+                },
+                room: room,
+                authentication: authentication
             };
             return gameConfig;
         }

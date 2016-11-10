@@ -1,9 +1,12 @@
 ﻿define(['knockout'], function(ko) {
 
-    function TicTacToe(gameConfig, gameState, table, userPlayerName) {
+    function TicTacToe(gameConfig, gameState) {
         var self = this;
-        var indices = [1, 2, 3];
+        var room = gameConfig.room;
+        var table = room.table();
+        var authentication = gameConfig.authentication;
 
+        var indices = [1, 2, 3];
 
         self.playerName1 = table.playerNames()[0];
         self.playerName2 = table.playerNames()[1];
@@ -36,8 +39,8 @@
         }
     }
 
-    function createGame(gameName, gameConfig, gameState, table, userPlayerName) {
-        var game = new TicTacToe(gameConfig, gameState, table, userPlayerName);
+    function createGame(gameName, gameConfig, gameState) {
+        var game = new TicTacToe(gameConfig, gameState);
 
         if (!self.change) {
             self.change = function(eventName, gameChangeResults) { };
