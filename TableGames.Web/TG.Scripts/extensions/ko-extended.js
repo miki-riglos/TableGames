@@ -13,6 +13,10 @@
         return this.indexOf(item) !== -1;
     };
 
+    ko.observableArray.fn.any = function(predicate) {
+        return ko.utils.arrayFilter(this(), predicate || function() { return true; }).length > 0;
+    };
+
     // bindings
     ko.bindingHandlers.onEnter = {
         init: function(element, valueAccessor, allBindings, viewModel) {

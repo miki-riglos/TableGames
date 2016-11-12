@@ -6,16 +6,30 @@
         var players = ko.observableArray();
         var getPlayer = function(playerName) { return players.first(function(player) { return player.name === playerName; }); };
 
-        // main
-        self.userPlayer = ko.computed(function() { return players.first(function(player) { return player.name === authentication.userName(); }); });
-        self.roomToAdd = ko.observable();
-        self.otherPlayers = ko.computed(function() { return players.filter(function(player) { return player.name !== authentication.userName(); }); });
-        self.attendedRooms = ko.observableArray();
-        self.gameNames = [];
-
         // notification
         var notification = Notification.instance;
         self.notification = notification;
+
+        // authentication
+        var authentication = Authentication.instance;
+        self.authentication = authentication;
+
+        // main
+        self.userPlayer = ko.computed(function() {
+            if (authentication.isLoggedIn()) {
+                var player = new Player({ name: authentication.userName() });
+                var playerWithRooms = players.first(function(player) { return player.name === authentication.userName(); });
+                if (playerWithRooms) {
+                    player.rooms = playerWithRooms.rooms;
+                };
+                return player;
+            }
+        });
+        self.roomToAdd = ko.observable();
+
+        self.otherPlayers = ko.computed(function() { return players.filter(function(player) { return player.name !== authentication.userName(); }); });
+        self.attendedRooms = ko.observableArray();
+        self.gameNames = [];
 
         // set state
         self.setState = function(currentState) {
@@ -24,10 +38,6 @@
             gameProvider.register(currentState.gameInfos);
             notification.addInfo('Connection established.');
         };
-
-        // authentication
-        var authentication = Authentication.instance;
-        self.authentication = authentication;
 
         // ... login
         self.login = function() {
@@ -46,16 +56,15 @@
                         authentication.login();
                         // enter attended roomNames
                         var player = getPlayer(authentication.userName());
-                        if (!player) {
-                            players.push(new Player({ name: authentication.userName() }));
+                        if (player) {
+                            attendedRoomState.forEach(function(roomState) {
+                                var host = getPlayer(roomState.hostName);
+                                var room = host ? host.getRoom(roomState.name) : null;
+                                if (room) {
+                                    self.enterRoom(room);
+                                }
+                            });
                         }
-                        attendedRoomState.forEach(function(roomState) {
-                            var host = getPlayer(roomState.hostName);
-                            var room = host ? host.getRoom(roomState.name) : null;
-                            if (room) {
-                                self.enterRoom(room);
-                            }
-                        });
                     })
                     .catch(function(err) {
                         notification.addError(err.message);
