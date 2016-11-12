@@ -212,9 +212,9 @@
 
         // table
         // ... create
-        self.createTable = function(room) {
-            if (authentication.isLoggedIn() && authentication.userName() === room.hostName && room.selectedGameName()) {
-                hub.server.createTable(room.hostName, room.name, room.selectedGameName());
+        self.createTable = function(room, gameName) {
+            if (authentication.isLoggedIn() && authentication.userName() === room.hostName) {
+                hub.server.createTable(room.hostName, room.name, gameName);
             }
         };
 

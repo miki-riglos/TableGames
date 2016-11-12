@@ -7,10 +7,6 @@
         var authentication = gameConfig.authentication;
 
         var indices = [1, 2, 3];
-
-        self.playerName1 = table.playerNames()[0];
-        self.playerName2 = table.playerNames()[1];
-
         self.indices = indices;
 
         self.board = {};

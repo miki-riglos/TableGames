@@ -1,35 +1,91 @@
 ﻿<style>
+    .tg-room > .navbar {
+        border-top-width: 0px;
+        border-right-width: 0px;
+        border-left-width: 0px;
+        border-bottom-right-radius: 0px;
+        border-bottom-left-radius: 0px;
+        margin-bottom: 15px;
+    }
+
+        .tg-room > .navbar .btn-toolbar {
+            margin-top: 9px;
+            margin-bottom: 8px;
+        }
+
+        .tg-room > .navbar .navbar-collapse {
+            padding-right: 0;
+        }
+
     .tg-room > .panel-body {
+        padding-top: 0;
         padding-bottom: 0;
     }
 
-    .tg-room-actions {
-        padding-bottom: 15px;
+        .tg-room > .panel-body .tg-chat {
+            margin-bottom: 15px;
+        }
+
+    .tg-room > .panel-footer {
+        line-height: 30px;
     }
 
-    .tg-room .tg-chat {
-        margin-bottom: 15px;
-    }
+        .tg-room > .panel-footer .badge {
+            margin: 0px 5px;
+            padding: 6px 10px;
+            font-size: 14px;
+            font-weight: normal;
+        }
+
+            .tg-room > .panel-footer .badge.tg-active {
+                background-color: #a94442;
+            }
 </style>
 
 <template id="roomTemplate">
-    <div class="panel panel-primary tg-room">
-        <div class="panel-heading">
-            <span data-bind="text: hostName"></span>/<span data-bind="text: name"></span>
-            <button type="button" class="close" data-bind="click: $root.leaveRoom" title="Leave Room">
-                <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
-            </button>
+    <div class="panel panel-default tg-room">
+        <div class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-bind="attr: { 'data-target': '#' + hostName + '_' + name + '_toolbar_container' }">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <span class="navbar-brand" data-bind="text: hostName + '/' + name"></span>
+                </div>
+
+                <div class="navbar-collapse collapse" data-bind="attr: { 'id': hostName + '_' + name + '_toolbar_container' }">
+                    <div class="btn-toolbar pull-right" role="toolbar">
+                        <!-- createTable -->
+                        <div class="btn-group" role="group" data-bind="visible: canCreateTable">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-bind="enable: canCreateTable" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Open Table <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" data-bind="foreach: $root.gameNames">
+                                <li><a href="#" data-bind="text: $data, click: $root.createTable.bind($parent, $parent, $data)"></a></li>
+                            </ul>
+                        </div>
+
+                        <!-- ko with: table -->
+                        <button type="button" class="btn btn-default" data-bind="visible: canJoin, click: $root.joinTable">Join Table</button>
+                        <button type="button" class="btn btn-default" data-bind="visible: canLeave, click: $root.leaveTable">Leave Table</button>
+                        <button type="button" class="btn btn-primary" data-bind="visible: canStart, click: $root.startTable">Start Game</button>
+                        <!-- /ko -->
+
+                        <!-- destroyTable -->
+                        <button type="button" class="btn btn-danger" data-bind="visible: canDestroyTable, click: $root.destroyTable">End Table</button>
+
+                        <!-- leaveRoom -->
+                        <button type="button" class="btn btn-primary" data-bind="click: $root.leaveRoom" title="Leave Room">
+                            <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="panel-body">
-            <div class="tg-room-actions" data-bind="visible: isHost">
-                <div class="form-inline">
-                    <select class="form-control" data-bind="options: $root.gameNames, value: selectedGameName, enable: !table()"></select>
-                    <button type="button" class="btn btn-primary" data-bind="enable: canCreateTable, click: $root.createTable">Open</button>
-                    <button type="button" class="btn btn-danger pull-right" data-bind="enable: canDestroyTable, click: $root.destroyTable">End</button>
-                </div>
-            </div>
-
             <div class="row">
                 <div class="col-sm-6" data-bind="if: table">
                     <!-- ko template: { name: 'tableTemplate', data: table } --><!-- /ko -->
@@ -39,6 +95,15 @@
                     <!-- ko template: { name: 'chatTemplate', data: chat } --><!-- /ko -->
                 </div>
             </div>
+        </div>
+
+        <div class="panel-footer">
+            Players:
+            <span data-bind="if: table">
+                <!-- ko foreach: table().playerNames -->
+                <span class="badge" data-bind="text: $data"></span>
+                <!-- /ko -->
+            </span>
         </div>
     </div>
 </template>

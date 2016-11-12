@@ -13,7 +13,6 @@
         });
 
         self.isAttended = ko.observable(false);
-        self.selectedGameName = ko.observable();
         self.table = ko.observable();
         self.chat = ko.observable();
 
