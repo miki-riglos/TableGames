@@ -1,16 +1,40 @@
-﻿<template id="ticTacToeTemplate">
-    <div>
-        <div data-bind="text: playerName1"></div>
-        <div data-bind="text: playerName2"></div>
+﻿<style>
+    .tg-tictactoe > .row {
+        margin: 0;
+    }
 
+    .tg-tictactoe-row2 {
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+    }
+
+    .tg-tictactoe-col2 {
+        border-left: 1px solid black;
+        border-right: 1px solid black;
+    }
+
+    .tg-tictactoe-box {
+        margin: 0 auto;
+        height: 40px;
+        padding: 6px 0;
+        width: 100%;
+        font-size: 20px;
+        text-align: center;
+    }
+    .tg-tictactoe-box.tg-empty:hover {
+        cursor: pointer;
+    }
+</style>
+
+<template id="ticTacToeTemplate">
+    <div class="tg-tictactoe">
         <!-- ko foreach: { data: indices, as: 'row' } -->
         <div class="row">
             <!-- ko foreach: { data: $parent.indices, as: 'col' } -->
-            <div class="col-xs-4">
-                <!-- ko with: $parents[1] -->
-                <span data-bind="text: board[row][col]"></span>
-                <button type="button" data-bind="click: assign.bind($data, row, col)">Assign</button>
-                <!-- /ko -->
+            <div class="col-xs-4" data-bind="css: 'tg-tictactoe-row' + row + ' tg-tictactoe-col' + col, with: $parents[1]">
+                <div class="tg-tictactoe-box" data-bind="click: assign.bind($data, row, col), css: { 'tg-empty': !board[row][col]() }">
+                    <div data-bind="text: board[row][col].symbol"></div>
+                </div>
             </div>
             <!-- /ko -->
         </div>
