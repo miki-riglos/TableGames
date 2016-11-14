@@ -21,16 +21,7 @@
         self.authentication = authentication;
 
         // main
-        self.userPlayer = ko.computed(function() {
-            if (authentication.isLoggedIn()) {
-                var player = new Player({ name: authentication.userName() });
-                var playerWithRooms = players.first(function(player) { return player.name === authentication.userName(); });
-                if (playerWithRooms) {
-                    player.rooms = playerWithRooms.rooms;
-                }
-                return player;
-            }
-        });
+        self.userPlayer = ko.computed(function() { return players.first(function(player) { return player.name === authentication.userName(); }); });
         self.roomToAdd = ko.observable();
 
         self.otherPlayers = ko.computed(function() { return players.filter(function(player) { return player.name !== authentication.userName(); }); });
@@ -61,16 +52,13 @@
                         // login
                         authentication.login();
                         // enter attended roomNames
-                        var player = getPlayer(authentication.userName());
-                        if (player) {
-                            attendedRoomState.forEach(function(roomState) {
-                                var host = getPlayer(roomState.hostName);
-                                var room = host ? host.getRoom(roomState.name) : null;
-                                if (room) {
-                                    self.enterRoom(room);
-                                }
-                            });
-                        }
+                        attendedRoomState.forEach(function(roomState) {
+                            var host = getPlayer(roomState.hostName);
+                            var room = host ? host.getRoom(roomState.name) : null;
+                            if (room) {
+                                self.enterRoom(room);
+                            }
+                        });
                     })
                     .catch(function(err) {
                         notification.addError(err.message);
@@ -79,6 +67,9 @@
         };
 
         hub.client.onLoggedIn = function(userName) {
+            if (!players.any(function(player) { return player.name === userName; })) {
+                players.push(new Player({ name: userName }));
+            }
             notification.addInfo(userName + ' just logged in.');
         };
 
@@ -128,10 +119,6 @@
 
         hub.client.onRoomAdded = function(userName, roomState) {
             var player = getPlayer(userName);
-            if (!player) {
-                player = new Player({ name: userName });
-                players.push(player);
-            }
             var room = player.addRoom(roomState);
             notification.addInfo(userName + ' added room ' + roomState.name + '.');
             // enter room if host
@@ -156,9 +143,6 @@
             var room = player.getRoom(roomState.name);
             self.attendedRooms.remove(room);
             player.removeRoom(room);
-            if (player.rooms().length === 0) {
-                players.remove(player);
-            }
             notification.addInfo(userName + ' removed room ' + roomState.name + '.');
         };
 
