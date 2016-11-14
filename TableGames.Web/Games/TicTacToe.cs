@@ -10,6 +10,7 @@ namespace TableGames.Web.Games
         private List<Box> _board;
 
         public TicTacToe(Table table) : base(table) {
+            SetNextPlayer();
             _board = createBoard();
         }
 
@@ -22,8 +23,14 @@ namespace TableGames.Web.Games
             var box = _board.First(b => b.Row == row && b.Col == col);
             if (box != null && box.PlayerName == null) {
                 box.PlayerName = playerName;
+                SetNextPlayer();
 
-                return new { row, col, playerName };
+                return new {
+                    row = row,
+                    col = col,
+                    playerName = playerName,
+                    activePlayerName = ActivePlayer.Name
+                };
             }
             else {
                 throw new Exception("TicTacToe AssignBox error.");
@@ -32,14 +39,18 @@ namespace TableGames.Web.Games
 
         public override object Change(string playerName, string eventName, dynamic gameChangeParameters) {
             if (eventName == "AssignBox") {
-                return AssignBox(playerName, (int)gameChangeParameters.row, (int)gameChangeParameters.col);
+                if (playerName == ActivePlayer.Name ) {
+                    return AssignBox(playerName, (int)gameChangeParameters.row, (int)gameChangeParameters.col);
+                }
+                throw new Exception("TicTacToe Change error - It is not your turn.");
             }
             throw new Exception("TicTacToe Change error.");
         }
 
         public override object ToClient() {
             return new {
-                board = _board.Select(b => b.ToClient())
+                board = _board.Select(b => b.ToClient()),
+                activePlayerName = ActivePlayer?.Name
             };
         }
 

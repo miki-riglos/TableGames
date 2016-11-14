@@ -12,6 +12,8 @@
         self.playerName1 = table.playerNames()[0];
         self.playerName2 = table.playerNames()[1];
 
+        table.activePlayerName(gameState.activePlayerName);
+
         var symbols = {};
         symbols[self.playerName1] = 'X';
         symbols[self.playerName2] = 'O';
@@ -29,6 +31,9 @@
         });
 
         self.assign = function(row, col) {
+            if (table.activePlayerName() !== authentication.userName()) {
+                return;
+            }
             var gameChangeParameters = {
                 row: row,
                 col: col
@@ -39,6 +44,7 @@
         self.change = function(playerName, eventName, gameChangeResults) {
             if (eventName === 'AssignBox') {
                 self.board[gameChangeResults.row][gameChangeResults.col](playerName);
+                table.activePlayerName(gameChangeResults.activePlayerName);
             }
         };
     }

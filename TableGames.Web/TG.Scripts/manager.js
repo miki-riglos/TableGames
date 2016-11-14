@@ -4,7 +4,13 @@
         var self = this;
 
         var players = ko.observableArray();
-        var getPlayer = function(playerName) { return players.first(function(player) { return player.name === playerName; }); };
+        var getPlayer = function(playerName) {
+            var player = players.first(function(player) { return player.name === playerName; });
+            if (!player && authentication.isLoggedIn()) {
+                player = self.userPlayer();
+            }
+            return player;
+        };
 
         // notification
         var notification = Notification.instance;
@@ -21,7 +27,7 @@
                 var playerWithRooms = players.first(function(player) { return player.name === authentication.userName(); });
                 if (playerWithRooms) {
                     player.rooms = playerWithRooms.rooms;
-                };
+                }
                 return player;
             }
         });

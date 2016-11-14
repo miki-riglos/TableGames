@@ -7,8 +7,21 @@ namespace TableGames.Web.Entities
     {
         public Table Table { get; private set; }
 
+        public Player ActivePlayer { get; private set; }
+
         public Game(Table table) {
             Table = table;
+        }
+
+        public void SetNextPlayer() {
+            if (ActivePlayer == null) {
+                ActivePlayer = Table.Players[0];
+            }
+            else {
+                var activeIndex = Table.Players.IndexOf(ActivePlayer);
+                activeIndex = activeIndex < (Table.Players.Count - 1) ? activeIndex + 1 : 0;
+                ActivePlayer = Table.Players[activeIndex];
+            }
         }
 
         public abstract object Change(string playerName, string eventName, object gameChangeParameters);

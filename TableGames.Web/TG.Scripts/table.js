@@ -8,6 +8,8 @@
         self.status = ko.observable(tableState.status);
         self.playerNames = ko.observableArray(tableState.playerNames);
 
+        self.activePlayerName = ko.observable(tableState.activePlayerName);
+
         self.room = room;
 
         self.game = ko.observable();

@@ -101,7 +101,7 @@
             Players:
             <span data-bind="if: table">
                 <!-- ko foreach: table().playerNames -->
-                <span class="badge" data-bind="text: $data"></span>
+                <span class="badge" data-bind="text: $data, css: { 'tg-active': $data === $parent.table().activePlayerName() }"></span>
                 <!-- /ko -->
             </span>
         </div>
