@@ -2,8 +2,7 @@
 
     function TicTacToe(gameConfig, gameState) {
         var self = this;
-        var room = gameConfig.room;
-        var table = room.table();
+        var table = gameConfig.table;
         var authentication = gameConfig.authentication;
 
         var indices = [1, 2, 3];
