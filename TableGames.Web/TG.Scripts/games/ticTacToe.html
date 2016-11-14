@@ -33,11 +33,12 @@
             <!-- ko foreach: { data: $parent.indices, as: 'col' } -->
             <div class="col-xs-4" data-bind="css: 'tg-tictactoe-row' + row + ' tg-tictactoe-col' + col, with: $parents[1]">
                 <div class="tg-tictactoe-box" data-bind="click: assign.bind($data, row, col), css: { 'tg-empty': !board[row][col]() }">
-                    <div data-bind="text: board[row][col].symbol"></div>
+                    <div data-bind="text: board[row][col].symbol, css: { 'bg-info': board[row][col].isWinning }"></div>
                 </div>
             </div>
             <!-- /ko -->
         </div>
         <!-- /ko -->
+        <div data-bind="text: winnerName"></div>
     </div>
 </template>
