@@ -201,7 +201,7 @@ namespace TableGames.Web.Hubs
         public void DestroyTable(string hostName, string roomName) {
             var room = _getPlayer(hostName).GetRoom(roomName);  // will throw if player is not host
 
-            room.Table = null;
+            room.DestroyTable();
 
             room.GetGroups().ForEach(groupId => {
                 Clients.Group(groupId).onTableDestroyed(hostName, roomName);

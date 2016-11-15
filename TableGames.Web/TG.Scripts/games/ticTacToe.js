@@ -28,7 +28,7 @@
             self.board[boxState.row][boxState.col](boxState.playerName);
         });
 
-        table.activePlayerName(gameState.activePlayerName);
+        table.activePlayerName(gameState.table.activePlayerName);
         self.isFinalized = ko.observable(gameState.isFinalized);
         gameState.winningBoxes.forEach(function(ab) { self.board[ab.row][ab.col].isWinning(true); });
         self.winnerName = ko.observable(gameState.winnerName);
@@ -47,7 +47,7 @@
 
         self.assignBox.onCompleted = function(playerName, gameChangeResults) {
             self.board[gameChangeResults.row][gameChangeResults.col](playerName);
-            table.activePlayerName(gameChangeResults.activePlayerName);
+            table.activePlayerName(gameChangeResults.table.activePlayerName);
             if (gameChangeResults.isFinalized) {
                 self.isFinalized(gameChangeResults.isFinalized);
                 gameChangeResults.winningBoxes.forEach(function(ab) { self.board[ab.row][ab.col].isWinning(true); });
@@ -71,7 +71,7 @@
                 self.board[boxState.row][boxState.col].isWinning(false);
             });
 
-            table.activePlayerName(gameChangeResults.activePlayerName);
+            table.activePlayerName(gameChangeResults.table.activePlayerName);
             self.isFinalized(gameChangeResults.isFinalized);
             gameChangeResults.winningBoxes.forEach(function(ab) { self.board[ab.row][ab.col].isWinning(true); });
             self.winnerName(gameChangeResults.winnerName);

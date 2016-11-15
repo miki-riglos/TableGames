@@ -18,7 +18,7 @@ namespace TableGames.Web.Games
             WinningBoxes = new List<AssignedBox>();
             WinnerName = null;
 
-            SetNextPlayer();
+            Table.SetNextPlayer();
         }
 
         private List<AssignedBox> createBoard() {
@@ -27,15 +27,15 @@ namespace TableGames.Web.Games
         }
 
         private object assignBox(string playerName, int row, int col) {
-            if (playerName != ActivePlayer.Name) {
+            if (playerName != Table.ActivePlayer.Name) {
                 throw new Exception("TicTacToe error - It is not your turn.");
             }
             var assignedBox = Board.First(ab => ab.Box.Row == row && ab.Box.Col == col);
             if (assignedBox != null && assignedBox.PlayerName == null) {
-                assignedBox.PlayerName = ActivePlayer.Name;
+                assignedBox.PlayerName = Table.ActivePlayer.Name;
 
                 // check if finalized
-                var playerBoxes = Board.Where(ab => ab.PlayerName == ActivePlayer.Name);
+                var playerBoxes = Board.Where(ab => ab.PlayerName == Table.ActivePlayer.Name);
                 var winningBoxCombination = _winningBoxCombinations.FirstOrDefault(ids => ids.Intersect(playerBoxes.Select(ab => ab.Box.Id)).Count() == 3);
 
                 if (winningBoxCombination == null) {
@@ -44,18 +44,20 @@ namespace TableGames.Web.Games
                 else {
                     IsFinalized = true;
                     WinningBoxes = Board.Where(ab => winningBoxCombination.Contains(ab.Box.Id)).ToList();
-                    WinnerName = ActivePlayer.Name;
+                    WinnerName = Table.ActivePlayer.Name;
                 }
 
                 // set next player if not finalized
                 if (!IsFinalized) {
-                    SetNextPlayer();
+                    Table.SetNextPlayer();
                 }
 
                 return new {
                     row = row,
                     col = col,
-                    activePlayerName = ActivePlayer.Name,
+                    table = new {
+                        activePlayerName = Table.ActivePlayer.Name,
+                    },
                     isFinalized = IsFinalized,
                     winningBoxes = WinningBoxes.Select(ab => ab.ToClient()),
                     winnerName = WinnerName
@@ -67,19 +69,21 @@ namespace TableGames.Web.Games
         }
 
         private object restart(string playerName) {
-            //if (playerName != Table.Room.Host.Name || !IsFinalized) {
-            //    throw new Exception("TicTacToe error - Only the Host can restart a finalized game.");
-            //}
+            if (playerName != Table.Room.Host.Name || !IsFinalized) {
+                throw new Exception("TicTacToe error - Only the Host can restart a finalized game.");
+            }
 
             Board = createBoard();
-            SetNextPlayer();
+            Table.SetNextPlayer();
             IsFinalized = false;
             WinningBoxes.Clear();
             WinnerName = null;
 
             return new {
                 board = Board.Select(ab => ab.ToClient()),
-                activePlayerName = ActivePlayer.Name,
+                table = new {
+                    activePlayerName = Table.ActivePlayer.Name,
+                },
                 isFinalized = IsFinalized,
                 winningBoxes = WinningBoxes.Select(ab => ab.ToClient()),
                 winnerName = WinnerName
@@ -99,7 +103,9 @@ namespace TableGames.Web.Games
         public override object ToClient() {
             return new {
                 board = Board.Select(ab => ab.ToClient()),
-                activePlayerName = ActivePlayer?.Name,
+                table = new {
+                    activePlayerName = Table.ActivePlayer?.Name,
+                },
                 isFinalized = IsFinalized,
                 winningBoxes = WinningBoxes.Select(ab => ab.ToClient()),
                 winnerName = WinnerName
