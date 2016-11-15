@@ -1,9 +1,9 @@
-﻿define(['knockout', 'authentication', 'gameProvider'], function(ko, Authentication, gameProvider) {
+﻿define(['knockout', 'jquery', 'authentication', 'gameProvider'], function(ko, $, Authentication, gameProvider) {
 
     function Table(tableState, room) {
         var self = this;
         var authentication = Authentication.instance;
-        var gamePromise;
+        var gamePromise = $.Deferred().resolve();
 
         self.gameName = tableState.gameName;
         self.status = ko.observable(tableState.status);
@@ -32,10 +32,7 @@
 
         self.start = function(tableStatus, gameConfig, gameState) {
             self.status(tableStatus);
-            gamePromise = gameProvider.createGame(self.gameName, gameConfig, gameState)
-                            .then(function(game) {
-                                self.game(game);
-                            });
+            self.startGame(gameConfig, gameState)
         };
         self.canStart = ko.computed(function() { return self.room.isHost() && !self.hasStarted(); });
 
@@ -45,6 +42,17 @@
                 self.game().change(playerName, eventName, gameChangeResults);
             });
         };
+
+        self.startGame = function(gameConfig, gameState) {
+            gamePromise = gamePromise
+                            .then(function() {
+                                return gameProvider.createGame(self.gameName, gameConfig, gameState)
+                            })
+                            .then(function(game) {
+                                self.game(game);
+                            });
+        }
+        self.canRestartGame = ko.computed(function() { return self.room.isHost() && self.hasStarted() && self.game() && self.game().isFinalized(); });
     }
 
     return Table;

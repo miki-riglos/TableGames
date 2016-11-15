@@ -3,9 +3,13 @@
     public abstract class Game
     {
         public Table Table { get; private set; }
+        public bool IsFinalized { get; protected set; }
+        public string WinnerName { get; protected set; }
 
         public Game(Table table) {
             Table = table;
+            WinnerName = null;
+            IsFinalized = false;
         }
 
         public abstract object Change(string playerName, string eventName, object gameChangeParameters);

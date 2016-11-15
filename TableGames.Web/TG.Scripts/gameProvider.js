@@ -16,6 +16,9 @@
         require([gameInfo.constructorFileName, 'tmpl!' + gameInfo.templateFileName], function(Constructor, templateName) {
             var game = new Constructor(gameConfig, gameState);
 
+            game.isFinalized = game.isFinalized || ko.observable(gameState.isFinalized);
+            game.winnerName = game.winnerName || ko.observable(gameState.winnerName);
+
             game.change = function(playerName, eventName, gameChangeResults) {
                 game[eventName].onCompleted(playerName, gameChangeResults);
             };
@@ -24,7 +27,6 @@
 
             return dfd.resolve(game);
         });
-
 
         return dfd.promise();
     }

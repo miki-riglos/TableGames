@@ -5,6 +5,10 @@
         var table = gameConfig.table;
         var authentication = gameConfig.authentication;
 
+        // base members
+        self.isFinalized = ko.observable(gameState.isFinalized);
+        self.winnerName = ko.observable(gameState.winnerName);
+
         var indices = [1, 2, 3];
         self.indices = indices;
 
@@ -27,11 +31,9 @@
         gameState.board.forEach(function(boxState) {
             self.board[boxState.row][boxState.col](boxState.playerName);
         });
+        gameState.winningBoxes.forEach(function(ab) { self.board[ab.row][ab.col].isWinning(true); });
 
         table.activePlayerName(gameState.table.activePlayerName);
-        self.isFinalized = ko.observable(gameState.isFinalized);
-        gameState.winningBoxes.forEach(function(ab) { self.board[ab.row][ab.col].isWinning(true); });
-        self.winnerName = ko.observable(gameState.winnerName);
 
         // assign box
         self.assignBox = function(row, col) {
@@ -53,28 +55,6 @@
                 gameChangeResults.winningBoxes.forEach(function(ab) { self.board[ab.row][ab.col].isWinning(true); });
                 self.winnerName(gameChangeResults.winnerName);
             }
-        };
-
-        // restart
-        self.restart = function() {
-            if (self.canRestart()) {
-                gameConfig.sendChangeToServer('restart', {});
-            }
-        };
-        self.canRestart = ko.computed(function() {
-            return table.room.hostName === authentication.userName() && self.isFinalized();
-        });
-
-        self.restart.onCompleted = function(playerName, gameChangeResults) {
-            gameChangeResults.board.forEach(function(boxState) {
-                self.board[boxState.row][boxState.col](boxState.playerName);
-                self.board[boxState.row][boxState.col].isWinning(false);
-            });
-
-            table.activePlayerName(gameChangeResults.table.activePlayerName);
-            self.isFinalized(gameChangeResults.isFinalized);
-            gameChangeResults.winningBoxes.forEach(function(ab) { self.board[ab.row][ab.col].isWinning(true); });
-            self.winnerName(gameChangeResults.winnerName);
         };
     }
 

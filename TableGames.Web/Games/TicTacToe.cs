@@ -8,15 +8,11 @@ namespace TableGames.Web.Games
     public class TicTacToe : Game
     {
         public List<AssignedBox> Board { get; private set; }
-        public bool IsFinalized { get; private set; }
         public List<AssignedBox> WinningBoxes { get; private set; }
-        public string WinnerName { get; private set; }
 
         public TicTacToe(Table table) : base(table) {
             Board = createBoard();
-            IsFinalized = false;
             WinningBoxes = new List<AssignedBox>();
-            WinnerName = null;
 
             Table.SetNextPlayer();
         }

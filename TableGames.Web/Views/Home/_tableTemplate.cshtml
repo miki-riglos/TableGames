@@ -23,5 +23,11 @@
             <!-- ko template: { name: game().templateName, data: game } --><!-- /ko -->
             <!-- /ko -->
         </div>
+        <div class="panel-footer">
+            <!-- ko if: game -->
+            <div data-bind="text: 'Winner: ' + game().winnerName()"></div>
+            <!-- /ko -->
+            <button type="button" class="btn btn-primary" data-bind="visible: canRestartGame, click: $root.restartGame">Restart</button>
+        </div>
     </div>
 </template>

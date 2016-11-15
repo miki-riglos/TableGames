@@ -197,6 +197,20 @@ namespace TableGames.Web.Hubs
             });
         }
 
+        public void RestartGame(string hostName, string roomName) {
+            var room = _getPlayer(hostName).GetRoom(roomName);  // will throw if player is not host
+
+            if (room.Table.Game.IsFinalized) {
+                room.Table.Start();
+
+                room.GetGroups().ForEach(groupId => {
+                    Clients.Group(groupId).onGameRestarted(hostName, roomName, room.Table.Game.ToClient());
+                });
+            } else {
+                throw new HubException("RestartGame error.");
+            }
+        }
+
         public void DestroyTable(string hostName, string roomName) {
             var room = _getPlayer(hostName).GetRoom(roomName);  // will throw if player is not host
 

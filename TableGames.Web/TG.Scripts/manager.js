@@ -288,6 +288,22 @@
             notification.addInfo(table.gameName + ' changed in room ' + hostName + '/' + roomName + '.');
         };
 
+        // ... ... restart game
+        self.restartGame = function(table) {
+            var room = table.room;
+            if (authentication.userName() === room.hostName) {
+                hub.server.restartGame(room.hostName, room.name);
+            }
+        };
+
+        hub.client.onGameRestarted = function(hostName, roomName, gameState) {
+            var room = getPlayer(hostName).getRoom(roomName);
+            var table = room.table();
+
+            table.startGame(getGameConfig(room), gameState);
+            notification.addInfo('Table ' + table.gameName + ' in room ' + hostName + '/' + roomName + ' just restarted.');
+        };
+
         // ... destroy
         self.destroyTable = function(room) {
             if (authentication.userName() === room.hostName) {
