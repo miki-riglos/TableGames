@@ -16,9 +16,9 @@
         require([gameInfo.constructorFileName, 'tmpl!' + gameInfo.templateFileName], function(Constructor, templateName) {
             var game = new Constructor(gameConfig, gameState);
 
-            if (!game.change) {
-                game.change = function(eventName, gameChangeResults) { };
-            }
+            game.change = function(playerName, eventName, gameChangeResults) {
+                game[eventName].onCompleted(playerName, gameChangeResults);
+            };
 
             game.templateName = templateName;
 

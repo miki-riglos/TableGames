@@ -21,9 +21,14 @@
         font-size: 20px;
         text-align: center;
     }
-    .tg-tictactoe-box.tg-empty:hover {
-        cursor: pointer;
-    }
+
+        .tg-tictactoe-box.tg-tictactoe-clickable:hover {
+            cursor: pointer;
+        }
+
+        .tg-tictactoe-box > div.bg-info {
+            border-radius: 14px;
+        }
 </style>
 
 <template id="ticTacToeTemplate">
@@ -32,13 +37,14 @@
         <div class="row">
             <!-- ko foreach: { data: $parent.indices, as: 'col' } -->
             <div class="col-xs-4" data-bind="css: 'tg-tictactoe-row' + row + ' tg-tictactoe-col' + col, with: $parents[1]">
-                <div class="tg-tictactoe-box" data-bind="click: assign.bind($data, row, col), css: { 'tg-empty': !board[row][col]() }">
+                <div class="tg-tictactoe-box" data-bind="click: assignBox.bind($data, row, col), css: { 'tg-tictactoe-clickable': !board[row][col]() && !isFinalized() }">
                     <div data-bind="text: board[row][col].symbol, css: { 'bg-info': board[row][col].isWinning }"></div>
                 </div>
             </div>
             <!-- /ko -->
         </div>
         <!-- /ko -->
-        <div data-bind="text: winnerName"></div>
+        <div data-bind="text: 'Winner: ' + winnerName()"></div>
+        <button type="button" class="btn btn-primary" data-bind="visible: canRestart, click: restart">Restart</button>
     </div>
 </template>

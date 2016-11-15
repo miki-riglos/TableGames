@@ -33,7 +33,8 @@
         gameState.winningBoxes.forEach(function(ab) { self.board[ab.row][ab.col].isWinning(true); });
         self.winnerName = ko.observable(gameState.winnerName);
 
-        self.assign = function(row, col) {
+        // assign box
+        self.assignBox = function(row, col) {
             if (table.activePlayerName() !== authentication.userName() || self.isFinalized()) {
                 return;
             }
@@ -44,16 +45,36 @@
             gameConfig.sendChangeToServer('assignBox', gameChangeParameters);
         };
 
-        self.change = function(playerName, eventName, gameChangeResults) {
-            if (eventName === 'assignBox') {
-                self.board[gameChangeResults.row][gameChangeResults.col](playerName);
-                table.activePlayerName(gameChangeResults.activePlayerName);
-                if (gameChangeResults.isFinalized) {
-                    self.isFinalized(gameChangeResults.isFinalized);
-                    gameChangeResults.winningBoxes.forEach(function(ab) { self.board[ab.row][ab.col].isWinning(true); });
-                    self.winnerName(gameChangeResults.winnerName);
-                }
+        self.assignBox.onCompleted = function(playerName, gameChangeResults) {
+            self.board[gameChangeResults.row][gameChangeResults.col](playerName);
+            table.activePlayerName(gameChangeResults.activePlayerName);
+            if (gameChangeResults.isFinalized) {
+                self.isFinalized(gameChangeResults.isFinalized);
+                gameChangeResults.winningBoxes.forEach(function(ab) { self.board[ab.row][ab.col].isWinning(true); });
+                self.winnerName(gameChangeResults.winnerName);
             }
+        };
+
+        // restart
+        self.restart = function() {
+            if (self.canRestart()) {
+                gameConfig.sendChangeToServer('restart', {});
+            }
+        };
+        self.canRestart = ko.computed(function() {
+            return table.room.hostName === authentication.userName() && self.isFinalized();
+        });
+
+        self.restart.onCompleted = function(playerName, gameChangeResults) {
+            gameChangeResults.board.forEach(function(boxState) {
+                self.board[boxState.row][boxState.col](boxState.playerName);
+                self.board[boxState.row][boxState.col].isWinning(false);
+            });
+
+            table.activePlayerName(gameChangeResults.activePlayerName);
+            self.isFinalized(gameChangeResults.isFinalized);
+            gameChangeResults.winningBoxes.forEach(function(ab) { self.board[ab.row][ab.col].isWinning(true); });
+            self.winnerName(gameChangeResults.winnerName);
         };
     }
 

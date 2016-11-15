@@ -26,13 +26,28 @@ namespace TableGames.Web.Games
             return indices.SelectMany(row => indices, (row, col) => new AssignedBox(row, col)).ToList();
         }
 
-        private object assignBox(int row, int col) {
+        private object assignBox(string playerName, int row, int col) {
+            if (playerName != ActivePlayer.Name) {
+                throw new Exception("TicTacToe error - It is not your turn.");
+            }
             var assignedBox = Board.First(ab => ab.Box.Row == row && ab.Box.Col == col);
             if (assignedBox != null && assignedBox.PlayerName == null) {
                 assignedBox.PlayerName = ActivePlayer.Name;
 
-                updateState();
+                // check if finalized
+                var playerBoxes = Board.Where(ab => ab.PlayerName == ActivePlayer.Name);
+                var winningBoxCombination = _winningBoxCombinations.FirstOrDefault(ids => ids.Intersect(playerBoxes.Select(ab => ab.Box.Id)).Count() == 3);
 
+                if (winningBoxCombination == null) {
+                    IsFinalized = Board.Count(ab => ab.PlayerName != null) >= 9;
+                }
+                else {
+                    IsFinalized = true;
+                    WinningBoxes = Board.Where(ab => winningBoxCombination.Contains(ab.Box.Id)).ToList();
+                    WinnerName = ActivePlayer.Name;
+                }
+
+                // set next player if not finalized
                 if (!IsFinalized) {
                     SetNextPlayer();
                 }
@@ -51,26 +66,32 @@ namespace TableGames.Web.Games
             }
         }
 
-        private void updateState() {
-            var playerBoxes = Board.Where(ab => ab.PlayerName == ActivePlayer.Name);
-            var winningBoxCombination = _winningBoxCombinations.FirstOrDefault(ids => ids.Intersect(playerBoxes.Select(ab => ab.Box.Id)).Count() == 3);
+        private object restart(string playerName) {
+            //if (playerName != Table.Room.Host.Name || !IsFinalized) {
+            //    throw new Exception("TicTacToe error - Only the Host can restart a finalized game.");
+            //}
 
-            if (winningBoxCombination == null) {
-                IsFinalized = Board.Count(ab => ab.PlayerName != null) >= 9;
-            }
-            else {
-                IsFinalized = true;
-                WinningBoxes = Board.Where(ab => winningBoxCombination.Contains(ab.Box.Id)).ToList();
-                WinnerName = ActivePlayer.Name;
-            }
+            Board = createBoard();
+            SetNextPlayer();
+            IsFinalized = false;
+            WinningBoxes.Clear();
+            WinnerName = null;
+
+            return new {
+                board = Board.Select(ab => ab.ToClient()),
+                activePlayerName = ActivePlayer.Name,
+                isFinalized = IsFinalized,
+                winningBoxes = WinningBoxes.Select(ab => ab.ToClient()),
+                winnerName = WinnerName
+            };
         }
 
         public override object Change(string playerName, string eventName, dynamic gameChangeParameters) {
             if (eventName == "assignBox") {
-                if (playerName == ActivePlayer.Name) {
-                    return assignBox((int)gameChangeParameters.row, (int)gameChangeParameters.col);
-                }
-                throw new Exception("TicTacToe Change error - It is not your turn.");
+                return assignBox(playerName, (int)gameChangeParameters.row, (int)gameChangeParameters.col);
+            }
+            else if (eventName == "restart") {
+                return restart(playerName);
             }
             throw new Exception("TicTacToe Change error.");
         }
