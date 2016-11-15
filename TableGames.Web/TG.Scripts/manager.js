@@ -283,9 +283,8 @@
         hub.client.onGameChanged = function(hostName, roomName, playerName, eventName, gameChangeResults) {
             var room = getPlayer(hostName).getRoom(roomName);
             var table = room.table();
-            var game = table.game();
 
-            game.change(playerName, eventName, gameChangeResults);
+            table.changeGame(playerName, eventName, gameChangeResults);
             notification.addInfo(table.gameName + ' changed in room ' + hostName + '/' + roomName + '.');
         };
 

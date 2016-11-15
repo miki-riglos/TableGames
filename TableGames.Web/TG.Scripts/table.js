@@ -3,6 +3,7 @@
     function Table(tableState, room) {
         var self = this;
         var authentication = Authentication.instance;
+        var gamePromise;
 
         self.gameName = tableState.gameName;
         self.status = ko.observable(tableState.status);
@@ -31,12 +32,19 @@
 
         self.start = function(tableStatus, gameConfig, gameState) {
             self.status(tableStatus);
-            gameProvider.createGame(self.gameName, gameConfig, gameState)
-                .then(function(game) {
-                    self.game(game);
-                });
+            gamePromise = gameProvider.createGame(self.gameName, gameConfig, gameState)
+                            .then(function(game) {
+                                self.game(game);
+                            });
         };
         self.canStart = ko.computed(function() { return self.room.isHost() && !self.hasStarted(); });
+
+        self.changeGame = function(playerName, eventName, gameChangeResults) {
+            gamePromise = gamePromise.then(function() {
+                if (!self) return;  // in case table was destroyed before game change
+                self.game().change(playerName, eventName, gameChangeResults);
+            });
+        };
     }
 
     return Table;

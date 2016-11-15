@@ -189,9 +189,8 @@ namespace TableGames.Web.Hubs
         // ... Games
         public void ChangeGame(string hostName, string roomName, string playerName, string eventName, object gameChangeParameters) {
             var room = _getPlayer(hostName).GetRoom(roomName);  // will throw if player is not host
-            var game = room.Table.Game;
 
-            var gameChangeResults = game.Change(playerName, eventName, gameChangeParameters);
+            var gameChangeResults = room.Table.ChangeGame(playerName, eventName, gameChangeParameters);
 
             room.GetGroups().ForEach(groupId => {
                 Clients.Group(groupId).onGameChanged(hostName, roomName, playerName, eventName, gameChangeResults);
