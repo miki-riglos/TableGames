@@ -11,15 +11,12 @@ namespace TableGames.Web.Games
         public List<AssignedBox> WinningBoxes { get; private set; }
 
         public TicTacToe(Table table) : base(table) {
-            Board = createBoard();
+            int[] indices = { 1, 2, 3 };
+            Board = indices.SelectMany(row => indices, (row, col) => new AssignedBox(row, col)).ToList();
+
             WinningBoxes = new List<AssignedBox>();
 
             Table.SetNextPlayer();
-        }
-
-        private List<AssignedBox> createBoard() {
-            int[] indices = { 1, 2, 3 };
-            return indices.SelectMany(row => indices, (row, col) => new AssignedBox(row, col)).ToList();
         }
 
         private object assignBox(string playerName, int row, int col) {
@@ -40,7 +37,7 @@ namespace TableGames.Web.Games
                 else {
                     IsFinalized = true;
                     WinningBoxes = Board.Where(ab => winningBoxCombination.Contains(ab.Box.Id)).ToList();
-                    WinnerName = Table.ActivePlayer.Name;
+                    WinnerNames.Add(Table.ActivePlayer.Name);
                 }
 
                 // set next player if not finalized
@@ -56,7 +53,7 @@ namespace TableGames.Web.Games
                     },
                     isFinalized = IsFinalized,
                     winningBoxes = WinningBoxes.Select(ab => ab.ToClient()),
-                    winnerName = WinnerName
+                    winnerNames = WinnerNames
                 };
             }
             else {
@@ -64,34 +61,9 @@ namespace TableGames.Web.Games
             }
         }
 
-        private object restart(string playerName) {
-            if (playerName != Table.Room.Host.Name || !IsFinalized) {
-                throw new Exception("TicTacToe error - Only the Host can restart a finalized game.");
-            }
-
-            Board = createBoard();
-            Table.SetNextPlayer();
-            IsFinalized = false;
-            WinningBoxes.Clear();
-            WinnerName = null;
-
-            return new {
-                board = Board.Select(ab => ab.ToClient()),
-                table = new {
-                    activePlayerName = Table.ActivePlayer.Name,
-                },
-                isFinalized = IsFinalized,
-                winningBoxes = WinningBoxes.Select(ab => ab.ToClient()),
-                winnerName = WinnerName
-            };
-        }
-
         public override object Change(string playerName, string eventName, dynamic gameChangeParameters) {
             if (eventName == "assignBox") {
                 return assignBox(playerName, (int)gameChangeParameters.row, (int)gameChangeParameters.col);
-            }
-            else if (eventName == "restart") {
-                return restart(playerName);
             }
             throw new Exception("TicTacToe Change error.");
         }
@@ -104,7 +76,7 @@ namespace TableGames.Web.Games
                 },
                 isFinalized = IsFinalized,
                 winningBoxes = WinningBoxes.Select(ab => ab.ToClient()),
-                winnerName = WinnerName
+                winnerNames = WinnerNames
             };
         }
 

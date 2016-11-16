@@ -32,7 +32,7 @@
 
         self.start = function(tableStatus, gameConfig, gameState) {
             self.status(tableStatus);
-            self.startGame(gameConfig, gameState)
+            self.startGame(gameConfig, gameState);
         };
         self.canStart = ko.computed(function() { return self.room.isHost() && !self.hasStarted(); });
 
@@ -46,12 +46,12 @@
         self.startGame = function(gameConfig, gameState) {
             gamePromise = gamePromise
                             .then(function() {
-                                return gameProvider.createGame(self.gameName, gameConfig, gameState)
+                                return gameProvider.createGame(self.gameName, gameConfig, gameState);
                             })
                             .then(function(game) {
                                 self.game(game);
                             });
-        }
+        };
         self.canRestartGame = ko.computed(function() { return self.room.isHost() && self.hasStarted() && self.game() && self.game().isFinalized(); });
     }
 

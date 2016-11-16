@@ -17,7 +17,7 @@
             var game = new Constructor(gameConfig, gameState);
 
             game.isFinalized = game.isFinalized || ko.observable(gameState.isFinalized);
-            game.winnerName = game.winnerName || ko.observable(gameState.winnerName);
+            game.winnerNames = game.winnerNames || ko.observableArray(gameState.winnerNames);
 
             game.change = function(playerName, eventName, gameChangeResults) {
                 game[eventName].onCompleted(playerName, gameChangeResults);

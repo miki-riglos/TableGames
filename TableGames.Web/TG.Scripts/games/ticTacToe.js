@@ -5,10 +5,6 @@
         var table = gameConfig.table;
         var authentication = gameConfig.authentication;
 
-        // base members
-        self.isFinalized = ko.observable(gameState.isFinalized);
-        self.winnerName = ko.observable(gameState.winnerName);
-
         var indices = [1, 2, 3];
         self.indices = indices;
 
@@ -19,7 +15,9 @@
         symbols[self.playerName1] = 'X';
         symbols[self.playerName2] = 'O';
 
+        // board
         self.board = {};
+        // ... create
         indices.forEach(function(row) {
             self.board[row] = {};
             indices.forEach(function(col) {
@@ -28,32 +26,30 @@
                 self.board[row][col].isWinning = ko.observable();
             });
         });
-        gameState.board.forEach(function(boxState) {
-            self.board[boxState.row][boxState.col](boxState.playerName);
-        });
+        // ... assign boxes to players
+        gameState.board.forEach(function(boxState) { self.board[boxState.row][boxState.col](boxState.playerName); });
+        // ... winning boxes
         gameState.winningBoxes.forEach(function(ab) { self.board[ab.row][ab.col].isWinning(true); });
 
         table.activePlayerName(gameState.table.activePlayerName);
 
+        self.winnerName = ko.observable();
+
         // assign box
         self.assignBox = function(row, col) {
-            if (table.activePlayerName() !== authentication.userName() || self.isFinalized()) {
-                return;
+            if (table.activePlayerName() === authentication.userName() && !self.isFinalized()) {
+                var gameChangeParameters = { row: row, col: col };
+                gameConfig.sendChangeToServer('assignBox', gameChangeParameters);
             }
-            var gameChangeParameters = {
-                row: row,
-                col: col
-            };
-            gameConfig.sendChangeToServer('assignBox', gameChangeParameters);
         };
 
         self.assignBox.onCompleted = function(playerName, gameChangeResults) {
             self.board[gameChangeResults.row][gameChangeResults.col](playerName);
             table.activePlayerName(gameChangeResults.table.activePlayerName);
+            self.isFinalized(gameChangeResults.isFinalized);
+            gameChangeResults.winningBoxes.forEach(function(ab) { self.board[ab.row][ab.col].isWinning(true); });
             if (gameChangeResults.isFinalized) {
-                self.isFinalized(gameChangeResults.isFinalized);
-                gameChangeResults.winningBoxes.forEach(function(ab) { self.board[ab.row][ab.col].isWinning(true); });
-                self.winnerName(gameChangeResults.winnerName);
+                self.winnerName(gameChangeResults.winnerNames[0]);
             }
         };
     }
