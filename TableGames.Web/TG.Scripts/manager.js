@@ -174,7 +174,7 @@
                 room.attend(tableState, chatConfig);
                 self.attendedRooms.push(room);
                 if (tableState && tableState.game) {
-                    room.table().start(tableState.status, getGameConfig(room), tableState.game);
+                    room.table().start(tableState, getGameConfig(room));
                 }
             }
         };
@@ -260,22 +260,11 @@
             }
         };
 
-        function getGameConfig(room) {
-            var gameConfig = {
-                sendChangeToServer: function(eventName, gameChangeParameters) {
-                    return hub.server.changeGame(room.hostName, room.name, authentication.userName(), eventName, gameChangeParameters);
-                },
-                table: room.table(),
-                authentication: authentication
-            };
-            return gameConfig;
-        }
-
-        hub.client.onTableStarted = function(hostName, roomName, tableStatus, gameState) {
+        hub.client.onTableStarted = function(hostName, roomName, tableState) {
             var room = getPlayer(hostName).getRoom(roomName);
             var table = room.table();
 
-            table.start(tableStatus, getGameConfig(room), gameState);
+            table.start(tableState, getGameConfig(room));
             notification.addInfo('Table ' + table.gameName + ' in room ' + hostName + '/' + roomName + ' just started.');
         };
 
@@ -296,11 +285,11 @@
             }
         };
 
-        hub.client.onGameRestarted = function(hostName, roomName, gameState) {
+        hub.client.onGameRestarted = function(hostName, roomName, tableState) {
             var room = getPlayer(hostName).getRoom(roomName);
             var table = room.table();
 
-            table.startGame(getGameConfig(room), gameState);
+            table.startGame(tableState, getGameConfig(room));
             notification.addInfo('Table ' + table.gameName + ' in room ' + hostName + '/' + roomName + ' just restarted.');
         };
 
@@ -318,6 +307,17 @@
             room.destroyTable();
             notification.addInfo(gameName + ' closed in room ' + hostName + '/' + roomName + '.');
         };
+
+        function getGameConfig(room) {
+            var gameConfig = {
+                sendChangeToServer: function(eventName, gameChangeParameters) {
+                    return hub.server.changeGame(room.hostName, room.name, authentication.userName(), eventName, gameChangeParameters);
+                },
+                table: room.table(),
+                authentication: authentication
+            };
+            return gameConfig;
+        }
     }
 
     return Manager;

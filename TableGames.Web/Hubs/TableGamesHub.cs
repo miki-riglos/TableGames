@@ -182,7 +182,7 @@ namespace TableGames.Web.Hubs
             room.Table.Start();
 
             room.GetGroups().ForEach(groupId => {
-                Clients.Group(groupId).onTableStarted(hostName, roomName, room.Table.Status.ToString(), room.Table.Game.ToClient());
+                Clients.Group(groupId).onTableStarted(hostName, roomName, room.Table.ToClient());
             });
         }
 
@@ -204,7 +204,7 @@ namespace TableGames.Web.Hubs
                 room.Table.Start();
 
                 room.GetGroups().ForEach(groupId => {
-                    Clients.Group(groupId).onGameRestarted(hostName, roomName, room.Table.Game.ToClient());
+                    Clients.Group(groupId).onGameRestarted(hostName, roomName, room.Table.ToClient());
                 });
             } else {
                 throw new HubException("RestartGame error.");

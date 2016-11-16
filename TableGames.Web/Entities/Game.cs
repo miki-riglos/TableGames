@@ -17,5 +17,12 @@ namespace TableGames.Web.Entities
         public abstract object Change(string playerName, string eventName, object gameChangeParameters);
 
         public abstract object ToClient();
+
+        public virtual object ToStats() {
+            return new {
+                isFinalized = IsFinalized,
+                winnerNames = WinnerNames
+            };
+        }
     }
 }

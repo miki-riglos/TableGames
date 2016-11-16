@@ -9,6 +9,7 @@
         self.status = ko.observable(tableState.status);
         self.playerNames = ko.observableArray(tableState.playerNames);
         self.activePlayerName = ko.observable(tableState.activePlayerName);
+        self.stats = ko.observableArray(tableState.stats);
 
         self.room = room;
 
@@ -30,9 +31,9 @@
         self.canJoin = ko.computed(function() { return authentication.isLoggedIn() && !self.hasStarted() && !self.hasJoined(); });
         self.canLeave = ko.computed(function() { return authentication.isLoggedIn() && !self.hasStarted() && self.hasJoined(); });
 
-        self.start = function(tableStatus, gameConfig, gameState) {
-            self.status(tableStatus);
-            self.startGame(gameConfig, gameState);
+        self.start = function(tableState, gameConfig) {
+            self.status(tableState.status);
+            self.startGame(tableState, gameConfig);
         };
         self.canStart = ko.computed(function() { return self.room.isHost() && !self.hasStarted(); });
 
@@ -43,10 +44,11 @@
             });
         };
 
-        self.startGame = function(gameConfig, gameState) {
+        self.startGame = function(tableState, gameConfig) {
+            self.stats(tableState.stats);
             gamePromise = gamePromise
                             .then(function() {
-                                return gameProvider.createGame(self.gameName, gameConfig, gameState);
+                                return gameProvider.createGame(self.gameName, gameConfig, tableState.game);
                             })
                             .then(function(game) {
                                 self.game(game);

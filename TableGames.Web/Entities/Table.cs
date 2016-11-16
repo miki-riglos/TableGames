@@ -18,12 +18,14 @@ namespace TableGames.Web.Entities
         public Player ActivePlayer { get; private set; }
         public Room Room { get; private set; }
         public Game Game { get; private set; }
+        public List<Game> Games { get; private set; }
 
         public Table(string gameName, Room room) {
             GameName = gameName;
             Status = TableStatus.Open;
             Players = new List<Player>();
             Room = room;
+            Games = new List<Game>();
         }
 
         public void AddPlayer(Player player) {
@@ -37,6 +39,7 @@ namespace TableGames.Web.Entities
         public void Start() {
             Status = TableStatus.Started;
             Game = new TicTacToe(this);
+            Games.Add(Game);
         }
 
         public void SetNextPlayer() {
@@ -59,7 +62,8 @@ namespace TableGames.Web.Entities
                 gameName = GameName,
                 status = Status.ToString(),
                 playerNames = Players.Select(p => p.Name),
-                game = Game?.ToClient()
+                game = Game?.ToClient(),
+                stats = Games.Select(g => g.ToStats())
             };
         }
     }
