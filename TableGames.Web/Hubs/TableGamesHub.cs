@@ -22,7 +22,7 @@ namespace TableGames.Web.Hubs
         public object GetState() {
             return new {
                 players = _players.Values.Select(p => p.ToClient()),
-                gameInfos = GameInfo.GameInfos.Select(gi => gi.ToClient())
+                gameInfoRegistry = GameInfo.Registry.Select(gi => gi.ToClient())
             };
         }
 

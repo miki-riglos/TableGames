@@ -5,6 +5,7 @@ using TableGames.Web.Entities;
 
 namespace TableGames.Web.Games
 {
+    [GameDescriptor("Tic Tac Toe", "games/ticTacToe")]
     public class TicTacToe : Game
     {
         public List<AssignedBox> Board { get; private set; }

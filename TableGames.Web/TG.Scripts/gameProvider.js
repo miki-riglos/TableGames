@@ -2,8 +2,8 @@
 
     var registry = {};
 
-    function register(gameInfos) {
-        gameInfos.forEach(function(gameInfo) {
+    function register(gameInfoRegistry) {
+        gameInfoRegistry.forEach(function(gameInfo) {
             registry[gameInfo.name] = gameInfo;
         });
     }

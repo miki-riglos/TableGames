@@ -31,8 +31,8 @@
         // set state
         self.setState = function(currentState) {
             players(currentState.players.map(function(playerState) { return new Player(playerState); }));
-            self.gameNames = currentState.gameInfos.map(function(gameInfo) { return gameInfo.name; });
-            gameProvider.register(currentState.gameInfos);
+            self.gameNames = currentState.gameInfoRegistry.map(function(gameInfo) { return gameInfo.name; });
+            gameProvider.register(currentState.gameInfoRegistry);
             notification.addInfo('Connection established.');
         };
 
