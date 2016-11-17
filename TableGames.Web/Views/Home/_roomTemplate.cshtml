@@ -71,6 +71,8 @@
                         <button type="button" class="btn btn-primary" data-bind="visible: canJoin, click: $root.joinTable">Join Table</button>
                         <button type="button" class="btn btn-default" data-bind="visible: canLeave, click: $root.leaveTable">Leave Table</button>
                         <button type="button" class="btn btn-primary" data-bind="visible: canStart, click: $root.startTable">Start Game</button>
+                        <button type="button" class="btn btn-primary" data-bind="visible: canRestartGame, click: $root.restartGame">Restart</button>
+                        <button type="button" class="btn btn-primary" data-bind="visible: hasStarted, attr: { 'data-target': '#' + room.hostName + '_' + room.name + '_stats' }" data-toggle="collapse">Stats</button>
                         <!-- /ko -->
 
                         <!-- destroyTable -->

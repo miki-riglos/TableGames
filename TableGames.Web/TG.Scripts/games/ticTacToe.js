@@ -33,8 +33,6 @@
 
         table.activePlayerName(gameState.table.activePlayerName);
 
-        self.winnerName = ko.observable();
-
         // assign box
         self.assignBox = function(row, col) {
             if (table.activePlayerName() === authentication.userName() && !self.isFinalized()) {
@@ -49,7 +47,7 @@
             self.isFinalized(gameChangeResults.isFinalized);
             gameChangeResults.winningBoxes.forEach(function(ab) { self.board[ab.row][ab.col].isWinning(true); });
             if (gameChangeResults.isFinalized) {
-                self.winnerName(gameChangeResults.winnerNames[0]);
+                table.stats(gameChangeResults.table.stats);
             }
         };
     }

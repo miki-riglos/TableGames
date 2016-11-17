@@ -1,14 +1,4 @@
-﻿<style>
-    .tg-table {
-        margin-bottom: 15px;
-    }
-
-    .tg-table-players {
-        padding-bottom: 15px;
-    }
-</style>
-
-<template id="tableTemplate">
+﻿<template id="tableTemplate">
     <div class="panel panel-default tg-table">
         <div class="panel-heading">
             <span class="badge pull-right" data-bind="text: status"></span>
@@ -22,24 +12,38 @@
             <!-- ko template: { name: game().templateName, data: game } --><!-- /ko -->
             <!-- /ko -->
         </div>
+    </div>
 
-        <div class="panel-footer">
-            <!-- ko if: game -->
-            <div data-bind="text: 'Winner: ' + game().winnerName()"></div>
-            <!-- /ko -->
-            <button type="button" class="btn btn-primary" data-bind="visible: canRestartGame, click: $root.restartGame">Restart</button>
-
-            <div data-bind="foreach: stats">
-                <div>
-                    <span data-bind="text: $index"></span>
-                    <span data-bind="text: isFinalized"></span>
-                    <span>
-                        <span data-bind="foreach: winnerNames">
-                            <span data-bind="text: $data"></span>
-                        </span>
-                    </span>
-                </div>
-            </div>
+    <!-- stats -->
+    <div class="panel panel-default collapse" data-bind="attr: { 'id': room.hostName + '_' + room.name + '_stats' }">
+        <div class="panel-heading">
+            <span>Stats</span>
         </div>
+        <table class="table table-condensed">
+            <thead>
+                <tr>
+                    <th>
+                        <span>#</span>
+                    </th>
+                    <!-- ko foreach: { data: playerNames, as: 'playerName' } -->
+                    <th>
+                        <span data-bind="text: playerName, css: { 'tg-active': playerName === $parent.activePlayerName() }"></span>
+                    </th>
+                    <!-- /ko -->
+                </tr>
+            </thead>
+            <tbody data-bind="foreach: { data: stats, as: 'gameStats' }">
+                <tr>
+                    <td>
+                        <span data-bind="text: $index() + 1"></span>
+                    </td>
+                    <!-- ko foreach: { data: $parent.playerNames, as: 'playerName' } -->
+                    <td data-bind="if: gameStats.winnerNames.indexOf(playerName) > -1">
+                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                    </td>
+                    <!-- /ko -->
+                </tr>
+            </tbody>
+        </table>
     </div>
 </template>

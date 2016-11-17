@@ -51,6 +51,7 @@ namespace TableGames.Web.Games
                     col = col,
                     table = new {
                         activePlayerName = Table.ActivePlayer.Name,
+                        stats = Table.Games.Select(g => g.ToStats())
                     },
                     isFinalized = IsFinalized,
                     winningBoxes = WinningBoxes.Select(ab => ab.ToClient()),
