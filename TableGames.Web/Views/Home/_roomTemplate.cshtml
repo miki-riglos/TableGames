@@ -5,57 +5,70 @@
         border-left-width: 0px;
         border-bottom-right-radius: 0px;
         border-bottom-left-radius: 0px;
-        margin-bottom: 15px;
+        margin-bottom: 0;
     }
+
+        .tg-room > .navbar .navbar-brand > .glyphicon-chevron-right {
+            display: inline-block;
+        }
+
+        .tg-room > .navbar .navbar-brand > .glyphicon-chevron-down {
+            display: none;
+        }
+
+        .tg-room > .navbar .navbar-brand.collapsed > .glyphicon-chevron-right {
+            display: none;
+        }
+
+        .tg-room > .navbar .navbar-brand.collapsed > .glyphicon-chevron-down {
+            display: inline-block;
+        }
+
+        .tg-room > .navbar .navbar-collapse {
+            overflow-y: visible; /* make game dropdown list visible when small */
+        }
 
         .tg-room > .navbar .btn-toolbar {
             margin-top: 9px;
             margin-bottom: 8px;
         }
 
-        .tg-room > .navbar .navbar-collapse {
-            padding-right: 0;
-        }
 
-    .tg-room > .panel-body {
-        padding-top: 0;
-        padding-bottom: 0;
-    }
-
-        .tg-room > .panel-body .tg-chat {
-            margin-bottom: 15px;
-        }
-
-    .tg-room > .panel-footer {
+    .tg-room .panel-footer {
         line-height: 30px;
+        margin-top: -15px;
     }
 
-        .tg-room > .panel-footer .badge {
+        .tg-room .panel-footer .badge {
             margin: 0px 5px;
             padding: 6px 10px;
             font-size: 14px;
             font-weight: normal;
         }
 
-            .tg-room > .panel-footer .badge.tg-active {
+            .tg-room .panel-footer .badge.tg-active {
                 background-color: #a94442;
             }
 </style>
 
 <template id="roomTemplate">
-    <div class="panel panel-default tg-room">
+    <div class="panel panel-default tg-room" data-bind="attr: { 'id': clientId }">
         <div class="navbar navbar-default">
             <div class="container-fluid">
                 <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-bind="attr: { 'data-target': '#' + hostName + '_' + name + '_toolbar_container' }">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-bind="attr: { 'data-target': '#' + clientId + '_toolbar_container' }">
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <span class="navbar-brand" data-bind="text: hostName + '/' + name"></span>
+                    <span class="navbar-brand" data-toggle="collapse" data-bind="attr: { 'data-target': '#' + clientId + '_body_container' }">
+                        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                        <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                        <span data-bind="text: hostName + '/' + name"></span>
+                    </span>
                 </div>
 
-                <div class="navbar-collapse collapse" data-bind="attr: { 'id': hostName + '_' + name + '_toolbar_container' }">
+                <div class="navbar-collapse collapse" data-bind="attr: { 'id': clientId + '_toolbar_container' }">
                     <div class="btn-toolbar pull-right" role="toolbar">
                         <!-- createTable -->
                         <div class="btn-group" role="group" data-bind="visible: canCreateTable">
@@ -72,7 +85,7 @@
                         <button type="button" class="btn btn-default" data-bind="visible: canLeave, click: $root.leaveTable">Leave Table</button>
                         <button type="button" class="btn btn-primary" data-bind="visible: canStart, click: $root.startTable">Start Game</button>
                         <button type="button" class="btn btn-primary" data-bind="visible: canRestartGame, click: $root.restartGame">Restart</button>
-                        <button type="button" class="btn btn-primary" data-bind="visible: hasStarted, attr: { 'data-target': '#' + room.hostName + '_' + room.name + '_stats' }" data-toggle="collapse">Stats</button>
+                        <button type="button" class="btn btn-primary" data-toggle="collapse" data-bind="visible: hasStarted, attr: { 'data-target': '#' + room.clientId + '_stats' }">Stats</button>
                         <!-- /ko -->
 
                         <!-- destroyTable -->
@@ -87,25 +100,27 @@
             </div>
         </div>
 
-        <div class="panel-body">
-            <div class="row">
-                <div class="col-sm-6" data-bind="if: table">
-                    <!-- ko template: { name: 'tableTemplate', data: table } --><!-- /ko -->
-                </div>
+        <div class="panel-collapse collapse in" data-bind="attr: { 'id': clientId + '_body_container' }">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-sm-6" data-bind="if: table">
+                        <!-- ko template: { name: 'tableTemplate', data: table } --><!-- /ko -->
+                    </div>
 
-                <div class="col-sm-6">
-                    <!-- ko template: { name: 'chatTemplate', data: chat } --><!-- /ko -->
+                    <div class="col-sm-6">
+                        <!-- ko template: { name: 'chatTemplate', data: chat } --><!-- /ko -->
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="panel-footer">
-            Players:
-            <span data-bind="if: table">
-                <!-- ko foreach: table().playerNames -->
-                <span class="badge" data-bind="text: $data, css: { 'tg-active': $data === $parent.table().activePlayerName() }"></span>
-                <!-- /ko -->
-            </span>
+            <div class="panel-footer">
+                Players:
+                <span data-bind="if: table">
+                    <!-- ko foreach: table().playerNames -->
+                    <span class="badge" data-bind="text: $data, css: { 'tg-active': $data === $parent.table().activePlayerName() }"></span>
+                    <!-- /ko -->
+                </span>
+            </div>
         </div>
     </div>
 </template>

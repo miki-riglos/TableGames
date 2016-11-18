@@ -1,9 +1,17 @@
 ﻿define(['knockout', 'authentication', 'chat', 'table'], function(ko, Authentication, Chat, Table) {
 
+    var counter = 0;
+
+    function getClientId() {
+        counter++;
+        return 'room' + counter;
+    }
+
     function Room(roomState) {
         var self = this;
         var authentication = Authentication.instance;
 
+        self.clientId = getClientId();
         self.name = roomState.name;
         self.hostName = roomState.hostName;
         self.attendance = ko.observable(roomState.attendance);
