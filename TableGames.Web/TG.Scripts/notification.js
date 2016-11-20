@@ -3,20 +3,26 @@
     function Notification() {
         var self = this;
 
-        self.messages = ko.observableArray();
+        self.alerts = ko.observableArray();
 
         self.addInfo = function(message) {
-            self.messages.push({
+            var alert = {
                 type: 'info',
+                message: message
+            };
+            self.alerts.push(alert);
+            setTimeout(function() { self.removeAlert(alert); }, 5000);
+        };
+
+        self.addError = function(message) {
+            self.alerts.push({
+                type: 'error',
                 message: message
             });
         };
 
-        self.addError = function(message) {
-            self.messages.push({
-                type: 'error',
-                message: message
-            });
+        self.removeAlert = function(alert) {
+            self.alerts.remove(alert);
         };
     }
 

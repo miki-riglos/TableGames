@@ -1,18 +1,30 @@
 ﻿<style>
-    .tg-notification .list-group-item {
-        padding-top: 4px;
-        padding-bottom: 4px;
-        font-size: small;
+    .tg-notification {
+        position: absolute;
+        margin-right: 15px;
+        margin-bottom: 15px;
+        bottom: 0;
+        right: 0;
+        width: 240px;
+        z-index: 1;
     }
+
+        .tg-notification > .alert {
+            margin-bottom: 5px;
+            padding: 10px;
+        }
+
+            .tg-notification > .alert > button.close {
+                margin-left: 10px;
+                margin-bottom: 10px;
+            }
 </style>
 
 <template id="notificationTemplate">
-    <div class="panel panel-info tg-notification">
-        <div class="panel-heading">Notifications</div>
-        <div class="list-group" data-bind="foreach: messages">
-            <div class="list-group-item">
-                <span data-bind="text: type"></span>:<span data-bind="text: message"></span>
-            </div>
+    <div class="tg-notification" data-bind="foreach: alerts">
+        <div class="alert" data-bind="css: type === 'error' ? 'alert-danger' : 'alert-info'" role="alert">
+            <button type="button" class="close" data-bind="click: $parent.removeAlert"><span aria-hidden="true">&times;</span></button>
+            <span data-bind="text: message"></span>
         </div>
     </div>
 </template>
