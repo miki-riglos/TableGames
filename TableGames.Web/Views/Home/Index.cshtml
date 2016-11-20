@@ -3,7 +3,7 @@
 }
 
 <div class="row">
-    <div class="col-sm-4">
+    <div class="col-sm-3">
         <!-- ko if: userPlayer -->
         <div class="panel panel-default">
             <div class="panel-heading">My Rooms</div>
@@ -21,9 +21,10 @@
             <div class="panel-heading">Other Rooms</div>
             <div class="list-group" data-bind="template: { name: 'playerTemplate', foreach: otherPlayers }"></div>
         </div>
+        <!-- ko template: { name: 'chatTemplate', data: chat } --><!-- /ko -->
     </div>
 
-    <div class="col-sm-8">
+    <div class="col-sm-9">
         <!-- attended rooms -->
         <div data-bind="template: { name: 'roomTemplate', foreach: attendedRooms }"></div>
     </div>
@@ -38,6 +39,7 @@
         <!-- ko template: { name: 'notificationTemplate', data: notification } --><!-- /ko -->
     </div>
 </div>
+
 
 @Html.Partial("_playerTemplate")
 @Html.Partial("_roomTemplate")

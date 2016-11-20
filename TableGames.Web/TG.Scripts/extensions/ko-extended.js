@@ -32,6 +32,13 @@
         }
     };
 
+    ko.bindingHandlers.scroll = {
+        update: function(element, valueAccessor, allBindings, viewModel) {
+            var parentElement = element.parentElement;
+            parentElement.scrollTop = parentElement.scrollHeight;
+        }
+    };
+
     return ko;
 });
 

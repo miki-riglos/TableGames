@@ -1,4 +1,9 @@
 ﻿<style>
+    .tg-chat > .list-group {
+        max-height: 216px;
+        overflow-y: auto;
+    }
+
     .tg-chat .list-group-item, .tg-chat .form-control {
         padding-top: 4px;
         padding-bottom: 4px;
@@ -22,7 +27,7 @@
     <div class="panel panel-warning tg-chat">
         <div class="panel-heading">Chat</div>
         <div class="list-group" data-bind="foreach: messages">
-            <div class="list-group-item">
+            <div class="list-group-item" data-bind="scroll">
                 <span class="tg-chat-username" data-bind="text: userName"></span>:
                 <span class="tg-chat-message" data-bind="text: message"></span>
             </div>
