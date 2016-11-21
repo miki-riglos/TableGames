@@ -1,6 +1,9 @@
 ﻿<template id="tableTemplate">
     <div class="panel panel-default tg-table">
         <div class="panel-heading">
+            <!-- ko if: game -->
+            <span class="pull-right glyphicon" data-bind="css: game().isFinalized() ? 'glyphicon-pause' : 'glyphicon-play'" aria-hidden="true"></span>
+            <!-- /ko -->
             <span class="badge pull-right" data-bind="text: status"></span>
             <span data-bind="text: gameName"></span>
         </div>
