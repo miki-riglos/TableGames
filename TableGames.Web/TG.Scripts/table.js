@@ -9,6 +9,8 @@
         self.status = ko.observable(tableState.status);
         self.playerNames = ko.observableArray(tableState.playerNames);
         self.activePlayerName = ko.observable(tableState.activePlayerName);
+
+        self.statsTemplateName = ko.observable('statsVerticalTemplate');
         self.stats = ko.observableArray(tableState.stats);
 
         self.room = room;
