@@ -7,21 +7,13 @@
         border-bottom-left-radius: 0px;
         margin-bottom: 0;
     }
-
-        .tg-room > .navbar .navbar-brand > .glyphicon-chevron-right {
-            display: inline-block;
+        .tg-room > .navbar .navbar-brand::before {
+            font-family: 'Glyphicons Halflings';
+            font-size: 14px;
+            content: "\e080";
         }
-
-        .tg-room > .navbar .navbar-brand > .glyphicon-chevron-down {
-            display: none;
-        }
-
-        .tg-room > .navbar .navbar-brand.collapsed > .glyphicon-chevron-right {
-            display: none;
-        }
-
-        .tg-room > .navbar .navbar-brand.collapsed > .glyphicon-chevron-down {
-            display: inline-block;
+        .tg-room > .navbar .navbar-brand.collapsed::before {
+            content: "\e114";
         }
 
         .tg-room > .navbar .navbar-collapse {
@@ -62,8 +54,6 @@
                         <span class="icon-bar"></span>
                     </button>
                     <span class="navbar-brand" data-toggle="collapse" data-bind="attr: { 'data-target': '#' + clientId + '_body_container' }">
-                        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-                        <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
                         <span data-bind="text: hostName + '/' + name"></span>
                     </span>
                 </div>
