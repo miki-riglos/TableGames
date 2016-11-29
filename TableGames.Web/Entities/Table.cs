@@ -18,6 +18,7 @@ namespace TableGames.Web.Entities
         public Room Room { get; private set; }
         public Game Game { get; private set; }
         public List<Game> Games { get; private set; }
+        public Dictionary<string, object> Bag { get; private set; }
 
         public Table(string gameName, Room room) {
             GameName = gameName;
@@ -25,6 +26,7 @@ namespace TableGames.Web.Entities
             Players = new List<Player>();
             Room = room;
             Games = new List<Game>();
+            Bag = new Dictionary<string, object>();
         }
 
         public void AddPlayer(Player player) {
@@ -52,7 +54,7 @@ namespace TableGames.Web.Entities
             }
         }
 
-        public object ChangeGame(string playerName, string eventName, object gameChangeParameters) {
+        public GameChangeResult ChangeGame(string playerName, string eventName, object gameChangeParameters) {
             return Game.Change(playerName, eventName, gameChangeParameters);
         }
 

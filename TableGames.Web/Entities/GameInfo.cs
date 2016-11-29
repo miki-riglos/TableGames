@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TableGames.Web.Games;
 
 namespace TableGames.Web.Entities
 {
@@ -48,7 +47,7 @@ namespace TableGames.Web.Entities
                             var gameDescriptor = (GameDescriptorAttribute)type.GetCustomAttributes(typeof(GameDescriptorAttribute), false).FirstOrDefault();
                             return new GameInfo() {
                                 Name = gameDescriptor.Name,
-                                Type = typeof(TicTacToe),
+                                Type = type,
                                 ConstructorFileName = gameDescriptor.ConstructorFileName,
                                 TemplateFileName = gameDescriptor.TemplateFileName
                             };

@@ -57,6 +57,13 @@
                             });
         };
         self.canRestartGame = ko.computed(function() { return self.room.isHost() && self.hasStarted() && self.game() && self.game().isFinalized(); });
+
+        self.changeUserGame = function(userGameState) {
+            gamePromise = gamePromise.then(function() {
+                if (!self) return;  // in case table was destroyed before game change
+                self.game().changeUserGame(userGameState);
+            });
+        };
     }
 
     return Table;

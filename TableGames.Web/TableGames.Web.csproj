@@ -154,6 +154,7 @@
     <Compile Include="Entities\Table.cs" />
     <Compile Include="Entities\Room.cs" />
     <Compile Include="Entities\Player.cs" />
+    <Compile Include="Games\Doubt.cs" />
     <Compile Include="Games\TicTacToe.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -203,6 +204,8 @@
     <Content Include="Scripts\_references.js" />
     <Content Include="TG.Scripts\authentication.js" />
     <Content Include="TG.Scripts\gameProvider.js" />
+    <Content Include="TG.Scripts\games\doubt.html" />
+    <Content Include="TG.Scripts\games\doubt.js" />
     <Content Include="TG.Scripts\notification.js" />
     <Content Include="TG.Scripts\games\ticTacToe.js" />
     <Content Include="TG.Scripts\table.js" />

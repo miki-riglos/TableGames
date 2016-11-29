@@ -23,6 +23,8 @@
                 game[eventName].onCompleted(playerName, gameChangeResults);
             };
 
+            game.changeUserGame = game.changeUserGame || function(userGameState) { };
+
             game.templateName = templateName;
 
             return dfd.resolve(game);

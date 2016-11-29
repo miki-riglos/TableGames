@@ -96,12 +96,16 @@ namespace TableGames.Web.Hubs
                 if (!room.PlayerAttendees.Contains(playerAttendee)) {
                     room.PlayerAttendees.Add(playerAttendee);
                 }
-                Clients.All.onRoomEntered(hostName, room.ToClient(), userName, room.Table?.ToClient());
+                var userGameState = room.Table?.Game?.GetPlayerGameStates()
+                                        .Where(kvp => kvp.Key.Name == userName)
+                                        .Select(kvp => kvp.Value)
+                                        .FirstOrDefault();
+                Clients.All.onRoomEntered(hostName, room.ToClient(), userName, room.Table?.ToClient(), userGameState);
             }
             else {
                 Groups.Add(Context.ConnectionId, room.GroupId);
                 room.AnonymousAttendees.Add(Context.ConnectionId);
-                Clients.All.onRoomEntered(hostName, room.ToClient(), null, null);
+                Clients.All.onRoomEntered(hostName, room.ToClient(), null, null, null);
                 // for anonymous attendee
                 Clients.Client(Context.ConnectionId).onRoomAttended(hostName, room.ToClient(), room.Table?.ToClient());
             }
@@ -181,20 +185,32 @@ namespace TableGames.Web.Hubs
 
             room.Table.Start();
 
+            // initial game state
             room.GetGroups().ForEach(groupId => {
                 Clients.Group(groupId).onTableStarted(hostName, roomName, room.Table.ToClient());
             });
+
+            // initial players state
+            foreach (var kvp in room.Table.Game.GetPlayerGameStates()) {
+                Clients.Group(kvp.Key.Name).onUserGameChanged(hostName, roomName, kvp.Value);
+            }
         }
 
         // ... Games
         public void ChangeGame(string hostName, string roomName, string playerName, string eventName, object gameChangeParameters) {
             var room = _getPlayer(hostName).GetRoom(roomName);  // will throw if player is not host
 
-            var gameChangeResults = room.Table.ChangeGame(playerName, eventName, gameChangeParameters);
+            var gameChangeResult = room.Table.ChangeGame(playerName, eventName, gameChangeParameters);
 
+            // game state
             room.GetGroups().ForEach(groupId => {
-                Clients.Group(groupId).onGameChanged(hostName, roomName, playerName, eventName, gameChangeResults);
+                Clients.Group(groupId).onGameChanged(hostName, roomName, playerName, eventName, gameChangeResult.GameState);
             });
+
+            // players state
+            foreach (var kvp in gameChangeResult.PlayerGameStates) {
+                Clients.Group(kvp.Key.Name).onUserGameChanged(hostName, roomName, kvp.Value);
+            }
         }
 
         public void RestartGame(string hostName, string roomName) {
@@ -203,10 +219,17 @@ namespace TableGames.Web.Hubs
             if (room.Table.Game.IsFinalized) {
                 room.Table.Start();
 
+                // initial game state
                 room.GetGroups().ForEach(groupId => {
                     Clients.Group(groupId).onGameRestarted(hostName, roomName, room.Table.ToClient());
                 });
-            } else {
+
+                // initial players state
+                foreach (var kvp in room.Table.Game.GetPlayerGameStates()) {
+                    Clients.Group(kvp.Key.Name).onUserGameChanged(hostName, roomName, kvp.Value);
+                }
+            }
+            else {
                 throw new HubException("RestartGame error.");
             }
         }

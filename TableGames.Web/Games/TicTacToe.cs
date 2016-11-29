@@ -20,7 +20,7 @@ namespace TableGames.Web.Games
             Table.SetNextPlayer();
         }
 
-        private object assignBox(string playerName, int row, int col) {
+        private GameChangeResult assignBox(string playerName, int row, int col) {
             if (playerName != Table.ActivePlayer.Name) {
                 throw new Exception("TicTacToe error - It is not your turn.");
             }
@@ -46,7 +46,7 @@ namespace TableGames.Web.Games
                     Table.SetNextPlayer();
                 }
 
-                return new {
+                return new GameChangeResult(new {
                     row = row,
                     col = col,
                     table = new {
@@ -56,14 +56,14 @@ namespace TableGames.Web.Games
                     isFinalized = IsFinalized,
                     winningBoxes = WinningBoxes.Select(ab => ab.ToClient()),
                     winnerNames = WinnerNames
-                };
+                });
             }
             else {
                 throw new Exception("TicTacToe AssignBox error.");
             }
         }
 
-        public override object Change(string playerName, string eventName, dynamic gameChangeParameters) {
+        public override GameChangeResult Change(string playerName, string eventName, dynamic gameChangeParameters) {
             if (eventName == "assignBox") {
                 return assignBox(playerName, (int)gameChangeParameters.row, (int)gameChangeParameters.col);
             }

@@ -153,17 +153,17 @@
             }
         };
 
-        hub.client.onRoomEntered = function(hostName, roomState, userName, tableState) {
+        hub.client.onRoomEntered = function(hostName, roomState, userName, tableState, userGameState) {
             var room = getPlayer(hostName).getRoom(roomState.name);
             room.attendance(roomState.attendance);
             notification.addInfo((userName || 'Attendee') + ' entered ' + hostName + '/' + roomState.name + '.');
             // update attendedRooms if is userName, avoid dups when multiple logins
             if (authentication.isLoggedIn() && authentication.userName() === userName) {
-                hub.client.onRoomAttended(hostName, roomState, tableState);
+                hub.client.onRoomAttended(hostName, roomState, tableState, userGameState);
             }
         };
 
-        hub.client.onRoomAttended = function(hostName, roomState, tableState) {
+        hub.client.onRoomAttended = function(hostName, roomState, tableState, userGameState) {
             var room = getPlayer(hostName).getRoom(roomState.name);
             if (!self.attendedRooms.contains(room)) {
                 var chatConfig = {
@@ -174,6 +174,7 @@
                 room.attend(tableState, chatConfig);
                 self.attendedRooms.push(room);
                 if (tableState && tableState.game) {
+                    tableState.game.userGame = userGameState;
                     room.table().start(tableState, getGameConfig(room));
                 }
             }
@@ -275,6 +276,14 @@
 
             table.changeGame(playerName, eventName, gameChangeResults);
             notification.addInfo(table.gameName + ' changed in room ' + hostName + '/' + roomName + '.');
+        };
+
+        // ... ... user/player game state 
+        hub.client.onUserGameChanged = function(hostName, roomName, userGameState) {
+            var room = getPlayer(hostName).getRoom(roomName);
+            var table = room.table();
+
+            table.changeUserGame(userGameState);
         };
 
         // ... ... restart game

@@ -1,0 +1,29 @@
+﻿<template id="doubtTemplate">
+    <div class="tg-doubt">
+        <table>
+            <tbody data-bind="foreach: playerCups">
+                <tr>
+                    <td data-bind="text: playerName"></td>
+                    <td data-bind="text: dicesQty"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="row">
+            <div class="col-xs-6">
+                Quantity: <span data-bind="text: quantity"></span>
+            </div>
+            <div class="col-xs-6">
+                Dice Value: <span data-bind="text: diceValue"></span>
+            </div>
+        </div>
+
+        <div class="row" data-bind="with: userGame">
+            <!-- ko foreach: dices -->
+            <div class="col-xs-2">
+                <span data-bind="text: $data"></span>
+            </div>
+            <!-- /ko -->
+        </div>
+    </div>
+</template>
