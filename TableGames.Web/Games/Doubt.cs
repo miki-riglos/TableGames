@@ -10,22 +10,12 @@ namespace TableGames.Web.Games
     {
         public List<PlayerCup> PlayerCups { get; private set; }
         public int Quantity { get; private set; }
-        public int DiceValue { get; private set; }
+        public Dice Dice { get; private set; }
 
         public Doubt(Table table) : base(table) {
-            // get quantity of dices per player
-            Dictionary<Player, int> playerDicesQty;
-            if (!Table.Bag.ContainsKey("DicesPerPlayer")) {
-                playerDicesQty = Table.Players.ToDictionary(p => p, p => 5);
-                Table.Bag.Add("DicesPerPlayer", playerDicesQty);
-            }
-            else {
-                playerDicesQty = (Dictionary<Player, int>)Table.Bag["DicesPerPlayer"];
-            }
-
-            // initialize dices per player
-            PlayerCups = new List<PlayerCup>();
-            PlayerCups.AddRange(playerDicesQty.Select(kvp => new PlayerCup(kvp.Key, kvp.Value)));
+            PlayerCups = new List<PlayerCup>(getPlayerDicesQty().Select(kvp => new PlayerCup(kvp.Key, kvp.Value)));
+            Quantity = 0;
+            Dice = new Dice() { IsExposed = true };
 
             Table.SetNextPlayer();
         }
@@ -37,7 +27,7 @@ namespace TableGames.Web.Games
             //TODO: validate parameters
 
             Quantity = quantity;
-            DiceValue = diceValue;
+            Dice.Value = diceValue;
 
             // set next player if not finalized
             if (!IsFinalized) {
@@ -62,7 +52,7 @@ namespace TableGames.Web.Games
             return new {
                 playerCups = PlayerCups.Select(pc => pc.ToClient()),
                 quantity = Quantity,
-                diceValue = DiceValue,
+                dice = Dice.ToClient(),
                 table = new {
                     activePlayerName = Table.ActivePlayer?.Name,
                 },
@@ -75,11 +65,23 @@ namespace TableGames.Web.Games
             return PlayerCups.ToDictionary(
                 pc => pc.Player,
                 pc => (object)new {
-                    dices = pc.Dices.Select(d => d.ToClient())
+                    dices = pc.Dices.Select(d => d.GetExposedDice().ToClient())
                 }
             );
         }
 
+        private Dictionary<Player, int> getPlayerDicesQty() {
+            Dictionary<Player, int> playerDicesQty;
+            if (!Table.Bag.ContainsKey("DicesPerPlayer")) {
+                playerDicesQty = Table.Players.ToDictionary(p => p, p => 5);
+                Table.Bag.Add("DicesPerPlayer", playerDicesQty);
+            }
+            else {
+                playerDicesQty = (Dictionary<Player, int>)Table.Bag["DicesPerPlayer"];
+            }
+
+            return playerDicesQty;
+        }
 
         public class PlayerCup
         {
@@ -88,33 +90,47 @@ namespace TableGames.Web.Games
 
             public PlayerCup(Player player, int dicesQuantity) {
                 Player = player;
-                Dices = new List<Dice>(Enumerable.Range(1, dicesQuantity).Select(i => new Dice()));
-                Dices.ForEach(d => d.Throw());
+                Dices = new List<Dice>(Enumerable.Range(1, dicesQuantity).Select(i => new Dice(true)));
             }
 
             public object ToClient() {
                 return new {
                     playerName = Player.Name,
-                    dicesQty = Dices.Count()
+                    dices = Dices.Select(d => d.ToClient())
                 };
             }
         }
-
     }
 
     public class Dice
     {
         private Random _random = new Random(Guid.NewGuid().GetHashCode());
 
+        public bool IsExposed { get; set; }
         public int Value { get; set; }
+
+        public Dice(bool throwDice = false) {
+            IsExposed = false;
+            if (throwDice) {
+                Throw();
+            }
+        }
 
         public void Throw() {
             Value = _random.Next(1, 7);
         }
 
+        public Dice GetExposedDice() {
+            var exposedDice = new Dice();
+            exposedDice.IsExposed = true;
+            exposedDice.Value = Value;
+            return exposedDice;
+        }
+
         public object ToClient() {
             return new {
-                value = Value
+                isExposed = IsExposed,
+                value = IsExposed ? Value : 0
             };
         }
     }

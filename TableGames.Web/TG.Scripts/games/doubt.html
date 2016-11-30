@@ -1,10 +1,37 @@
-﻿<template id="doubtTemplate">
+﻿<style>
+    .tg-doubt-dice {
+        display: inline-block;
+        margin: 2px;
+        padding: 2px 6px;
+        width: 64px;
+        border: 4px solid gray;
+        border-radius: 10px;
+    }
+
+    .tg-doubt-dice-dot {
+        display: inline-block;
+        margin-right: 1px;
+        margin-left: 1px;
+        width: 10px;
+        height: 10px;
+        border: 1px solid gray;
+        border-radius: 50%;
+        background-color: gray;
+        visibility: hidden;
+    }
+
+        .tg-doubt-dice-dot.visible {
+            visibility: visible;
+        }
+</style>
+
+<template id="doubtTemplate">
     <div class="tg-doubt">
         <table>
             <tbody data-bind="foreach: playerCups">
                 <tr>
                     <td data-bind="text: playerName"></td>
-                    <td data-bind="text: dicesQty"></td>
+                    <td data-bind="template: { name: 'doubtDiceTemplate', foreach: dices }"></td>
                 </tr>
             </tbody>
         </table>
@@ -13,17 +40,28 @@
             <div class="col-xs-6">
                 Quantity: <span data-bind="text: quantity"></span>
             </div>
-            <div class="col-xs-6">
-                Dice Value: <span data-bind="text: diceValue"></span>
-            </div>
+            <div class="col-xs-6" data-bind="template: { name: 'doubtDiceTemplate', data: dice }"></div>
         </div>
 
-        <div class="row" data-bind="with: userGame">
-            <!-- ko foreach: dices -->
-            <div class="col-xs-2">
-                <span data-bind="text: $data"></span>
-            </div>
+        <div data-bind="with: userGame">
+            <!-- ko template: { name: 'doubtDiceTemplate', foreach: dices } -->
             <!-- /ko -->
         </div>
+    </div>
+</template>
+
+<template id="doubtDiceTemplate">
+    <div class="tg-doubt-dice">
+        <div class="tg-doubt-dice-dot" data-bind="css: { 'visible': value() >= 2 }"></div>
+        <div class="tg-doubt-dice-dot"></div>
+        <div class="tg-doubt-dice-dot" data-bind="css: { 'visible': value() >= 4 }"></div>
+
+        <div class="tg-doubt-dice-dot" data-bind="css: { 'visible': value() === 6 }"></div>
+        <div class="tg-doubt-dice-dot" data-bind="css: { 'visible': [1, 3, 5].indexOf(value()) !== -1 }"></div>
+        <div class="tg-doubt-dice-dot" data-bind="css: { 'visible': value() === 6 }"></div>
+
+        <div class="tg-doubt-dice-dot" data-bind="css: { 'visible': value() >= 4 }"></div>
+        <div class="tg-doubt-dice-dot"></div>
+        <div class="tg-doubt-dice-dot" data-bind="css: { 'visible': value() >= 2 }"></div>
     </div>
 </template>

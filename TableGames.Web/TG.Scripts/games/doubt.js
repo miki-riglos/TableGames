@@ -6,27 +6,32 @@
         var authentication = gameConfig.authentication;
 
         self.quantity = ko.observable(gameState.quantity);
-        self.diceValue = ko.observable(gameState.diceValue);
+        self.dice = new Dice(gameState.dice);
 
-        self.playerCups = gameState.playerCups;
+        self.playerCups = gameState.playerCups.map(function(playerCupState) {
+            return {
+                playerName: playerCupState.playerName,
+                dices: playerCupState.dices.map(function(diceState) { return new Dice(diceState); })
+            };
+        });
 
         table.activePlayerName(gameState.table.activePlayerName);
 
         // user game
-        self.userGame = {
-            dices: ko.observableArray()
-        };
-
-        self.changeUserGame = function(userGameState) {
-            userGameState.dices.forEach(function(dice) {
-                self.userGame.dices.push(ko.observable(dice.value));
-            });
-        };
-
+        self.userGame = null;
         if (gameState.userGame) {
-            self.changeUserGame(gameState.userGame);
+            self.userGame = {
+                dices: ko.observableArray(gameState.userGame.dices.map(function(diceState) { return new Dice(diceState); }))
+            };
         }
 
+        // chage user game state
+        self.changeUserGame = function(userGameState) {
+            userGameState.dices.forEach(function(diceState, index) {
+                self.userGame.dices()[index].isExposed(diceState.isExposed);
+                self.userGame.dices()[index].value(diceState.value);
+            });
+        };
 
         // bet
         self.bet = function(row, col) {
@@ -45,6 +50,13 @@
             //    table.stats(gameChangeResults.table.stats);
             //}
         };
+    }
+
+    function Dice(diceState) {
+        var self = this;
+
+        self.isExposed = ko.observable(diceState.isExposed);
+        self.value = ko.observable(diceState.value);
     }
 
     return Doubt;
