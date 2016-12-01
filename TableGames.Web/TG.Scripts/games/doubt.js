@@ -18,18 +18,20 @@
         table.activePlayerName(gameState.table.activePlayerName);
 
         // user game
-        self.userGame = null;
-        if (gameState.userGame) {
-            self.userGame = {
-                dices: ko.observableArray(gameState.userGame.dices.map(function(diceState) { return new Dice(diceState); }))
-            };
-        }
+        self.userGame = ko.observable();
 
-        // chage user game state
-        self.changeUserGame = function(userGameState) {
-            userGameState.dices.forEach(function(diceState, index) {
-                self.userGame.dices()[index].isExposed(diceState.isExposed);
-                self.userGame.dices()[index].value(diceState.value);
+        // set user game state
+        self.setUserGame = function(userGameState) {
+            self.userGame({
+                dices: ko.observableArray(userGameState.dices.map(function(diceState) { return new Dice(diceState); }))
+            });
+        };
+
+        // change user game state
+        self.changeUserGame = function(eventName, userGameChangeResults) {
+            userGameChangeResults.dices.forEach(function(diceState, index) {
+                self.userGame().dices()[index].isExposed(diceState.isExposed);
+                self.userGame().dices()[index].value(diceState.value);
             });
         };
 

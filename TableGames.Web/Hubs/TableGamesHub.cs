@@ -192,7 +192,7 @@ namespace TableGames.Web.Hubs
 
             // initial players state
             foreach (var kvp in room.Table.Game.GetPlayerGameStates()) {
-                Clients.Group(kvp.Key.Name).onUserGameChanged(hostName, roomName, kvp.Value);
+                Clients.Group(kvp.Key.Name).onUserGameStarted(hostName, roomName, kvp.Value);
             }
         }
 
@@ -209,7 +209,7 @@ namespace TableGames.Web.Hubs
 
             // players state
             foreach (var kvp in gameChangeResult.PlayerGameStates) {
-                Clients.Group(kvp.Key.Name).onUserGameChanged(hostName, roomName, kvp.Value);
+                Clients.Group(kvp.Key.Name).onUserGameChanged(hostName, roomName, eventName, kvp.Value);
             }
         }
 
@@ -226,7 +226,7 @@ namespace TableGames.Web.Hubs
 
                 // initial players state
                 foreach (var kvp in room.Table.Game.GetPlayerGameStates()) {
-                    Clients.Group(kvp.Key.Name).onUserGameChanged(hostName, roomName, kvp.Value);
+                    Clients.Group(kvp.Key.Name).onUserGameStarted(hostName, roomName, kvp.Value);
                 }
             }
             else {

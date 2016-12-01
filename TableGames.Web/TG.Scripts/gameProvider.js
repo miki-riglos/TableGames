@@ -23,7 +23,8 @@
                 game[eventName].onCompleted(playerName, gameChangeResults);
             };
 
-            game.changeUserGame = game.changeUserGame || function(userGameState) { };
+            game.setUserGame = game.setUserGame || function(userGameState) { };
+            game.changeUserGame = game.changeUserGame || function(eventName, userGameChangeResults) { };
 
             game.templateName = templateName;
 

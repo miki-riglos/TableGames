@@ -174,8 +174,10 @@
                 room.attend(tableState, chatConfig);
                 self.attendedRooms.push(room);
                 if (tableState && tableState.game) {
-                    tableState.game.userGame = userGameState;
                     room.table().start(tableState, getGameConfig(room));
+                    if (userGameState) {
+                        room.table().setUserGame(userGameState);
+                    }
                 }
             }
         };
@@ -278,12 +280,20 @@
             notification.addInfo(table.gameName + ' changed in room ' + hostName + '/' + roomName + '.');
         };
 
-        // ... ... user/player game state 
-        hub.client.onUserGameChanged = function(hostName, roomName, userGameState) {
+        // ... ... set user game state 
+        hub.client.onUserGameStarted = function(hostName, roomName, userGameState) {
             var room = getPlayer(hostName).getRoom(roomName);
             var table = room.table();
 
-            table.changeUserGame(userGameState);
+            table.setUserGame(userGameState);
+        };
+
+        // ... ... change user game state 
+        hub.client.onUserGameChanged = function(hostName, roomName, eventName, userGameChangeResults) {
+            var room = getPlayer(hostName).getRoom(roomName);
+            var table = room.table();
+
+            table.changeUserGame(eventName, userGameChangeResults);
         };
 
         // ... ... restart game
