@@ -1,67 +1,92 @@
 ﻿<style>
+    .tg-doubt-bet-qty, .tg-doubt-playername {
+        line-height: 50px;
+    }
+
+    .tg-doubt-playercups, .tg-doubt-usergame {
+        margin-top: 20px;
+    }
+
     .tg-doubt-dice {
         display: inline-block;
-        margin: 2px;
-        padding: 2px 6px;
-        width: 64px;
-        border: 4px solid gray;
-        border-radius: 10px;
+        width: 50px;
+        height: 50px;
     }
 
-    .tg-doubt-dice-dot {
+    .tg-dial {
         display: inline-block;
-        margin-right: 1px;
-        margin-left: 1px;
-        width: 10px;
-        height: 10px;
-        border: 1px solid gray;
-        border-radius: 50%;
-        background-color: gray;
-        visibility: hidden;
+        width: 40px;
     }
-
-        .tg-doubt-dice-dot.visible {
-            visibility: visible;
-        }
 </style>
 
 <template id="doubtTemplate">
     <div class="tg-doubt">
-        <table>
-            <tbody data-bind="foreach: playerCups">
-                <tr>
-                    <td data-bind="text: playerName"></td>
-                    <td data-bind="template: { name: 'doubtDiceTemplate', foreach: dices }"></td>
-                </tr>
-            </tbody>
-        </table>
-
         <div class="row">
-            <div class="col-xs-6">
+            <div class="col-xs-3 tg-doubt-bet-qty">
                 Quantity: <span data-bind="text: quantity"></span>
             </div>
-            <div class="col-xs-6" data-bind="template: { name: 'doubtDiceTemplate', data: dice }"></div>
+            <div class="col-xs-9" data-bind="template: { name: 'doubtDiceTemplate', data: dice }"></div>
         </div>
 
-        <div data-bind="with: userGame">
-            <!-- ko template: { name: 'doubtDiceTemplate', foreach: dices } -->
-            <!-- /ko -->
+        <div class="tg-doubt-playercups" data-bind="foreach: playerCups">
+            <div class="row">
+                <div class="col-xs-3 tg-doubt-playername" data-bind="text: playerName"></div>
+                <div class="col-xs-9" data-bind="template: { name: 'doubtDiceTemplate', foreach: dices }"></div>
+            </div>
         </div>
+
+
+        <div class="tg-doubt-usergame" data-bind="with: userGame">
+            <div class="row">
+                <div class="col-xs-3">Actions</div>
+                <div class="col-xs-9" data-bind="template: { name: 'doubtDiceTemplate', foreach: dices }"></div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-4">
+                    Quantity: <span data-bind="text: $parent.bet.quantity"></span>
+                    <!-- ko template: { name: 'doubtDialTemplate', data: $parent.bet.quantity.dial } --><!-- /ko -->
+                </div>
+                <div class="col-xs-4">
+                    <!-- ko template: { name: 'doubtDiceTemplate', data: $parent.bet.dice } --><!-- /ko -->
+                    <!-- ko template: { name: 'doubtDialTemplate', data: $parent.bet.dice.dial } --><!-- /ko -->
+                </div>
+                <div class="col-xs-4">
+                    <button type="button" class="btn btn-primary" data-bind="click: $parent.bet">Bet</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 </template>
 
 <template id="doubtDiceTemplate">
     <div class="tg-doubt-dice">
-        <div class="tg-doubt-dice-dot" data-bind="css: { 'visible': value() >= 2 }"></div>
-        <div class="tg-doubt-dice-dot"></div>
-        <div class="tg-doubt-dice-dot" data-bind="css: { 'visible': value() >= 4 }"></div>
+        <svg viewBox="0 0 128 128">
+            <rect width="128" height="128" fill="gray" rx="8" />
+            <rect width="112" height="112" fill="white" x="8" y="8" rx="4" />
 
-        <div class="tg-doubt-dice-dot" data-bind="css: { 'visible': value() === 6 }"></div>
-        <div class="tg-doubt-dice-dot" data-bind="css: { 'visible': [1, 3, 5].indexOf(value()) !== -1 }"></div>
-        <div class="tg-doubt-dice-dot" data-bind="css: { 'visible': value() === 6 }"></div>
+            <circle cx="30" cy="30" r="10" fill="gray" data-bind="visible: value() >= 2" />
+            <circle cx="98" cy="30" r="10" fill="gray" data-bind="visible: value() >= 4" />
 
-        <div class="tg-doubt-dice-dot" data-bind="css: { 'visible': value() >= 4 }"></div>
-        <div class="tg-doubt-dice-dot"></div>
-        <div class="tg-doubt-dice-dot" data-bind="css: { 'visible': value() >= 2 }"></div>
+            <circle cx="30" cy="64" r="10" fill="gray" data-bind="visible: value() === 6" />
+            <circle cx="64" cy="64" r="10" fill="gray" data-bind="visible: [1, 3, 5].indexOf(value()) !== -1" />
+            <circle cx="98" cy="64" r="10" fill="gray" data-bind="visible: value() === 6" />
+
+            <circle cx="30" cy="98" r="10" fill="gray" data-bind="visible: value() >= 4" />
+            <circle cx="98" cy="98" r="10" fill="gray" data-bind="visible: value() >= 2" />
+        </svg>
+    </div>
+</template>
+
+
+<template id="doubtDialTemplate">
+    <div class="tg-dial">
+        <button type="button" class="btn btn-default" data-bind="click: up">
+            <span class="glyphicon glyphicon-triangle-top" aria-hidden="true"></span>
+        </button>
+        <button type="button" class="btn btn-default" data-bind="click: down">
+            <span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true"></span>
+        </button>
     </div>
 </template>

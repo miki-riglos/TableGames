@@ -36,11 +36,22 @@
         };
 
         // bet
-        self.bet = function(row, col) {
+        self.bet = function() {
             //if (table.activePlayerName() === authentication.userName() && !self.isFinalized()) {
             //    var gameChangeParameters = { row: row, col: col };
             //    gameConfig.sendChangeToServer('assignBox', gameChangeParameters);
             //}
+        };
+        self.bet.quantity = ko.observable(1);
+        self.bet.quantity.dial = {
+            up: function() { self.bet.quantity(self.bet.quantity() + 1); },
+            down: function() { self.bet.quantity(self.bet.quantity() - 1); }
+        };
+
+        self.bet.dice = new Dice({ value: 1 });
+        self.bet.dice.dial = {
+            up: function() { self.bet.dice.value(self.bet.dice.value() + 1); },
+            down: function() { self.bet.dice.value(self.bet.dice.value() - 1); }
         };
 
         self.bet.onCompleted = function(playerName, gameChangeResults) {
