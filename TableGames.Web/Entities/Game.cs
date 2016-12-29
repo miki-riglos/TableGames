@@ -1,20 +1,37 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace TableGames.Web.Entities
 {
     public abstract class Game
     {
         public Table Table { get; private set; }
-        public bool IsFinalized { get; protected set; }
+        public bool IsFinalized { get; set; }
         public List<string> WinnerNames { get; protected set; }
+        public List<IGameAction> Actions { get; protected set; }
 
         public Game(Table table) {
             Table = table;
             WinnerNames = new List<string>();
             IsFinalized = false;
+            Actions = new List<IGameAction>();
         }
 
-        public abstract GameChangeResult Change(string playerName, string eventName, object gameChangeParameters);
+        public GameChangeResult Change(string playerName, string eventName, object gameChangeParameters) {
+            if (playerName != Table.ActivePlayer.Name) {
+                throw new Exception("It is not your turn.");
+            }
+
+            var gameAction = Actions.FirstOrDefault(a => a.EventName == eventName);
+
+            if (gameAction != null) {
+                return gameAction.Execute(gameChangeParameters);
+            }
+            else {
+                throw new Exception("Game Change error.");
+            }
+        }
 
         public abstract object ToClient();
 
@@ -28,6 +45,12 @@ namespace TableGames.Web.Entities
                 winnerNames = WinnerNames
             };
         }
+    }
+
+    public interface IGameAction
+    {
+        string EventName { get; }
+        GameChangeResult Execute(object gameChangeParameters);
     }
 
     public class GameChangeResult

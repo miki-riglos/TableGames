@@ -8,44 +8,18 @@ namespace TableGames.Web.Games
     [GameDescriptor("Doubt", "games/doubt")]
     public class Doubt : Game
     {
-        public List<PlayerCup> PlayerCups { get; private set; }
-        public int Quantity { get; private set; }
-        public Dice Dice { get; private set; }
+        public List<PlayerCup> PlayerCups { get; set; }
+        public int Quantity { get; set; }
+        public Dice Dice { get; set; }
 
         public Doubt(Table table) : base(table) {
+            Actions.Add(new BetAction(this));
+
             PlayerCups = new List<PlayerCup>(getPlayerDicesQty().Select(kvp => new PlayerCup(kvp.Key, kvp.Value)));
             Quantity = 0;
             Dice = new Dice() { IsExposed = true };
 
             Table.SetNextPlayer();
-        }
-
-        private GameChangeResult bet(string playerName, int quantity, int diceValue) {
-            if (playerName != Table.ActivePlayer.Name) {
-                throw new Exception("Doubt error - It is not your turn.");
-            }
-            //TODO: validate parameters
-
-            Quantity = quantity;
-            Dice.Value = diceValue;
-
-            // set next player if not finalized
-            if (!IsFinalized) {
-                Table.SetNextPlayer();
-            }
-
-            return new GameChangeResult(new {
-                table = new {
-                    activePlayerName = Table.ActivePlayer.Name
-                }
-            });
-        }
-
-        public override GameChangeResult Change(string playerName, string eventName, dynamic gameChangeParameters) {
-            if (eventName == "bet") {
-                return bet(playerName, (int)gameChangeParameters.quantity, (int)gameChangeParameters.value);
-            }
-            throw new Exception("Doubt Change error.");
         }
 
         public override object ToClient() {
@@ -82,23 +56,23 @@ namespace TableGames.Web.Games
 
             return playerDicesQty;
         }
+    }
 
-        public class PlayerCup
-        {
-            public Player Player { get; set; }
-            public List<Dice> Dices { get; set; }
+    public class PlayerCup
+    {
+        public Player Player { get; set; }
+        public List<Dice> Dices { get; set; }
 
-            public PlayerCup(Player player, int dicesQuantity) {
-                Player = player;
-                Dices = new List<Dice>(Enumerable.Range(1, dicesQuantity).Select(i => new Dice(true)));
-            }
+        public PlayerCup(Player player, int dicesQuantity) {
+            Player = player;
+            Dices = new List<Dice>(Enumerable.Range(1, dicesQuantity).Select(i => new Dice(true)));
+        }
 
-            public object ToClient() {
-                return new {
-                    playerName = Player.Name,
-                    dices = Dices.Select(d => d.ToClient())
-                };
-            }
+        public object ToClient() {
+            return new {
+                playerName = Player.Name,
+                dices = Dices.Select(d => d.ToClient())
+            };
         }
     }
 
@@ -132,6 +106,37 @@ namespace TableGames.Web.Games
                 isExposed = IsExposed,
                 value = IsExposed ? Value : 0
             };
+        }
+    }
+
+    public class BetAction : IGameAction
+    {
+        public string EventName { get { return "Bet"; } }
+
+        private Doubt _doubt;
+
+        public BetAction(Doubt doubt) {
+            _doubt = doubt;
+        }
+
+        public GameChangeResult Execute(dynamic gameChangeParameters) {
+            var quantity = (int)gameChangeParameters.quantity;
+            var diceValue = (int)gameChangeParameters.diceValue;
+
+            //TODO: validate parameters
+
+            _doubt.Quantity = quantity;
+            _doubt.Dice.Value = diceValue;
+
+            _doubt.Table.SetNextPlayer();
+
+            return new GameChangeResult(new {
+                quantity = _doubt.Quantity,
+                dice = _doubt.Dice.ToClient(),
+                table = new {
+                    activePlayerName = _doubt.Table.ActivePlayer.Name
+                }
+            });
         }
     }
 }

@@ -19,8 +19,13 @@
             game.isFinalized = game.isFinalized || ko.observable(gameState.isFinalized);
             game.winnerNames = game.winnerNames || ko.observableArray(gameState.winnerNames);
 
+            // index actions by eventName
+            game.actions.forEach(function(action) {
+                game.actions[action.eventName] = action;
+            });
+
             game.change = function(playerName, eventName, gameChangeResults) {
-                game[eventName].onCompleted(playerName, gameChangeResults);
+                game.actions[eventName].onExecuted(playerName, gameChangeResults);
             };
 
             game.setUserGame = game.setUserGame || function(userGameState) { };

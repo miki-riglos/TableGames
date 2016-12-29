@@ -8,14 +8,14 @@
         self.quantity = ko.observable(gameState.quantity);
         self.dice = new Dice(gameState.dice);
 
-        self.playerCups = gameState.playerCups.map(function(playerCupState) {
-            return {
-                playerName: playerCupState.playerName,
-                dices: playerCupState.dices.map(function(diceState) { return new Dice(diceState); })
-            };
-        });
+        self.playerCups = gameState.playerCups.map(function(playerCupState) { return new PlayerCup(playerCupState); });
 
         table.activePlayerName(gameState.table.activePlayerName);
+
+        // actions
+        self.actions = [
+            new BetAction(self, gameConfig)
+        ];
 
         // user game
         self.userGame = ko.observable();
@@ -34,42 +34,56 @@
                 self.userGame().dices()[index].value(diceState.value);
             });
         };
+    }
 
-        // bet
-        self.bet = function() {
-            //if (table.activePlayerName() === authentication.userName() && !self.isFinalized()) {
-            //    var gameChangeParameters = { row: row, col: col };
-            //    gameConfig.sendChangeToServer('assignBox', gameChangeParameters);
-            //}
-        };
-        self.bet.quantity = ko.observable(1);
-        self.bet.quantity.dial = {
-            up: function() { self.bet.quantity(self.bet.quantity() + 1); },
-            down: function() { self.bet.quantity(self.bet.quantity() - 1); }
-        };
-
-        self.bet.dice = new Dice({ value: 1 });
-        self.bet.dice.dial = {
-            up: function() { self.bet.dice.value(self.bet.dice.value() + 1); },
-            down: function() { self.bet.dice.value(self.bet.dice.value() - 1); }
-        };
-
-        self.bet.onCompleted = function(playerName, gameChangeResults) {
-            //self.board[gameChangeResults.row][gameChangeResults.col](playerName);
-            //table.activePlayerName(gameChangeResults.table.activePlayerName);
-            //self.isFinalized(gameChangeResults.isFinalized);
-            //gameChangeResults.winningBoxes.forEach(function(ab) { self.board[ab.row][ab.col].isWinning(true); });
-            //if (gameChangeResults.isFinalized) {
-            //    table.stats(gameChangeResults.table.stats);
-            //}
-        };
+    function PlayerCup(playerCupState) {
+        var self = this;
+        self.playerName = playerCupState.playerName;
+        self.dices = playerCupState.dices.map(function(diceState) { return new Dice(diceState); });
     }
 
     function Dice(diceState) {
         var self = this;
-
         self.isExposed = ko.observable(diceState.isExposed);
         self.value = ko.observable(diceState.value);
+    }
+
+    function BetAction(doubt, gameConfig) {
+        var self = this;
+        var table = gameConfig.table;
+        var authentication = gameConfig.authentication;
+
+        self.eventName = 'bet';
+
+        // quantity
+        self.quantity = ko.observable(1);
+        self.quantity.dial = {
+            up: function() { self.quantity(self.quantity() + 1); },
+            down: function() { self.quantity(self.quantity() - 1); }
+        };
+
+        // dice
+        self.dice = new Dice({ value: 1 });
+        self.dice.dial = {
+            up: function() { self.dice.value(self.dice.value() + 1); },
+            down: function() { self.dice.value(self.dice.value() - 1); }
+        };
+
+        self.execute = function(row, col) {
+            if (table.activePlayerName() === authentication.userName() && !doubt.isFinalized()) {
+                var gameChangeParameters = {
+                    quantity: self.quantity(),
+                    diceValue: self.dice.value()
+                };
+                gameConfig.sendChangeToServer(self.eventName, gameChangeParameters);
+            }
+        };
+
+        self.onExecuted = function(playerName, gameChangeResults) {
+            doubt.quantity(gameChangeResults.quantity);
+            doubt.dice.value(gameChangeResults.dice.value);
+            table.activePlayerName(gameChangeResults.table.activePlayerName);
+        };
     }
 
     return Doubt;

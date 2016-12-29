@@ -15,6 +15,11 @@
         symbols[self.playerName1] = 'X';
         symbols[self.playerName2] = 'O';
 
+        // actions
+        self.actions = [
+            new AssignBoxAction(self, gameConfig)
+        ];
+
         // board
         self.board = {};
         // ... create
@@ -32,20 +37,27 @@
         gameState.winningBoxes.forEach(function(ab) { self.board[ab.row][ab.col].isWinning(true); });
 
         table.activePlayerName(gameState.table.activePlayerName);
+    }
 
-        // assign box
-        self.assignBox = function(row, col) {
-            if (table.activePlayerName() === authentication.userName() && !self.isFinalized()) {
+    function AssignBoxAction(ticTacToe, gameConfig) {
+        var self = this;
+        var table = gameConfig.table;
+        var authentication = gameConfig.authentication;
+
+        self.eventName = 'assignBox';
+
+        self.execute = function(row, col) {
+            if (table.activePlayerName() === authentication.userName() && !ticTacToe.isFinalized()) {
                 var gameChangeParameters = { row: row, col: col };
-                gameConfig.sendChangeToServer('assignBox', gameChangeParameters);
+                gameConfig.sendChangeToServer(self.eventName, gameChangeParameters);
             }
         };
 
-        self.assignBox.onCompleted = function(playerName, gameChangeResults) {
-            self.board[gameChangeResults.row][gameChangeResults.col](playerName);
+        self.onExecuted = function(playerName, gameChangeResults) {
+            ticTacToe.board[gameChangeResults.row][gameChangeResults.col](playerName);
             table.activePlayerName(gameChangeResults.table.activePlayerName);
-            self.isFinalized(gameChangeResults.isFinalized);
-            gameChangeResults.winningBoxes.forEach(function(ab) { self.board[ab.row][ab.col].isWinning(true); });
+            ticTacToe.isFinalized(gameChangeResults.isFinalized);
+            gameChangeResults.winningBoxes.forEach(function(ab) { ticTacToe.board[ab.row][ab.col].isWinning(true); });
             if (gameChangeResults.isFinalized) {
                 table.stats(gameChangeResults.table.stats);
             }

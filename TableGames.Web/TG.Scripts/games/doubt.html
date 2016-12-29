@@ -44,15 +44,15 @@
 
             <div class="row">
                 <div class="col-xs-4">
-                    Quantity: <span data-bind="text: $parent.bet.quantity"></span>
-                    <!-- ko template: { name: 'doubtDialTemplate', data: $parent.bet.quantity.dial } --><!-- /ko -->
+                    Quantity: <span data-bind="text: $parent.actions.bet.quantity"></span>
+                    <!-- ko template: { name: 'doubtDialTemplate', data: $parent.actions.bet.quantity.dial } --><!-- /ko -->
                 </div>
                 <div class="col-xs-4">
-                    <!-- ko template: { name: 'doubtDiceTemplate', data: $parent.bet.dice } --><!-- /ko -->
-                    <!-- ko template: { name: 'doubtDialTemplate', data: $parent.bet.dice.dial } --><!-- /ko -->
+                    <!-- ko template: { name: 'doubtDiceTemplate', data: $parent.actions.bet.dice } --><!-- /ko -->
+                    <!-- ko template: { name: 'doubtDialTemplate', data: $parent.actions.bet.dice.dial } --><!-- /ko -->
                 </div>
                 <div class="col-xs-4">
-                    <button type="button" class="btn btn-primary" data-bind="click: $parent.bet">Bet</button>
+                    <button type="button" class="btn btn-primary" data-bind="click: $parent.actions.bet.execute">Bet</button>
                 </div>
             </div>
         </div>
