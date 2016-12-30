@@ -30,6 +30,7 @@ namespace TableGames.Web.Entities
         public Type Type { get; set; }
         public string ConstructorFileName { get; set; }
         public string TemplateFileName { get; set; }
+        public IEnumerable<Type> ActionTypes { get; set; }
 
         public object ToClient() {
             return new {
@@ -40,6 +41,10 @@ namespace TableGames.Web.Entities
         }
 
         private static Lazy<IEnumerable<GameInfo>> _registry = new Lazy<IEnumerable<GameInfo>>(() => {
+            var actionsRegistry = AppDomain.CurrentDomain.GetAssemblies()
+                        .SelectMany(a => a.GetTypes())
+                        .Where(type => typeof(IGameAction).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract);
+
             return AppDomain.CurrentDomain.GetAssemblies()
                         .SelectMany(a => a.GetTypes())
                         .Where(type => typeof(Game).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
@@ -49,18 +54,21 @@ namespace TableGames.Web.Entities
                                 Name = gameDescriptor.Name,
                                 Type = type,
                                 ConstructorFileName = gameDescriptor.ConstructorFileName,
-                                TemplateFileName = gameDescriptor.TemplateFileName
+                                TemplateFileName = gameDescriptor.TemplateFileName,
+                                ActionTypes = actionsRegistry.Where(t => t.GetConstructor(new[] { type }) != null)
                             };
-
                         });
         });
 
         public static IEnumerable<GameInfo> Registry => _registry.Value;
 
         public static Game CreateGame(string gameName, Table table) {
-            var gameType = Registry.First(gi => gi.Name == gameName).Type;
-            return (Game)Activator.CreateInstance(gameType, table);
-        }
+            var gameInfo = Registry.First(gi => gi.Name == gameName);
+            var game = (Game)Activator.CreateInstance(gameInfo.Type, table);
 
+            game.Actions.AddRange(gameInfo.ActionTypes.Select(actionType => (IGameAction)Activator.CreateInstance(actionType, game)));
+
+            return game;
+        }
     }
 }

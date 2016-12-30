@@ -15,11 +15,6 @@
         symbols[self.playerName1] = 'X';
         symbols[self.playerName2] = 'O';
 
-        // actions
-        self.actions = [
-            new AssignBoxAction(self, gameConfig)
-        ];
-
         // board
         self.board = {};
         // ... create
@@ -39,30 +34,32 @@
         table.activePlayerName(gameState.table.activePlayerName);
     }
 
-    function AssignBoxAction(ticTacToe, gameConfig) {
-        var self = this;
-        var table = gameConfig.table;
-        var authentication = gameConfig.authentication;
+    TicTacToe.ActionConstructors = [
+        function AssignBoxAction(ticTacToe, gameConfig) {
+            var self = this;
+            var table = gameConfig.table;
+            var authentication = gameConfig.authentication;
 
-        self.name = 'assignBox';
+            self.name = 'assignBox';
 
-        self.execute = function(row, col) {
-            if (table.activePlayerName() === authentication.userName() && !ticTacToe.isFinalized()) {
-                var gameChangeParameters = { row: row, col: col };
-                gameConfig.sendChangeToServer(self.name, gameChangeParameters);
-            }
-        };
+            self.execute = function(row, col) {
+                if (table.activePlayerName() === authentication.userName() && !ticTacToe.isFinalized()) {
+                    var gameChangeParameters = { row: row, col: col };
+                    gameConfig.sendChangeToServer(self.name, gameChangeParameters);
+                }
+            };
 
-        self.onExecuted = function(playerName, gameChangeResults) {
-            ticTacToe.board[gameChangeResults.row][gameChangeResults.col](playerName);
-            table.activePlayerName(gameChangeResults.table.activePlayerName);
-            ticTacToe.isFinalized(gameChangeResults.isFinalized);
-            gameChangeResults.winningBoxes.forEach(function(ab) { ticTacToe.board[ab.row][ab.col].isWinning(true); });
-            if (gameChangeResults.isFinalized) {
-                table.stats(gameChangeResults.table.stats);
-            }
-        };
-    }
+            self.onExecuted = function(playerName, gameChangeResults) {
+                ticTacToe.board[gameChangeResults.row][gameChangeResults.col](playerName);
+                table.activePlayerName(gameChangeResults.table.activePlayerName);
+                ticTacToe.isFinalized(gameChangeResults.isFinalized);
+                gameChangeResults.winningBoxes.forEach(function(ab) { ticTacToe.board[ab.row][ab.col].isWinning(true); });
+                if (gameChangeResults.isFinalized) {
+                    table.stats(gameChangeResults.table.stats);
+                }
+            };
+        }
+    ];
 
     return TicTacToe;
 });

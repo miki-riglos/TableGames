@@ -19,8 +19,10 @@
             game.isFinalized = game.isFinalized || ko.observable(gameState.isFinalized);
             game.winnerNames = game.winnerNames || ko.observableArray(gameState.winnerNames);
 
-            // index actions by name
-            game.actions.forEach(function(action) {
+            // actions by name
+            game.actions = {};
+            Constructor.ActionConstructors.forEach(function(ActionConstructor) {
+                var action = new ActionConstructor(game, gameConfig);
                 game.actions[action.name] = action;
             });
 

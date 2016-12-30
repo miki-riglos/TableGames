@@ -12,11 +12,6 @@
 
         table.activePlayerName(gameState.table.activePlayerName);
 
-        // actions
-        self.actions = [
-            new BetAction(self, gameConfig)
-        ];
-
         // user game
         self.userGame = ko.observable();
 
@@ -36,6 +31,46 @@
         };
     }
 
+    Doubt.ActionConstructors = [
+        function BetAction(doubt, gameConfig) {
+            var self = this;
+            var table = gameConfig.table;
+            var authentication = gameConfig.authentication;
+
+            self.name = 'bet';
+
+            // quantity
+            self.quantity = ko.observable(1);
+            self.quantity.dial = {
+                up: function() { self.quantity(self.quantity() + 1); },
+                down: function() { self.quantity(self.quantity() - 1); }
+            };
+
+            // dice
+            self.dice = new Dice({ value: 1 });
+            self.dice.dial = {
+                up: function() { self.dice.value(self.dice.value() + 1); },
+                down: function() { self.dice.value(self.dice.value() - 1); }
+            };
+
+            self.execute = function(row, col) {
+                if (table.activePlayerName() === authentication.userName() && !doubt.isFinalized()) {
+                    var gameChangeParameters = {
+                        quantity: self.quantity(),
+                        diceValue: self.dice.value()
+                    };
+                    gameConfig.sendChangeToServer(self.name, gameChangeParameters);
+                }
+            };
+
+            self.onExecuted = function(playerName, gameChangeResults) {
+                doubt.quantity(gameChangeResults.quantity);
+                doubt.dice.value(gameChangeResults.dice.value);
+                table.activePlayerName(gameChangeResults.table.activePlayerName);
+            };
+        },
+    ];
+
     function PlayerCup(playerCupState) {
         var self = this;
         self.playerName = playerCupState.playerName;
@@ -46,44 +81,6 @@
         var self = this;
         self.isExposed = ko.observable(diceState.isExposed);
         self.value = ko.observable(diceState.value);
-    }
-
-    function BetAction(doubt, gameConfig) {
-        var self = this;
-        var table = gameConfig.table;
-        var authentication = gameConfig.authentication;
-
-        self.name = 'bet';
-
-        // quantity
-        self.quantity = ko.observable(1);
-        self.quantity.dial = {
-            up: function() { self.quantity(self.quantity() + 1); },
-            down: function() { self.quantity(self.quantity() - 1); }
-        };
-
-        // dice
-        self.dice = new Dice({ value: 1 });
-        self.dice.dial = {
-            up: function() { self.dice.value(self.dice.value() + 1); },
-            down: function() { self.dice.value(self.dice.value() - 1); }
-        };
-
-        self.execute = function(row, col) {
-            if (table.activePlayerName() === authentication.userName() && !doubt.isFinalized()) {
-                var gameChangeParameters = {
-                    quantity: self.quantity(),
-                    diceValue: self.dice.value()
-                };
-                gameConfig.sendChangeToServer(self.name, gameChangeParameters);
-            }
-        };
-
-        self.onExecuted = function(playerName, gameChangeResults) {
-            doubt.quantity(gameChangeResults.quantity);
-            doubt.dice.value(gameChangeResults.dice.value);
-            table.activePlayerName(gameChangeResults.table.activePlayerName);
-        };
     }
 
     return Doubt;

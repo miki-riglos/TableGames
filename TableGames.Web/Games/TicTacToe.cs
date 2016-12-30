@@ -12,9 +12,6 @@ namespace TableGames.Web.Games
         public List<AssignedBox> WinningBoxes { get; set; }
 
         public TicTacToe(Table table) : base(table) {
-            Actions.Add(new AssignBoxAction(this));
-
-
             int[] indices = { 1, 2, 3 };
             Board = indices.SelectMany(row => indices, (row, col) => new AssignedBox(row, col)).ToList();
 

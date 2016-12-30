@@ -13,8 +13,6 @@ namespace TableGames.Web.Games
         public Dice Dice { get; set; }
 
         public Doubt(Table table) : base(table) {
-            Actions.Add(new BetAction(this));
-
             PlayerCups = new List<PlayerCup>(getPlayerDicesQty().Select(kvp => new PlayerCup(kvp.Key, kvp.Value)));
             Quantity = 0;
             Dice = new Dice() { IsExposed = true };
