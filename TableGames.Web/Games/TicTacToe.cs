@@ -39,36 +39,6 @@ namespace TableGames.Web.Games
         };
     }
 
-    public class Box
-    {
-        public int Row { get; set; }
-        public int Col { get; set; }
-        public int Id { get { return Row * 10 + Col; } }
-
-        public Box(int row, int col) {
-            Row = row;
-            Col = col;
-        }
-    }
-
-    public class AssignedBox
-    {
-        public Box Box { get; set; }
-        public string PlayerName { get; set; }
-
-        public AssignedBox(int row, int col) {
-            Box = new Box(row, col);
-        }
-
-        public object ToClient() {
-            return new {
-                row = Box.Row,
-                col = Box.Col,
-                playerName = PlayerName
-            };
-        }
-    }
-
     public class AssignBoxAction : IGameAction
     {
         public string Name => "assignBox";
@@ -120,6 +90,36 @@ namespace TableGames.Web.Games
             else {
                 throw new Exception("TicTacToe AssignBox error.");
             }
+        }
+    }
+
+    public class Box
+    {
+        public int Row { get; set; }
+        public int Col { get; set; }
+        public int Id { get { return Row * 10 + Col; } }
+
+        public Box(int row, int col) {
+            Row = row;
+            Col = col;
+        }
+    }
+
+    public class AssignedBox
+    {
+        public Box Box { get; set; }
+        public string PlayerName { get; set; }
+
+        public AssignedBox(int row, int col) {
+            Box = new Box(row, col);
+        }
+
+        public object ToClient() {
+            return new {
+                row = Box.Row,
+                col = Box.Col,
+                playerName = PlayerName
+            };
         }
     }
 }

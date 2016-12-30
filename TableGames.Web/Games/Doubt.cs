@@ -56,6 +56,80 @@ namespace TableGames.Web.Games
         }
     }
 
+    public class BetAction : IGameAction
+    {
+        public string Name => "bet";
+
+        private Doubt _doubt;
+
+        public BetAction(Doubt doubt) {
+            _doubt = doubt;
+        }
+
+        public GameChangeResult Execute(dynamic gameChangeParameters) {
+            var quantity = (int)gameChangeParameters.quantity;
+            var diceValue = (int)gameChangeParameters.diceValue;
+
+            //TODO: validate parameters
+
+            _doubt.Quantity = quantity;
+            _doubt.Dice.Value = diceValue;
+
+            _doubt.Table.SetNextPlayer();
+
+            return new GameChangeResult(new {
+                quantity = _doubt.Quantity,
+                dice = _doubt.Dice.ToClient(),
+                table = new {
+                    activePlayerName = _doubt.Table.ActivePlayer.Name
+                }
+            });
+        }
+    }
+
+    public class DoubtAction : IGameAction
+    {
+        public string Name => "doubt";
+
+        private Doubt _doubt;
+
+        public DoubtAction(Doubt doubt) {
+            _doubt = doubt;
+        }
+
+        private bool isRight() {
+            var actualQuantiy = _doubt.PlayerCups.SelectMany(pc => pc.Dices).Count(d => d.Value == _doubt.Dice.Value);
+            // add wildcards
+            if (_doubt.Dice.Value > 1) {
+                actualQuantiy += _doubt.PlayerCups.SelectMany(pc => pc.Dices).Count(d => d.Value == 1);
+            }
+            return _doubt.Quantity > actualQuantiy;
+        }
+
+        public GameChangeResult Execute(dynamic gameChangeParameters) {
+            if (isRight()) {
+                _doubt.WinnerNames.Add(_doubt.Table.ActivePlayer.Name);
+                // previous player lose one dice?
+            }
+            else {
+                // current player lose one dice?
+            }
+
+            _doubt.PlayerCups.ForEach(pc => pc.ExposeDices());
+            _doubt.IsFinalized = true;
+
+            return new GameChangeResult(new {
+                playerCups = _doubt.PlayerCups.Select(pc => pc.ToClient()),
+                table = new {
+                    activePlayerName = _doubt.Table.ActivePlayer.Name,
+                    stats = _doubt.Table.Games.Select(g => g.ToStats())
+                },
+                isFinalized = _doubt.IsFinalized,
+                winnerNames = _doubt.WinnerNames
+            });
+        }
+    }
+
     public class PlayerCup
     {
         public Player Player { get; set; }
@@ -64,6 +138,10 @@ namespace TableGames.Web.Games
         public PlayerCup(Player player, int dicesQuantity) {
             Player = player;
             Dices = new List<Dice>(Enumerable.Range(1, dicesQuantity).Select(i => new Dice(true)));
+        }
+
+        public void ExposeDices() {
+            Dices.ForEach(d => d.IsExposed = true);
         }
 
         public object ToClient() {
@@ -104,37 +182,6 @@ namespace TableGames.Web.Games
                 isExposed = IsExposed,
                 value = IsExposed ? Value : 0
             };
-        }
-    }
-
-    public class BetAction : IGameAction
-    {
-        public string Name => "bet";
-
-        private Doubt _doubt;
-
-        public BetAction(Doubt doubt) {
-            _doubt = doubt;
-        }
-
-        public GameChangeResult Execute(dynamic gameChangeParameters) {
-            var quantity = (int)gameChangeParameters.quantity;
-            var diceValue = (int)gameChangeParameters.diceValue;
-
-            //TODO: validate parameters
-
-            _doubt.Quantity = quantity;
-            _doubt.Dice.Value = diceValue;
-
-            _doubt.Table.SetNextPlayer();
-
-            return new GameChangeResult(new {
-                quantity = _doubt.Quantity,
-                dice = _doubt.Dice.ToClient(),
-                table = new {
-                    activePlayerName = _doubt.Table.ActivePlayer.Name
-                }
-            });
         }
     }
 }

@@ -9,6 +9,11 @@
         self.dice = new Dice(gameState.dice);
 
         self.playerCups = gameState.playerCups.map(function(playerCupState) { return new PlayerCup(playerCupState); });
+        self.playerCups.update = function(playerCupsState) {
+            playerCupsState.forEach(function(playerCupState, index) {
+                self.playerCups[index].updateDices(playerCupState.dices);
+            });
+        }
 
         table.activePlayerName(gameState.table.activePlayerName);
 
@@ -69,12 +74,39 @@
                 table.activePlayerName(gameChangeResults.table.activePlayerName);
             };
         },
+        function DoubtAction(doubt, gameConfig) {
+            var self = this;
+            var table = gameConfig.table;
+            var authentication = gameConfig.authentication;
+
+            self.name = 'doubt';
+
+            self.execute = function(row, col) {
+                if (table.activePlayerName() === authentication.userName() && !doubt.isFinalized()) {
+                    var gameChangeParameters = {};
+                    gameConfig.sendChangeToServer(self.name, gameChangeParameters);
+                }
+            };
+
+            self.onExecuted = function(playerName, gameChangeResults) {
+                doubt.playerCups.update(gameChangeResults.playerCups);
+                doubt.isFinalized(gameChangeResults.isFinalized);
+                table.stats(gameChangeResults.table.stats);
+            };
+        }
     ];
 
     function PlayerCup(playerCupState) {
         var self = this;
         self.playerName = playerCupState.playerName;
         self.dices = playerCupState.dices.map(function(diceState) { return new Dice(diceState); });
+
+        self.updateDices = function(dicesState) {
+            dicesState.forEach(function(diceState, index) {
+                self.dices[index].value(diceState.value);
+                self.dices[index].isExposed(diceState.isExposed);
+            });
+        }
     }
 
     function Dice(diceState) {
