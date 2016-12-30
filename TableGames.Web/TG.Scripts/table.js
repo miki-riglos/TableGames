@@ -39,10 +39,10 @@
         };
         self.canStart = ko.computed(function() { return self.room.isHost() && !self.hasStarted(); });
 
-        self.changeGame = function(playerName, eventName, gameChangeResults) {
+        self.changeGame = function(playerName, actionName, gameChangeResults) {
             gamePromise = gamePromise.then(function() {
                 if (!self) return;  // in case table was destroyed before game change
-                self.game().change(playerName, eventName, gameChangeResults);
+                self.game().change(playerName, actionName, gameChangeResults);
             });
         };
 
@@ -66,10 +66,10 @@
             });
         };
 
-        self.changeUserGame = function(eventName, userGameChangeResults) {
+        self.changeUserGame = function(actionName, userGameChangeResults) {
             gamePromise = gamePromise.then(function() {
                 if (!self) return;  // in case table was destroyed before game change
-                self.game().changeUserGame(eventName, userGameChangeResults);
+                self.game().changeUserGame(actionName, userGameChangeResults);
             });
         };
     }

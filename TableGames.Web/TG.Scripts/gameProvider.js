@@ -19,17 +19,17 @@
             game.isFinalized = game.isFinalized || ko.observable(gameState.isFinalized);
             game.winnerNames = game.winnerNames || ko.observableArray(gameState.winnerNames);
 
-            // index actions by eventName
+            // index actions by name
             game.actions.forEach(function(action) {
-                game.actions[action.eventName] = action;
+                game.actions[action.name] = action;
             });
 
-            game.change = function(playerName, eventName, gameChangeResults) {
-                game.actions[eventName].onExecuted(playerName, gameChangeResults);
+            game.change = function(playerName, actionName, gameChangeResults) {
+                game.actions[actionName].onExecuted(playerName, gameChangeResults);
             };
 
             game.setUserGame = game.setUserGame || function(userGameState) { };
-            game.changeUserGame = game.changeUserGame || function(eventName, userGameChangeResults) { };
+            game.changeUserGame = game.changeUserGame || function(actionName, userGameChangeResults) { };
 
             game.templateName = templateName;
 

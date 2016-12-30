@@ -272,11 +272,11 @@
         };
 
         // ... ... games 
-        hub.client.onGameChanged = function(hostName, roomName, playerName, eventName, gameChangeResults) {
+        hub.client.onGameChanged = function(hostName, roomName, playerName, actionName, gameChangeResults) {
             var room = getPlayer(hostName).getRoom(roomName);
             var table = room.table();
 
-            table.changeGame(playerName, eventName, gameChangeResults);
+            table.changeGame(playerName, actionName, gameChangeResults);
             notification.addInfo(table.gameName + ' changed in room ' + hostName + '/' + roomName + '.');
         };
 
@@ -289,11 +289,11 @@
         };
 
         // ... ... change user game state 
-        hub.client.onUserGameChanged = function(hostName, roomName, eventName, userGameChangeResults) {
+        hub.client.onUserGameChanged = function(hostName, roomName, actionName, userGameChangeResults) {
             var room = getPlayer(hostName).getRoom(roomName);
             var table = room.table();
 
-            table.changeUserGame(eventName, userGameChangeResults);
+            table.changeUserGame(actionName, userGameChangeResults);
         };
 
         // ... ... restart game
@@ -329,8 +329,8 @@
 
         function getGameConfig(room) {
             var gameConfig = {
-                sendChangeToServer: function(eventName, gameChangeParameters) {
-                    return hub.server.changeGame(room.hostName, room.name, authentication.userName(), eventName, gameChangeParameters);
+                sendChangeToServer: function(actionName, gameChangeParameters) {
+                    return hub.server.changeGame(room.hostName, room.name, authentication.userName(), actionName, gameChangeParameters);
                 },
                 table: room.table(),
                 authentication: authentication

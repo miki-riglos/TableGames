@@ -28,7 +28,7 @@
         };
 
         // change user game state
-        self.changeUserGame = function(eventName, userGameChangeResults) {
+        self.changeUserGame = function(actionName, userGameChangeResults) {
             userGameChangeResults.dices.forEach(function(diceState, index) {
                 self.userGame().dices()[index].isExposed(diceState.isExposed);
                 self.userGame().dices()[index].value(diceState.value);
@@ -53,7 +53,7 @@
         var table = gameConfig.table;
         var authentication = gameConfig.authentication;
 
-        self.eventName = 'bet';
+        self.name = 'bet';
 
         // quantity
         self.quantity = ko.observable(1);
@@ -75,7 +75,7 @@
                     quantity: self.quantity(),
                     diceValue: self.dice.value()
                 };
-                gameConfig.sendChangeToServer(self.eventName, gameChangeParameters);
+                gameConfig.sendChangeToServer(self.name, gameChangeParameters);
             }
         };
 

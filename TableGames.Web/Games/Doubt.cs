@@ -111,7 +111,7 @@ namespace TableGames.Web.Games
 
     public class BetAction : IGameAction
     {
-        public string EventName { get { return "Bet"; } }
+        public string Name => "bet";
 
         private Doubt _doubt;
 

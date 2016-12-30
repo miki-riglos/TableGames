@@ -197,19 +197,19 @@ namespace TableGames.Web.Hubs
         }
 
         // ... Games
-        public void ChangeGame(string hostName, string roomName, string playerName, string eventName, object gameChangeParameters) {
+        public void ChangeGame(string hostName, string roomName, string playerName, string actionName, object gameChangeParameters) {
             var room = _getPlayer(hostName).GetRoom(roomName);  // will throw if player is not host
 
-            var gameChangeResult = room.Table.ChangeGame(playerName, eventName, gameChangeParameters);
+            var gameChangeResult = room.Table.ChangeGame(playerName, actionName, gameChangeParameters);
 
             // game state
             room.GetGroups().ForEach(groupId => {
-                Clients.Group(groupId).onGameChanged(hostName, roomName, playerName, eventName, gameChangeResult.GameState);
+                Clients.Group(groupId).onGameChanged(hostName, roomName, playerName, actionName, gameChangeResult.GameState);
             });
 
             // players state
             foreach (var kvp in gameChangeResult.PlayerGameStates) {
-                Clients.Group(kvp.Key.Name).onUserGameChanged(hostName, roomName, eventName, kvp.Value);
+                Clients.Group(kvp.Key.Name).onUserGameChanged(hostName, roomName, actionName, kvp.Value);
             }
         }
 

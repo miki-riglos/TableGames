@@ -74,7 +74,7 @@ namespace TableGames.Web.Games
 
     public class AssignBoxAction : IGameAction
     {
-        public string EventName { get { return "assignBox"; } }
+        public string Name => "assignBox";
 
         private TicTacToe _ticTacToe;
 

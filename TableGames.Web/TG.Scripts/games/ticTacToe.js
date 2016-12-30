@@ -44,12 +44,12 @@
         var table = gameConfig.table;
         var authentication = gameConfig.authentication;
 
-        self.eventName = 'assignBox';
+        self.name = 'assignBox';
 
         self.execute = function(row, col) {
             if (table.activePlayerName() === authentication.userName() && !ticTacToe.isFinalized()) {
                 var gameChangeParameters = { row: row, col: col };
-                gameConfig.sendChangeToServer(self.eventName, gameChangeParameters);
+                gameConfig.sendChangeToServer(self.name, gameChangeParameters);
             }
         };
 

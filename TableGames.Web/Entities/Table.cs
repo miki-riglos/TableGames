@@ -54,8 +54,8 @@ namespace TableGames.Web.Entities
             }
         }
 
-        public GameChangeResult ChangeGame(string playerName, string eventName, object gameChangeParameters) {
-            return Game.Change(playerName, eventName, gameChangeParameters);
+        public GameChangeResult ChangeGame(string playerName, string actionName, object gameChangeParameters) {
+            return Game.Change(playerName, actionName, gameChangeParameters);
         }
 
         public object ToClient() {

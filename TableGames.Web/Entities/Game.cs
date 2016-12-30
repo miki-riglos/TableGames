@@ -18,12 +18,12 @@ namespace TableGames.Web.Entities
             Actions = new List<IGameAction>();
         }
 
-        public GameChangeResult Change(string playerName, string eventName, object gameChangeParameters) {
+        public GameChangeResult Change(string playerName, string actionName, object gameChangeParameters) {
             if (playerName != Table.ActivePlayer.Name) {
                 throw new Exception("It is not your turn.");
             }
 
-            var gameAction = Actions.FirstOrDefault(a => a.EventName == eventName);
+            var gameAction = Actions.FirstOrDefault(a => a.Name == actionName);
 
             if (gameAction != null) {
                 return gameAction.Execute(gameChangeParameters);
@@ -49,7 +49,7 @@ namespace TableGames.Web.Entities
 
     public interface IGameAction
     {
-        string EventName { get; }
+        string Name { get; }
         GameChangeResult Execute(object gameChangeParameters);
     }
 
