@@ -70,14 +70,11 @@
                 }
             };
 
-            self.execute = function() {
-                if (table.isUserTurn()) {
-                    var gameChangeParameters = {
-                        quantity: self.quantity(),
-                        diceValue: self.dice.value()
-                    };
-                    gameConfig.sendChangeToServer(self.name, gameChangeParameters);
-                }
+            self.getParameters = function() {
+                return {
+                    quantity: self.quantity(),
+                    diceValue: self.dice.value()
+                };
             };
 
             self.onExecuted = function(playerName, gameChangeResults) {
