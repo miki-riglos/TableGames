@@ -118,8 +118,9 @@
                     <!-- ko foreach: { data: $parent.playerNames, as: 'playerName' } -->
                     <td>
                         <span class="glyphicon glyphicon-ok" data-bind="visible: gameStats.winnerNames.indexOf(playerName) > -1" aria-hidden="true"></span>
-                        <span data-bind="visible: playerName === gameStats.diceLoserName">-1</span>
-                        <span data-bind="visible: playerName === gameStats.diceWinnerName">+1</span>
+                        <span class="glyphicon glyphicon-ok" data-bind="visible: gameStats.winnerNames.indexOf(playerName) === -1" style="visibility: hidden;" aria-hidden="true"></span>
+                        <span class="glyphicon glyphicon-minus-sign" data-bind="visible: playerName === gameStats.diceLoserName" aria-hidden="true"></span>
+                        <span class="glyphicon glyphicon-plus-sign" data-bind="visible: playerName === gameStats.diceWinnerName" aria-hidden="true"></span>
                     </td>
                     <!-- /ko -->
                 </tr>

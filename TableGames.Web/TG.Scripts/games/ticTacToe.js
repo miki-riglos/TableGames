@@ -1,9 +1,7 @@
 ﻿define(['knockout'], function(ko) {
 
-    function TicTacToe(gameConfig, gameState) {
+    function TicTacToe(gameConfig, gameState, table) {
         var self = this;
-        var table = gameConfig.table;
-        var authentication = gameConfig.authentication;
 
         var indices = [1, 2, 3];
         self.indices = indices;
@@ -35,25 +33,22 @@
     }
 
     TicTacToe.ActionConstructors = [
-        function AssignBoxAction(ticTacToe, gameConfig) {
+        function AssignBoxAction(gameConfig, game, table) {
             var self = this;
-            var table = gameConfig.table;
-            var authentication = gameConfig.authentication;
-
             self.name = 'assignBox';
 
             self.execute = function(row, col) {
-                if (table.activePlayerName() === authentication.userName() && !ticTacToe.isFinalized()) {
+                if (table.isUserTurn()) {
                     var gameChangeParameters = { row: row, col: col };
                     gameConfig.sendChangeToServer(self.name, gameChangeParameters);
                 }
             };
 
             self.onExecuted = function(playerName, gameChangeResults) {
-                ticTacToe.board[gameChangeResults.row][gameChangeResults.col](playerName);
+                game.board[gameChangeResults.row][gameChangeResults.col](playerName);
                 table.activePlayerName(gameChangeResults.table.activePlayerName);
-                ticTacToe.isFinalized(gameChangeResults.isFinalized);
-                gameChangeResults.winningBoxes.forEach(function(ab) { ticTacToe.board[ab.row][ab.col].isWinning(true); });
+                game.isFinalized(gameChangeResults.isFinalized);
+                gameChangeResults.winningBoxes.forEach(function(ab) { game.board[ab.row][ab.col].isWinning(true); });
                 if (gameChangeResults.isFinalized) {
                     table.stats(gameChangeResults.table.stats);
                 }

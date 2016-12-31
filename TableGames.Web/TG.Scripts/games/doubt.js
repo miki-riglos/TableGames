@@ -1,9 +1,7 @@
 ﻿define(['knockout'], function(ko) {
 
-    function Doubt(gameConfig, gameState) {
+    function Doubt(gameConfig, gameState, table) {
         var self = this;
-        var table = gameConfig.table;
-        var authentication = gameConfig.authentication;
 
         self.quantity = ko.observable(gameState.quantity);
         self.dice = new Dice(gameState.dice);
@@ -35,33 +33,45 @@
             });
         };
 
+        // stats template
         table.statsTemplateName('doubtStatsTemplate');
     }
 
     Doubt.ActionConstructors = [
-        function BetAction(doubt, gameConfig) {
+        function BetAction(gameConfig, game, table) {
             var self = this;
-            var table = gameConfig.table;
-            var authentication = gameConfig.authentication;
-
             self.name = 'bet';
 
             // quantity
             self.quantity = ko.observable(1);
             self.quantity.dial = {
-                up: function() { self.quantity(self.quantity() + 1); },
-                down: function() { self.quantity(self.quantity() - 1); }
+                up: function() {
+                    self.quantity(self.quantity() + 1);
+                },
+                down: function() {
+                    if (self.quantity() > 1) {
+                        self.quantity(self.quantity() - 1);
+                    }
+                }
             };
 
             // dice
             self.dice = new Dice({ value: 1 });
             self.dice.dial = {
-                up: function() { self.dice.value(self.dice.value() + 1); },
-                down: function() { self.dice.value(self.dice.value() - 1); }
+                up: function() {
+                    if (self.dice.value() < 6) {
+                        self.dice.value(self.dice.value() + 1);
+                    }
+                },
+                down: function() {
+                    if (self.dice.value() > 1) {
+                        self.dice.value(self.dice.value() - 1);
+                    }
+                }
             };
 
-            self.execute = function(row, col) {
-                if (table.activePlayerName() === authentication.userName() && !doubt.isFinalized()) {
+            self.execute = function() {
+                if (table.isUserTurn()) {
                     var gameChangeParameters = {
                         quantity: self.quantity(),
                         diceValue: self.dice.value()
@@ -71,48 +81,28 @@
             };
 
             self.onExecuted = function(playerName, gameChangeResults) {
-                doubt.quantity(gameChangeResults.quantity);
-                doubt.dice.value(gameChangeResults.dice.value);
+                game.quantity(gameChangeResults.quantity);
+                game.dice.value(gameChangeResults.dice.value);
                 table.activePlayerName(gameChangeResults.table.activePlayerName);
             };
         },
-        function DoubtAction(doubt, gameConfig) {
+        function DoubtAction(gameConfig, game, table) {
             var self = this;
-            var table = gameConfig.table;
-            var authentication = gameConfig.authentication;
-
             self.name = 'doubt';
 
-            self.execute = function(row, col) {
-                if (table.activePlayerName() === authentication.userName() && !doubt.isFinalized()) {
-                    var gameChangeParameters = {};
-                    gameConfig.sendChangeToServer(self.name, gameChangeParameters);
-                }
-            };
-
             self.onExecuted = function(playerName, gameChangeResults) {
-                doubt.playerCups.update(gameChangeResults.playerCups);
-                doubt.isFinalized(gameChangeResults.isFinalized);
+                game.playerCups.update(gameChangeResults.playerCups);
+                game.isFinalized(gameChangeResults.isFinalized);
                 table.stats(gameChangeResults.table.stats);
             };
         },
-        function MatchAction(doubt, gameConfig) {
+        function MatchAction(gameConfig, game, table) {
             var self = this;
-            var table = gameConfig.table;
-            var authentication = gameConfig.authentication;
-
             self.name = 'match';
 
-            self.execute = function(row, col) {
-                if (table.activePlayerName() === authentication.userName() && !doubt.isFinalized()) {
-                    var gameChangeParameters = {};
-                    gameConfig.sendChangeToServer(self.name, gameChangeParameters);
-                }
-            };
-
             self.onExecuted = function(playerName, gameChangeResults) {
-                doubt.playerCups.update(gameChangeResults.playerCups);
-                doubt.isFinalized(gameChangeResults.isFinalized);
+                game.playerCups.update(gameChangeResults.playerCups);
+                game.isFinalized(gameChangeResults.isFinalized);
                 table.stats(gameChangeResults.table.stats);
             };
         }

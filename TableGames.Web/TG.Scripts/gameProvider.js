@@ -14,15 +14,22 @@
         var gameInfo = registry[gameName];
 
         require([gameInfo.constructorFileName, 'tmpl!' + gameInfo.templateFileName], function(Constructor, templateName) {
-            var game = new Constructor(gameConfig, gameState);
+            var game = new Constructor(gameConfig, gameState, gameConfig.table);
 
             game.isFinalized = game.isFinalized || ko.observable(gameState.isFinalized);
             game.winnerNames = game.winnerNames || ko.observableArray(gameState.winnerNames);
 
-            // actions by name
+            // instantiate actions and attach to game
             game.actions = {};
             Constructor.ActionConstructors.forEach(function(ActionConstructor) {
-                var action = new ActionConstructor(game, gameConfig);
+                var action = new ActionConstructor(gameConfig, game, gameConfig.table);
+                action.getParameters = action.getParameters || function() { return {}; };
+                action.execute = action.execute || function() {
+                    if (gameConfig.table.isUserTurn()) {
+                        var gameChangeParameters = action.getParameters();
+                        gameConfig.sendChangeToServer(action.name, gameChangeParameters);
+                    }
+                };
                 game.actions[action.name] = action;
             });
 

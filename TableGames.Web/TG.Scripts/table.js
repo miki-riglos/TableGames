@@ -72,6 +72,10 @@
                 self.game().changeUserGame(actionName, userGameChangeResults);
             });
         };
+
+        self.isUserTurn = function() {
+            return self.activePlayerName() === authentication.userName() && !self.game().isFinalized();
+        };
     }
 
     return Table;
