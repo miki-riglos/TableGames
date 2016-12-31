@@ -11,6 +11,8 @@ namespace TableGames.Web.Games
         public List<PlayerCup> PlayerCups { get; set; }
         public int Quantity { get; set; }
         public Dice Dice { get; set; }
+        public Player DiceLoser { get; private set; }
+        public Player DiceWinner { get; private set; }
 
         public Doubt(Table table) : base(table) {
             PlayerCups = new List<PlayerCup>(getPlayerDicesQty().Select(kvp => new PlayerCup(kvp.Key, kvp.Value)));
@@ -18,6 +20,25 @@ namespace TableGames.Web.Games
             Dice = new Dice() { IsExposed = true };
 
             Table.SetNextPlayer();
+        }
+
+        public int GetActualQuantity() {
+            var actualQuantiy = PlayerCups.SelectMany(pc => pc.Dices).Count(d => d.Value == Dice.Value);
+            // add wildcards
+            if (Dice.Value > 1) {
+                actualQuantiy += PlayerCups.SelectMany(pc => pc.Dices).Count(d => d.Value == 1);
+            }
+            return actualQuantiy;
+        }
+
+        public void SetPlayerDicesQty(Player player, int delta) {
+            getPlayerDicesQty()[player] += delta;
+            if (delta < 0) {
+                DiceLoser = player;
+            }
+            else {
+                DiceWinner = player;
+            }
         }
 
         public override object ToClient() {
@@ -53,6 +74,15 @@ namespace TableGames.Web.Games
             }
 
             return playerDicesQty;
+        }
+
+        public override object ToStats() {
+            return new {
+                isFinalized = IsFinalized,
+                winnerNames = WinnerNames,
+                diceLoserName = DiceLoser?.Name,
+                diceWinnerName = DiceWinner?.Name
+            };
         }
     }
 
@@ -97,22 +127,47 @@ namespace TableGames.Web.Games
             _doubt = doubt;
         }
 
-        private bool isRight() {
-            var actualQuantiy = _doubt.PlayerCups.SelectMany(pc => pc.Dices).Count(d => d.Value == _doubt.Dice.Value);
-            // add wildcards
-            if (_doubt.Dice.Value > 1) {
-                actualQuantiy += _doubt.PlayerCups.SelectMany(pc => pc.Dices).Count(d => d.Value == 1);
+        public GameChangeResult Execute(dynamic gameChangeParameters) {
+            if (_doubt.Quantity > _doubt.GetActualQuantity()) {
+                _doubt.WinnerNames.Add(_doubt.Table.ActivePlayer.Name);
+                _doubt.SetPlayerDicesQty(_doubt.Table.GetPreviousPlayer(), -1);
             }
-            return _doubt.Quantity > actualQuantiy;
+            else {
+                _doubt.SetPlayerDicesQty(_doubt.Table.ActivePlayer, -1);
+            }
+
+            _doubt.PlayerCups.ForEach(pc => pc.ExposeDices());
+            _doubt.IsFinalized = true;
+
+            return new GameChangeResult(new {
+                playerCups = _doubt.PlayerCups.Select(pc => pc.ToClient()),
+                table = new {
+                    activePlayerName = _doubt.Table.ActivePlayer.Name,
+                    stats = _doubt.Table.Games.Select(g => g.ToStats())
+                },
+                isFinalized = _doubt.IsFinalized,
+                winnerNames = _doubt.WinnerNames
+            });
+        }
+    }
+
+    public class MatchAction : IGameAction
+    {
+        public string Name => "match";
+
+        private Doubt _doubt;
+
+        public MatchAction(Doubt doubt) {
+            _doubt = doubt;
         }
 
         public GameChangeResult Execute(dynamic gameChangeParameters) {
-            if (isRight()) {
+            if (_doubt.Quantity == _doubt.GetActualQuantity()) {
                 _doubt.WinnerNames.Add(_doubt.Table.ActivePlayer.Name);
-                // previous player lose one dice?
+                _doubt.SetPlayerDicesQty(_doubt.Table.ActivePlayer, 1);
             }
             else {
-                // current player lose one dice?
+                _doubt.SetPlayerDicesQty(_doubt.Table.ActivePlayer, -1);
             }
 
             _doubt.PlayerCups.ForEach(pc => pc.ExposeDices());

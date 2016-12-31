@@ -54,6 +54,7 @@
                 <div class="col-xs-4">
                     <button type="button" class="btn btn-primary" data-bind="click: $parent.actions.bet.execute">Bet</button>
                     <button type="button" class="btn btn-primary" data-bind="click: $parent.actions.doubt.execute">Doubt</button>
+                    <button type="button" class="btn btn-primary" data-bind="click: $parent.actions.match.execute">Match</button>
                 </div>
             </div>
         </div>
@@ -80,7 +81,6 @@
     </div>
 </template>
 
-
 <template id="doubtDialTemplate">
     <div class="tg-dial">
         <button type="button" class="btn btn-default" data-bind="click: up">
@@ -89,5 +89,41 @@
         <button type="button" class="btn btn-default" data-bind="click: down">
             <span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true"></span>
         </button>
+    </div>
+</template>
+
+<template id="doubtStatsTemplate">
+    <div class="panel panel-default collapse" data-bind="attr: { 'id': room.clientId + '_stats' }">
+        <div class="panel-heading">
+            <span>Stats</span>
+        </div>
+        <table class="table table-condensed">
+            <thead>
+                <tr>
+                    <th>
+                        <span>#</span>
+                    </th>
+                    <!-- ko foreach: { data: playerNames, as: 'playerName' } -->
+                    <th>
+                        <span data-bind="text: playerName, css: { 'tg-active': playerName === $parent.activePlayerName() }"></span>
+                    </th>
+                    <!-- /ko -->
+                </tr>
+            </thead>
+            <tbody data-bind="foreach: { data: stats, as: 'gameStats' }">
+                <tr>
+                    <td>
+                        <span data-bind="text: $index() + 1"></span>
+                    </td>
+                    <!-- ko foreach: { data: $parent.playerNames, as: 'playerName' } -->
+                    <td>
+                        <span class="glyphicon glyphicon-ok" data-bind="visible: gameStats.winnerNames.indexOf(playerName) > -1" aria-hidden="true"></span>
+                        <span data-bind="visible: playerName === gameStats.diceLoserName">-1</span>
+                        <span data-bind="visible: playerName === gameStats.diceWinnerName">+1</span>
+                    </td>
+                    <!-- /ko -->
+                </tr>
+            </tbody>
+        </table>
     </div>
 </template>

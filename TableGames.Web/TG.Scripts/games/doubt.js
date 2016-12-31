@@ -34,6 +34,8 @@
                 self.userGame().dices()[index].value(diceState.value);
             });
         };
+
+        table.statsTemplateName('doubtStatsTemplate');
     }
 
     Doubt.ActionConstructors = [
@@ -80,6 +82,26 @@
             var authentication = gameConfig.authentication;
 
             self.name = 'doubt';
+
+            self.execute = function(row, col) {
+                if (table.activePlayerName() === authentication.userName() && !doubt.isFinalized()) {
+                    var gameChangeParameters = {};
+                    gameConfig.sendChangeToServer(self.name, gameChangeParameters);
+                }
+            };
+
+            self.onExecuted = function(playerName, gameChangeResults) {
+                doubt.playerCups.update(gameChangeResults.playerCups);
+                doubt.isFinalized(gameChangeResults.isFinalized);
+                table.stats(gameChangeResults.table.stats);
+            };
+        },
+        function MatchAction(doubt, gameConfig) {
+            var self = this;
+            var table = gameConfig.table;
+            var authentication = gameConfig.authentication;
+
+            self.name = 'match';
 
             self.execute = function(row, col) {
                 if (table.activePlayerName() === authentication.userName() && !doubt.isFinalized()) {

@@ -54,6 +54,16 @@ namespace TableGames.Web.Entities
             }
         }
 
+        public Player GetPreviousPlayer() {
+            Player previousPlayer = null;
+            if (ActivePlayer != null) {
+                var previousIndex = Players.IndexOf(ActivePlayer);
+                previousIndex = previousIndex >= 1 ? previousIndex - 1 : Players.Count - 1;
+                previousPlayer = Players[previousIndex];
+            }
+            return previousPlayer;
+        }
+
         public GameChangeResult ChangeGame(string playerName, string actionName, object gameChangeParameters) {
             return Game.Change(playerName, actionName, gameChangeParameters);
         }
