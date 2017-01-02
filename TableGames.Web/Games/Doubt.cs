@@ -11,6 +11,7 @@ namespace TableGames.Web.Games
         public List<PlayerCup> PlayerCups { get; set; }
         public int Quantity { get; set; }
         public Dice Dice { get; set; }
+        public int ActualQuantity { get; set; }
         public Player DiceLoser { get; private set; }
         public Player DiceWinner { get; private set; }
 
@@ -46,6 +47,7 @@ namespace TableGames.Web.Games
                 playerCups = PlayerCups.Select(pc => pc.ToClient()),
                 quantity = Quantity,
                 dice = Dice.ToClient(),
+                actualQuantity = ActualQuantity,
                 table = new {
                     activePlayerName = Table.ActivePlayer?.Name,
                 },
@@ -57,7 +59,7 @@ namespace TableGames.Web.Games
         public override Dictionary<Player, object> GetPlayerGameStates() {
             return PlayerCups.ToDictionary(
                 pc => pc.Player,
-                pc => (object)new { dices = pc.Dices.Select(d => d.GetExposedDice().ToClient()) }
+                pc => (object)new { dices = pc.Dices.Select(d => d.ToClient(true)) }
             );
         }
 
@@ -112,7 +114,7 @@ namespace TableGames.Web.Games
             if (rethrowOthers) {
                 foreach (var dice in _doubt.PlayerCups.First(pc => pc.Player == _doubt.Table.ActivePlayer).Dices) {
                     if (!dice.IsExposed) {
-                        if (dice.Value == diceValue) {
+                        if (dice.Value == diceValue || dice.Value == 1) {
                             dice.IsExposed = true;
                         }
                         else {
@@ -151,7 +153,8 @@ namespace TableGames.Web.Games
         }
 
         public GameChangeResult Execute(dynamic gameChangeParameters) {
-            if (_doubt.Quantity > _doubt.GetActualQuantity()) {
+            _doubt.ActualQuantity = _doubt.GetActualQuantity();
+            if (_doubt.Quantity > _doubt.ActualQuantity) {
                 _doubt.WinnerNames.Add(_doubt.Table.ActivePlayer.Name);
                 _doubt.SetPlayerDicesQty(_doubt.Table.GetPreviousPlayer(), -1);
             }
@@ -163,6 +166,7 @@ namespace TableGames.Web.Games
             _doubt.IsFinalized = true;
 
             return new GameChangeResult(new {
+                actualQuantity = _doubt.ActualQuantity,
                 playerCups = _doubt.PlayerCups.Select(pc => pc.ToClient()),
                 table = new {
                     activePlayerName = _doubt.Table.ActivePlayer.Name,
@@ -185,7 +189,8 @@ namespace TableGames.Web.Games
         }
 
         public GameChangeResult Execute(dynamic gameChangeParameters) {
-            if (_doubt.Quantity == _doubt.GetActualQuantity()) {
+            _doubt.ActualQuantity = _doubt.GetActualQuantity();
+            if (_doubt.Quantity == _doubt.ActualQuantity) {
                 _doubt.WinnerNames.Add(_doubt.Table.ActivePlayer.Name);
                 _doubt.SetPlayerDicesQty(_doubt.Table.ActivePlayer, 1);
             }
@@ -197,6 +202,7 @@ namespace TableGames.Web.Games
             _doubt.IsFinalized = true;
 
             return new GameChangeResult(new {
+                actualQuantity = _doubt.ActualQuantity,
                 playerCups = _doubt.PlayerCups.Select(pc => pc.ToClient()),
                 table = new {
                     activePlayerName = _doubt.Table.ActivePlayer.Name,
@@ -248,17 +254,10 @@ namespace TableGames.Web.Games
             Value = _random.Next(1, 7);
         }
 
-        public Dice GetExposedDice() {
-            var exposedDice = new Dice();
-            exposedDice.IsExposed = true;
-            exposedDice.Value = Value;
-            return exposedDice;
-        }
-
-        public object ToClient() {
+        public object ToClient(bool includeValue = false) {
             return new {
                 isExposed = IsExposed,
-                value = IsExposed ? Value : 0
+                value = IsExposed || includeValue ? Value : 0
             };
         }
     }

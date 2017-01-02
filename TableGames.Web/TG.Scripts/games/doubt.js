@@ -5,8 +5,9 @@
 
         self.quantity = ko.observable(gameState.quantity);
         self.dice = new Dice(gameState.dice);
+        self.actualQuantity = ko.observable(gameState.actualQuantity);
 
-        self.playerCups = gameState.playerCups.map(function(playerCupState) { return new PlayerCup(playerCupState); });
+        self.playerCups = gameState.playerCups.map(function(playerCupState) { return new PlayerCup(playerCupState, self); });
         self.playerCups.update = function(playerCupsState) {
             playerCupsState.forEach(function(playerCupState, index) {
                 self.playerCups[index].updateDices(playerCupState.dices);
@@ -28,8 +29,8 @@
         // change user game state
         self.changeUserGame = function(actionName, userGameChangeResults) {
             userGameChangeResults.dices.forEach(function(diceState, index) {
-                self.userGame().dices()[index].isExposed(diceState.isExposed);
-                self.userGame().dices()[index].value(diceState.value);
+                self.userGame().dices[index].isExposed(diceState.isExposed);
+                self.userGame().dices[index].value(diceState.value);
             });
         };
 
@@ -56,7 +57,7 @@
             };
 
             // dice
-            self.dice = new Dice({ value: 1 });
+            self.dice = new Dice({ isExposed: true, value: 1 });
             self.dice.dial = {
                 up: function() {
                     if (self.dice.value() < 6) {
@@ -93,6 +94,7 @@
             self.name = 'doubt';
 
             self.onExecuted = function(playerName, gameChangeResults) {
+                game.actualQuantity(gameChangeResults.actualQuantity);
                 game.playerCups.update(gameChangeResults.playerCups);
                 game.isFinalized(gameChangeResults.isFinalized);
                 table.stats(gameChangeResults.table.stats);
@@ -103,6 +105,7 @@
             self.name = 'match';
 
             self.onExecuted = function(playerName, gameChangeResults) {
+                game.actualQuantity(gameChangeResults.actualQuantity);
                 game.playerCups.update(gameChangeResults.playerCups);
                 game.isFinalized(gameChangeResults.isFinalized);
                 table.stats(gameChangeResults.table.stats);
@@ -110,10 +113,10 @@
         }
     ];
 
-    function PlayerCup(playerCupState) {
+    function PlayerCup(playerCupState, doubt) {
         var self = this;
         self.playerName = playerCupState.playerName;
-        self.dices = playerCupState.dices.map(function(diceState) { return new Dice(diceState); });
+        self.dices = playerCupState.dices.map(function(diceState) { return new Dice(diceState, doubt); });
 
         self.updateDices = function(dicesState) {
             dicesState.forEach(function(diceState, index) {
@@ -123,10 +126,24 @@
         };
     }
 
-    function Dice(diceState) {
+    function Dice(diceState, doubt) {
         var self = this;
         self.isExposed = ko.observable(diceState.isExposed);
         self.value = ko.observable(diceState.value);
+
+        self.color = ko.computed(function() { return self.isExposed() ? '#545454' : '#939393'; });
+        self.matchingColor = ko.computed({
+            read: function() {
+                var color = 'white';
+                if (doubt && doubt.isFinalized()) {
+                    if (doubt.dice.value() === self.value() || self.value() === 1) {
+                        color = '#d9edf7';
+                    }
+                }
+                return color;
+            },
+            deferEvaluation: true
+        });
     }
 
     return Doubt;
