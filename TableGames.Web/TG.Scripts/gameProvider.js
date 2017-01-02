@@ -16,6 +16,8 @@
         require([gameInfo.constructorFileName, 'tmpl!' + gameInfo.templateFileName], function(Constructor, templateName) {
             var game = new Constructor(gameConfig, gameState, gameConfig.table);
 
+            game.table = gameConfig.table;
+
             game.isFinalized = game.isFinalized || ko.observable(gameState.isFinalized);
             game.winnerNames = game.winnerNames || ko.observableArray(gameState.winnerNames);
 

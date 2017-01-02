@@ -11,7 +11,7 @@
             playerCupsState.forEach(function(playerCupState, index) {
                 self.playerCups[index].updateDices(playerCupState.dices);
             });
-        }
+        };
 
         table.activePlayerName(gameState.table.activePlayerName);
 
@@ -21,7 +21,7 @@
         // set user game state
         self.setUserGame = function(userGameState) {
             self.userGame({
-                dices: ko.observableArray(userGameState.dices.map(function(diceState) { return new Dice(diceState); }))
+                dices: userGameState.dices.map(function(diceState) { return new Dice(diceState); })
             });
         };
 
@@ -70,16 +70,21 @@
                 }
             };
 
+            // rethrow other dices
+            self.rethrowOthers = ko.observable(false);
+
             self.getParameters = function() {
                 return {
                     quantity: self.quantity(),
-                    diceValue: self.dice.value()
+                    diceValue: self.dice.value(),
+                    rethrowOthers: self.rethrowOthers()
                 };
             };
 
             self.onExecuted = function(playerName, gameChangeResults) {
                 game.quantity(gameChangeResults.quantity);
                 game.dice.value(gameChangeResults.dice.value);
+                game.playerCups.update(gameChangeResults.playerCups);
                 table.activePlayerName(gameChangeResults.table.activePlayerName);
             };
         },
@@ -115,7 +120,7 @@
                 self.dices[index].value(diceState.value);
                 self.dices[index].isExposed(diceState.isExposed);
             });
-        }
+        };
     }
 
     function Dice(diceState) {

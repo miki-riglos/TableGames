@@ -57,9 +57,7 @@ namespace TableGames.Web.Games
         public override Dictionary<Player, object> GetPlayerGameStates() {
             return PlayerCups.ToDictionary(
                 pc => pc.Player,
-                pc => (object)new {
-                    dices = pc.Dices.Select(d => d.GetExposedDice().ToClient())
-                }
+                pc => (object)new { dices = pc.Dices.Select(d => d.GetExposedDice().ToClient()) }
             );
         }
 
@@ -99,21 +97,46 @@ namespace TableGames.Web.Games
         public GameChangeResult Execute(dynamic gameChangeParameters) {
             var quantity = (int)gameChangeParameters.quantity;
             var diceValue = (int)gameChangeParameters.diceValue;
+            var rethrowOthers = (bool)gameChangeParameters.rethrowOthers;
 
             //TODO: validate parameters
 
             _doubt.Quantity = quantity;
             _doubt.Dice.Value = diceValue;
 
+            // objects to return
+            object gameState = null;
+            IEnumerable<object> playerCups = new List<object>();
+            Dictionary<Player, object> playerGameStates = new Dictionary<Player, object>();
+
+            if (rethrowOthers) {
+                foreach (var dice in _doubt.PlayerCups.First(pc => pc.Player == _doubt.Table.ActivePlayer).Dices) {
+                    if (!dice.IsExposed) {
+                        if (dice.Value == diceValue) {
+                            dice.IsExposed = true;
+                        }
+                        else {
+                            dice.Throw();
+                        }
+                    }
+                }
+                playerCups = _doubt.PlayerCups.Select(pc => pc.ToClient());
+
+                playerGameStates = _doubt.GetPlayerGameStates();
+            }
+
             _doubt.Table.SetNextPlayer();
 
-            return new GameChangeResult(new {
+            gameState = new {
+                playerCups = playerCups,
                 quantity = _doubt.Quantity,
                 dice = _doubt.Dice.ToClient(),
                 table = new {
                     activePlayerName = _doubt.Table.ActivePlayer.Name
                 }
-            });
+            };
+
+            return new GameChangeResult(gameState, playerGameStates);
         }
     }
 
