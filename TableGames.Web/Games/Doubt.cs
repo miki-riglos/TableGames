@@ -118,7 +118,7 @@ namespace TableGames.Web.Games
                             dice.IsExposed = true;
                         }
                         else {
-                            dice.Throw();
+                            dice.Roll();
                         }
                     }
                 }
@@ -243,14 +243,14 @@ namespace TableGames.Web.Games
         public bool IsExposed { get; set; }
         public int Value { get; set; }
 
-        public Dice(bool throwDice = false) {
+        public Dice(bool rollDice = false) {
             IsExposed = false;
-            if (throwDice) {
-                Throw();
+            if (rollDice) {
+                Roll();
             }
         }
 
-        public void Throw() {
+        public void Roll() {
             Value = _random.Next(1, 7);
         }
 

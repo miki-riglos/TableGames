@@ -29,7 +29,7 @@
         // set user game state
         self.setUserGame = function(userGameState) {
             self.userGame({
-                dices: userGameState.dices.map(function(diceState) { return new Dice(diceState); })
+                dices: userGameState.dices.map(function(diceState) { return new Dice(diceState, self); })
             });
         };
 
