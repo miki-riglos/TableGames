@@ -3,8 +3,20 @@
         line-height: 50px;
     }
 
-    .tg-doubt-playercups, .tg-doubt-usergame, .tg-doubt-usergame .tab-content {
+    .tg-doubt-playercups, .tg-doubt-usergame {
         margin-top: 20px;
+    }
+
+    .tg-doubt-usergame .tab-content {
+        padding: 15px;
+        border-left: 1px solid #ddd;
+        border-right: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+        border-radius: 0 0 5px 5px;
+    }
+
+    .tg-doubt-usergame-actionbutton {
+        width: 100%;
     }
 
     .tg-doubt-dice {
@@ -31,12 +43,20 @@
             </div>
         </div>
 
-        <div class="tg-doubt-playercups" data-bind="foreach: playerCups">
+        <div class="tg-doubt-playercups" data-bind="foreach: { data: playerCups, as: 'cup' }">
             <div class="row">
-                <div class="col-xs-3 tg-doubt-playername" data-bind="text: playerName"></div>
+                <div class="col-xs-3 tg-doubt-playername">
+                    <span class="pull-right" data-bind="if: $parent.isFinalized">
+                        <!-- ko with: $parent.table.stats()[$parent.table.stats().length - 1] -->
+                        <span class="glyphicon glyphicon-minus-sign" data-bind="visible: cup.playerName === diceLoserName" aria-hidden="true"></span>
+                        <span class="glyphicon glyphicon-plus-sign" data-bind="visible: cup.playerName === diceWinnerName" aria-hidden="true"></span>
+                        <!-- /ko -->
+                    </span>
+                    <span class="" data-bind="text: cup.playerName"></span>
+                </div>
 
                 <!-- ko if: playerName !== $root.authentication.userName() || $parent.isFinalized() -->
-                <div class="col-xs-9" data-bind="template: { name: 'doubtDiceTemplate', foreach: dices }"></div>
+                <div class="col-xs-9" data-bind="template: { name: 'doubtDiceTemplate', foreach: cup.dices }"></div>
                 <!-- /ko -->
 
                 <!-- ko if: playerName === $root.authentication.userName() && !$parent.isFinalized() -->
@@ -77,10 +97,10 @@
                         <div class="col-xs-4">
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" data-bind="checked: $parent.actions.bet.rethrowOthers" /> Rethrow others
+                                    <input type="checkbox" data-bind="checked: $parent.actions.bet.rethrowOthers, enable: $parent.table.isUserTurn" /> Rethrow others
                                 </label>
                             </div>
-                            <button type="button" class="btn btn-primary" data-bind="click: $parent.actions.bet.execute">Bet</button>
+                            <button type="button" class="btn btn-primary tg-doubt-usergame-actionbutton" data-bind="click: $parent.actions.bet.execute, enable: $parent.table.isUserTurn">Bet</button>
                         </div>
                     </div>
                 </div>
@@ -88,14 +108,16 @@
                 <div role="tabpanel" class="tab-pane fade" data-bind="attr: { 'id': $parent.table.room.clientId + '_action_doubt' }">
                     <div class="row">
                         <div class="col-xs-offset-8 col-xs-4">
-                            <button type="button" class="btn btn-primary" data-bind="click: $parent.actions.doubt.execute">Doubt</button>
+                            <button type="button" class="btn btn-primary tg-doubt-usergame-actionbutton" data-bind="click: $parent.actions.doubt.execute, enable: $parent.table.isUserTurn">Doubt</button>
                         </div>
                     </div>
                 </div>
 
                 <div role="tabpanel" class="tab-pane fade" data-bind="attr: { 'id': $parent.table.room.clientId + '_action_match' }">
-                    <div class="col-xs-offset-8 col-xs-4">
-                        <button type="button" class="btn btn-primary" data-bind="click: $parent.actions.match.execute">Match</button>
+                    <div class="row">
+                        <div class="col-xs-offset-8 col-xs-4">
+                            <button type="button" class="btn btn-primary tg-doubt-usergame-actionbutton" data-bind="click: $parent.actions.match.execute, enable: $parent.table.isUserTurn">Match</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -125,10 +147,10 @@
 
 <template id="doubtDialTemplate">
     <div class="tg-dial">
-        <button type="button" class="btn btn-default" data-bind="click: up">
+        <button type="button" class="btn btn-default" data-bind="click: up.execute, enable: up.enable">
             <span class="glyphicon glyphicon-triangle-top" aria-hidden="true"></span>
         </button>
-        <button type="button" class="btn btn-default" data-bind="click: down">
+        <button type="button" class="btn btn-default" data-bind="click: down.execute, enable: down.enable">
             <span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true"></span>
         </button>
     </div>
@@ -159,10 +181,9 @@
                     </td>
                     <!-- ko foreach: { data: $parent.playerNames, as: 'playerName' } -->
                     <td>
-                        <span class="glyphicon glyphicon-ok" data-bind="visible: gameStats.winnerNames.indexOf(playerName) > -1" aria-hidden="true"></span>
-                        <span class="glyphicon glyphicon-ok" data-bind="visible: gameStats.winnerNames.indexOf(playerName) === -1" style="visibility: hidden;" aria-hidden="true"></span>
                         <span class="glyphicon glyphicon-minus-sign" data-bind="visible: playerName === gameStats.diceLoserName" aria-hidden="true"></span>
                         <span class="glyphicon glyphicon-plus-sign" data-bind="visible: playerName === gameStats.diceWinnerName" aria-hidden="true"></span>
+                        <span class="glyphicon glyphicon-ok" data-bind="visible: gameStats.winnerNames.indexOf(playerName) > -1" aria-hidden="true"></span>
                     </td>
                     <!-- /ko -->
                 </tr>

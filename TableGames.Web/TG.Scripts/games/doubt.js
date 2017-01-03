@@ -46,28 +46,40 @@
             // quantity
             self.quantity = ko.observable(1);
             self.quantity.dial = {
-                up: function() {
-                    self.quantity(self.quantity() + 1);
+                up: {
+                    execute: function() {
+                        self.quantity(self.quantity() + 1);
+                    },
+                    enable: table.isUserTurn
                 },
-                down: function() {
-                    if (self.quantity() > 1) {
-                        self.quantity(self.quantity() - 1);
-                    }
+                down: {
+                    execute: function() {
+                        if (self.quantity() > 1) {
+                            self.quantity(self.quantity() - 1);
+                        }
+                    },
+                    enable: table.isUserTurn
                 }
             };
 
             // dice
             self.dice = new Dice({ isExposed: true, value: 1 });
             self.dice.dial = {
-                up: function() {
-                    if (self.dice.value() < 6) {
-                        self.dice.value(self.dice.value() + 1);
-                    }
+                up: {
+                    execute: function() {
+                        if (self.dice.value() < 6) {
+                            self.dice.value(self.dice.value() + 1);
+                        }
+                    },
+                    enable: table.isUserTurn
                 },
-                down: function() {
-                    if (self.dice.value() > 1) {
-                        self.dice.value(self.dice.value() - 1);
-                    }
+                down: {
+                    execute: function() {
+                        if (self.dice.value() > 1) {
+                            self.dice.value(self.dice.value() - 1);
+                        }
+                    },
+                    enable: table.isUserTurn
                 }
             };
 

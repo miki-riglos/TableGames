@@ -73,9 +73,9 @@
             });
         };
 
-        self.isUserTurn = function() {
-            return self.activePlayerName() === authentication.userName() && !self.game().isFinalized();
-        };
+        self.isUserTurn = ko.computed(function() {
+            return self.activePlayerName() === authentication.userName() && self.game() && !self.game().isFinalized();
+        });
     }
 
     return Table;
