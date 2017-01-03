@@ -16,6 +16,13 @@
 
         table.activePlayerName(gameState.table.activePlayerName);
 
+        self.finalize = function(gameChangeResults) {
+            self.actualQuantity(gameChangeResults.actualQuantity);
+            self.playerCups.update(gameChangeResults.playerCups);
+            self.isFinalized(gameChangeResults.isFinalized);
+            table.stats(gameChangeResults.table.stats);
+        };
+
         // user game
         self.userGame = ko.observable();
 
@@ -106,10 +113,7 @@
             self.name = 'doubt';
 
             self.onExecuted = function(playerName, gameChangeResults) {
-                game.actualQuantity(gameChangeResults.actualQuantity);
-                game.playerCups.update(gameChangeResults.playerCups);
-                game.isFinalized(gameChangeResults.isFinalized);
-                table.stats(gameChangeResults.table.stats);
+                game.finalize(gameChangeResults);
             };
         },
         function MatchAction(gameConfig, game, table) {
@@ -117,10 +121,7 @@
             self.name = 'match';
 
             self.onExecuted = function(playerName, gameChangeResults) {
-                game.actualQuantity(gameChangeResults.actualQuantity);
-                game.playerCups.update(gameChangeResults.playerCups);
-                game.isFinalized(gameChangeResults.isFinalized);
-                table.stats(gameChangeResults.table.stats);
+                game.finalize(gameChangeResults);
             };
         }
     ];
