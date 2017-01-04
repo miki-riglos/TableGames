@@ -99,7 +99,7 @@ namespace TableGames.Web.Games
         public GameChangeResult Execute(dynamic gameChangeParameters) {
             var quantity = (int)gameChangeParameters.quantity;
             var diceValue = (int)gameChangeParameters.diceValue;
-            var rethrowOthers = (bool)gameChangeParameters.rethrowOthers;
+            var rollOthers = (bool)gameChangeParameters.rollOthers;
 
             //TODO: validate parameters
 
@@ -111,7 +111,7 @@ namespace TableGames.Web.Games
             IEnumerable<object> playerCups = new List<object>();
             Dictionary<Player, object> playerGameStates = new Dictionary<Player, object>();
 
-            if (rethrowOthers) {
+            if (rollOthers) {
                 foreach (var dice in _doubt.PlayerCups.First(pc => pc.Player == _doubt.Table.ActivePlayer).Dices) {
                     if (!dice.IsExposed) {
                         if (dice.Value == diceValue || dice.Value == 1) {

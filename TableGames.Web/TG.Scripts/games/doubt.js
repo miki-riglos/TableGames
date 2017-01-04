@@ -91,13 +91,13 @@
             };
 
             // rethrow other dices
-            self.rethrowOthers = ko.observable(false);
+            self.rollOthers = ko.observable(false);
 
             self.getParameters = function() {
                 return {
                     quantity: self.quantity(),
                     diceValue: self.dice.value(),
-                    rethrowOthers: self.rethrowOthers()
+                    rollOthers: self.rollOthers()
                 };
             };
 
