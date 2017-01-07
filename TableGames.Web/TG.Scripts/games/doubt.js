@@ -31,13 +31,22 @@
             self.userGame({
                 dices: userGameState.dices.map(function(diceState) { return new Dice(diceState, self); })
             });
+            // animate dices, userGame must be defined and bound
+            if (!userGameState.inProgress) {
+                self.userGame().dices.forEach(function(dice) { dice.roll(dice.value()); });
+            }
         };
 
         // change user game state
         self.changeUserGame = function(actionName, userGameChangeResults) {
             userGameChangeResults.dices.forEach(function(diceState, index) {
                 self.userGame().dices[index].isExposed(diceState.isExposed);
-                self.userGame().dices[index].value(diceState.value);
+                if (diceState.rollCount > self.userGame().dices[index].rollCount) {
+                    self.userGame().dices[index].roll(diceState.value);
+                } else {
+                    self.userGame().dices[index].value(diceState.value);
+                }
+                self.userGame().dices[index].rollCount = diceState.rollCount;
             });
         };
 
@@ -51,7 +60,7 @@
             self.name = 'bet';
 
             // quantity
-            self.quantity = ko.observable(1);
+            self.quantity = ko.observable(game.quantity() || 1);
             self.quantity.dial = {
                 up: {
                     execute: function() {
@@ -70,7 +79,7 @@
             };
 
             // dice
-            self.dice = new Dice({ isExposed: true, value: 1 });
+            self.dice = new Dice({ isExposed: true, value: game.dice.value() || 1 });
             self.dice.dial = {
                 up: {
                     execute: function() {
@@ -147,6 +156,25 @@
         var self = this;
         self.isExposed = ko.observable(diceState.isExposed);
         self.value = ko.observable(diceState.value);
+        self.rollCount = diceState.rollCount || 0;
+
+        // roll dice
+        self.roll = function(value) {
+            var promise = $.when();
+            for (var i = 1; i <= 8; i++) {
+                promise = promise.then(self.roll.step);
+            }
+            promise = promise.then(function() {
+                self.value(value);
+            });
+        };
+        self.roll.step = function() {
+            var dfd = $.Deferred();
+            var stepValue = Math.floor(Math.random() * 6) + 1;
+            self.value(stepValue);
+            setTimeout(function() { dfd.resolve(stepValue); }, 100);
+            return dfd.promise();
+        };
 
         self.color = ko.computed(function() { return self.isExposed() ? '#545454' : '#939393'; });
         self.matchingColor = ko.computed({

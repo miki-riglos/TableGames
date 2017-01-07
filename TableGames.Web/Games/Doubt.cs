@@ -278,22 +278,26 @@ namespace TableGames.Web.Games
 
         public bool IsExposed { get; set; }
         public int Value { get; set; }
+        public int RollCount { get; private set; }
 
-        public Dice(bool rollDice = false) {
+        public Dice(bool roll = false) {
             IsExposed = false;
-            if (rollDice) {
+            RollCount = 0;
+            if (roll) {
                 Roll();
             }
         }
 
         public void Roll() {
             Value = _random.Next(1, 7);
+            RollCount++;
         }
 
         public object ToClient(bool includeValue = false) {
             return new {
                 isExposed = IsExposed,
-                value = IsExposed || includeValue ? Value : 0
+                value = IsExposed || includeValue ? Value : 0,
+                rollCount = RollCount
             };
         }
     }

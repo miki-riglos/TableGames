@@ -3,7 +3,7 @@
     function Table(tableState, room) {
         var self = this;
         var authentication = Authentication.instance;
-        var gamePromise = $.Deferred().resolve();
+        var gamePromise = $.when();
 
         self.gameName = tableState.gameName;
         self.status = ko.observable(tableState.status);

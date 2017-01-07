@@ -174,8 +174,10 @@
                 room.attend(tableState, chatConfig);
                 self.attendedRooms.push(room);
                 if (tableState && tableState.game) {
+                    tableState.game.inProgress = true;
                     room.table().start(tableState, getGameConfig(room));
                     if (userGameState) {
+                        userGameState.inProgress = true;
                         room.table().setUserGame(userGameState);
                     }
                 }
