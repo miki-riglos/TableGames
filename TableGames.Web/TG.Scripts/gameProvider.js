@@ -1,4 +1,6 @@
-﻿define(['knockout', 'jquery'], function(ko, $) {
+﻿define(['knockout', 'jquery', 'notification'], function(ko, $, Notification) {
+
+    var notification = Notification.instance;
 
     var registry = {};
 
@@ -29,7 +31,10 @@
                 action.execute = action.execute || function() {
                     if (gameConfig.table.isUserTurn()) {
                         var gameChangeParameters = action.getParameters();
-                        gameConfig.sendChangeToServer(action.name, gameChangeParameters);
+                        gameConfig.sendChangeToServer(action.name, gameChangeParameters)
+                                  .catch(function(err) {
+                                      notification.addError(err.message);
+                                  });
                     }
                 };
                 game.actions[action.name] = action;

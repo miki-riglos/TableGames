@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Microsoft.AspNet.SignalR;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,7 +20,7 @@ namespace TableGames.Web.Entities
 
         public GameChangeResult Change(string playerName, string actionName, object gameChangeParameters) {
             if (playerName != Table.ActivePlayer.Name) {
-                throw new Exception("It is not your turn.");
+                throw new HubException("It is not your turn.");
             }
 
             var gameAction = Actions.FirstOrDefault(a => a.Name == actionName);
@@ -29,7 +29,7 @@ namespace TableGames.Web.Entities
                 return gameAction.Execute(gameChangeParameters);
             }
             else {
-                throw new Exception("Game Change error.");
+                throw new HubException("Game Change error.");
             }
         }
 

@@ -90,7 +90,7 @@
                 }
             };
 
-            // rethrow other dices
+            // roll other dices
             self.rollOthers = ko.observable(false);
 
             self.getParameters = function() {
@@ -106,6 +106,10 @@
                 game.dice.value(gameChangeResults.dice.value);
                 game.playerCups.update(gameChangeResults.playerCups);
                 table.activePlayerName(gameChangeResults.table.activePlayerName);
+                // reset
+                self.quantity(gameChangeResults.quantity);
+                self.dice.value(gameChangeResults.dice.value);
+                self.rollOthers(false);
             };
         },
         function DoubtAction(gameConfig, game, table) {

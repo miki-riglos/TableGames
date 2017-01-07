@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Microsoft.AspNet.SignalR;
 using System.Collections.Concurrent;
 using System.Linq;
 
@@ -21,7 +21,7 @@ namespace TableGames.Web.Entities
                 return room;
             }
             else {
-                throw new Exception("Player AddRoom error.");
+                throw new HubException("Player AddRoom error.");
             }
         }
 
@@ -31,7 +31,7 @@ namespace TableGames.Web.Entities
                 return room;
             }
             else {
-                throw new Exception("Player GetRoom error.");
+                throw new HubException("Player GetRoom error.");
             }
         }
 
@@ -41,7 +41,7 @@ namespace TableGames.Web.Entities
                 return;
             }
             else {
-                throw new Exception("Player RemoveRoom error.");
+                throw new HubException("Player RemoveRoom error.");
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNet.SignalR;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TableGames.Web.Entities;
@@ -101,7 +102,9 @@ namespace TableGames.Web.Games
             var diceValue = (int)gameChangeParameters.diceValue;
             var rollOthers = (bool)gameChangeParameters.rollOthers;
 
-            //TODO: validate parameters
+            if (!isValid(_doubt.Quantity, _doubt.Dice.Value, quantity, diceValue)) {
+                throw new HubException("Invalid bet.");
+            };
 
             _doubt.Quantity = quantity;
             _doubt.Dice.Value = diceValue;
@@ -112,14 +115,12 @@ namespace TableGames.Web.Games
             Dictionary<Player, object> playerGameStates = new Dictionary<Player, object>();
 
             if (rollOthers) {
-                foreach (var dice in _doubt.PlayerCups.First(pc => pc.Player == _doubt.Table.ActivePlayer).Dices) {
-                    if (!dice.IsExposed) {
-                        if (dice.Value == diceValue || dice.Value == 1) {
-                            dice.IsExposed = true;
-                        }
-                        else {
-                            dice.Roll();
-                        }
+                foreach (var dice in _doubt.PlayerCups.First(pc => pc.Player == _doubt.Table.ActivePlayer).Dices.Where(d => !d.IsExposed)) {
+                    if (dice.Value == diceValue || dice.Value == 1) {
+                        dice.IsExposed = true;
+                    }
+                    else {
+                        dice.Roll();
                     }
                 }
                 playerCups = _doubt.PlayerCups.Select(pc => pc.ToClient());
@@ -139,6 +140,41 @@ namespace TableGames.Web.Games
             };
 
             return new GameChangeResult(gameState, playerGameStates);
+        }
+
+        private bool isValid(int fromQuantity, int fromDiceValue, int toQuantity, int toDiceValue) {
+            var valid = false;
+
+            if (toDiceValue < fromDiceValue) {
+                if (toDiceValue == 1) {
+                    if (toQuantity >= (fromQuantity / 2 + 1)) {
+                        valid = true;
+                    }
+                }
+                else {
+                    if (toQuantity > fromQuantity) {
+                        valid = true;
+                    }
+                }
+            }
+            else if (fromDiceValue == toDiceValue) {
+                if (toQuantity > fromQuantity) {
+                    valid = true;
+                }
+            }
+            else if (toDiceValue > fromDiceValue) {
+                if (fromDiceValue == 1) {
+                    if (toQuantity >= (fromQuantity * 2 + 1)) {
+                        valid = true;
+                    }
+                }
+                else {
+                    if (toQuantity >= fromQuantity) {
+                        valid = true;
+                    }
+                }
+            }
+            return valid;
         }
     }
 

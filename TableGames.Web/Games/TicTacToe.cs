@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Microsoft.AspNet.SignalR;
 using System.Collections.Generic;
 using System.Linq;
 using TableGames.Web.Entities;
@@ -88,7 +88,7 @@ namespace TableGames.Web.Games
                 });
             }
             else {
-                throw new Exception("TicTacToe AssignBox error.");
+                throw new HubException("TicTacToe AssignBox error.");
             }
         }
     }
