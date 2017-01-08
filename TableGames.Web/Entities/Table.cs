@@ -64,12 +64,19 @@ namespace TableGames.Web.Entities
             }
         }
 
+        public void SetNextPlayer(Player player) {
+            ActivePlayer = player;
+        }
+
         public Player GetPreviousPlayer() {
             Player previousPlayer = null;
             if (ActivePlayer != null) {
                 var previousIndex = Players.IndexOf(ActivePlayer);
                 previousIndex = previousIndex >= 1 ? previousIndex - 1 : Players.Count - 1;
                 previousPlayer = Players[previousIndex];
+                if (Game.IsEliminated(previousPlayer)) {
+                    previousPlayer = GetPreviousPlayer();
+                }
             }
             return previousPlayer;
         }

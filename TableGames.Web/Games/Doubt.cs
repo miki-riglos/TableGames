@@ -21,7 +21,9 @@ namespace TableGames.Web.Games
             Quantity = 0;
             Dice = new Dice() { IsExposed = true };
 
-            Table.SetNextPlayer();
+            if (Table.ActivePlayer == null) {
+                Table.SetNextPlayer();
+            }
         }
 
         public int GetActualQuantity() {
@@ -41,6 +43,7 @@ namespace TableGames.Web.Games
             else {
                 DiceWinner = player;
             }
+            Table.SetNextPlayer(player);
         }
 
         public void End() {
