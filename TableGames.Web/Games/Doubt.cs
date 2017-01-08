@@ -26,6 +26,11 @@ namespace TableGames.Web.Games
             if (Table.ActivePlayer == null) {
                 Table.SetNextPlayer();
             }
+            else {
+                if (IsEliminated(Table.ActivePlayer)) {
+                    Table.SetNextPlayer();
+                }
+            }
         }
 
         public int GetActualQuantity() {
@@ -50,10 +55,6 @@ namespace TableGames.Web.Games
 
         public void End() {
             IsEnded = true;
-
-            if (IsEliminated(Table.ActivePlayer)) {
-                Table.SetNextPlayer();
-            }
 
             // check if table ends
             var playersWithDices = getPlayerDicesQty().Where(kvp => kvp.Value > 0).Select(kvp => kvp.Key);
