@@ -46,7 +46,7 @@ namespace TableGames.Web.Entities
         public virtual object ToStats() {
             return new {
                 isEnded = IsEnded,
-                winnerNames = Winners
+                winnerNames = Winners.Select(p => p.Name)
             };
         }
     }

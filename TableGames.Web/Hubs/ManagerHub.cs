@@ -5,7 +5,7 @@ using TableGames.Web.Entities;
 
 namespace TableGames.Web.Hubs
 {
-    public class TableGamesHub : Hub
+    public class ManagerHub : Hub
     {
         private static readonly ConcurrentDictionary<string, Player> _players = new ConcurrentDictionary<string, Player>();
 

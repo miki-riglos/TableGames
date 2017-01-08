@@ -11,7 +11,7 @@ define('jquery', function() { return window.jQuery; });    // already loaded in 
 
 require(['ko-ext', 'jquery', 'manager'], function(ko, $, Manager) {
 
-    var hub = $.connection.tableGamesHub;
+    var hub = $.connection.managerHub;
 
     var manager = new Manager(hub);
 
