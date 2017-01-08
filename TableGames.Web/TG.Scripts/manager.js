@@ -287,7 +287,10 @@
             var room = getPlayer(hostName).getRoom(roomName);
             var table = room.table();
 
-            table.setUserGame(userGameState);
+            // if user leaves room, table is lost - it will be recreated when re-entering
+            if (table) {
+                table.setUserGame(userGameState);
+            }
         };
 
         // ... ... change user game state 
