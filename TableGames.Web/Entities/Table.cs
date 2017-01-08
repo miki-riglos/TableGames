@@ -6,7 +6,8 @@ namespace TableGames.Web.Entities
     public enum TableStatus
     {
         Open,
-        Started
+        Started,
+        Ended
     }
 
     public class Table
@@ -18,6 +19,7 @@ namespace TableGames.Web.Entities
         public Room Room { get; private set; }
         public Game Game { get; private set; }
         public List<Game> Games { get; private set; }
+        public List<Player> Winners { get; protected set; }
         public Dictionary<string, object> Bag { get; private set; }
 
         public Table(string gameName, Room room) {
@@ -26,6 +28,7 @@ namespace TableGames.Web.Entities
             Players = new List<Player>();
             Room = room;
             Games = new List<Game>();
+            Winners = new List<Player>();
             Bag = new Dictionary<string, object>();
         }
 
@@ -38,6 +41,10 @@ namespace TableGames.Web.Entities
         }
 
         public void Start() {
+            if (Status == TableStatus.Ended) {
+                Winners = new List<Player>();
+                Bag = new Dictionary<string, object>();
+            }
             Status = TableStatus.Started;
             Game = GameInfo.CreateGame(GameName, this);
             Games.Add(Game);
@@ -51,6 +58,9 @@ namespace TableGames.Web.Entities
                 var activeIndex = Players.IndexOf(ActivePlayer);
                 activeIndex = activeIndex < (Players.Count - 1) ? activeIndex + 1 : 0;
                 ActivePlayer = Players[activeIndex];
+                if (Game.IsEliminated(ActivePlayer)) {
+                    SetNextPlayer();
+                }
             }
         }
 
@@ -68,13 +78,20 @@ namespace TableGames.Web.Entities
             return Game.Change(playerName, actionName, gameChangeParameters);
         }
 
+        public void End(IEnumerable<Player> winners) {
+            ActivePlayer = null;
+            Status = TableStatus.Ended;
+            Winners.AddRange(winners);
+        }
+
         public object ToClient() {
             return new {
                 gameName = GameName,
                 status = Status.ToString(),
                 playerNames = Players.Select(p => p.Name),
                 game = Game?.ToClient(),
-                stats = Games.Select(g => g.ToStats())
+                stats = Games.Select(g => g.ToStats()),
+                winnerNames = Winners.Select(p => p.Name)
             };
         }
     }

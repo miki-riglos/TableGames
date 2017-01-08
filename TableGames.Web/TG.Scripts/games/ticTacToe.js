@@ -47,9 +47,9 @@
             self.onExecuted = function(playerName, gameChangeResults) {
                 game.board[gameChangeResults.row][gameChangeResults.col](playerName);
                 table.activePlayerName(gameChangeResults.table.activePlayerName);
-                game.isFinalized(gameChangeResults.isFinalized);
+                game.isEnded(gameChangeResults.isEnded);
                 gameChangeResults.winningBoxes.forEach(function(ab) { game.board[ab.row][ab.col].isWinning(true); });
-                if (gameChangeResults.isFinalized) {
+                if (gameChangeResults.isEnded) {
                     table.stats(gameChangeResults.table.stats);
                 }
             };

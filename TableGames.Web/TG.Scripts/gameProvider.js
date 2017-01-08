@@ -18,7 +18,7 @@
 
             game.table = gameConfig.table;
 
-            game.isFinalized = game.isFinalized || ko.observable(gameState.isFinalized);
+            game.isEnded = game.isEnded || ko.observable(gameState.isEnded);
             game.winnerNames = game.winnerNames || ko.observableArray(gameState.winnerNames);
 
             // instantiate actions and attach to game

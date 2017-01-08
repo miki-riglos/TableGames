@@ -7,11 +7,13 @@
         border-bottom-left-radius: 0px;
         margin-bottom: 0;
     }
+
         .tg-room > .navbar .navbar-brand::before {
             font-family: 'Glyphicons Halflings';
             font-size: 14px;
             content: "\e080";
         }
+
         .tg-room > .navbar .navbar-brand.collapsed::before {
             content: "\e114";
         }
@@ -40,6 +42,10 @@
 
             .tg-room .panel-footer .badge.tg-active {
                 background-color: #a94442;
+            }
+
+            .tg-room .panel-footer .badge.tg-winner {
+                background-color: #337ab7;
             }
 </style>
 
@@ -75,7 +81,7 @@
                         <button type="button" class="btn btn-default" data-bind="visible: canLeave, click: $root.leaveTable">Leave Table</button>
                         <button type="button" class="btn btn-primary" data-bind="visible: canStart, click: $root.startTable">Start Game</button>
                         <button type="button" class="btn btn-primary" data-bind="visible: canRestartGame, click: $root.restartGame">Restart</button>
-                        <button type="button" class="btn btn-primary" data-toggle="collapse" data-bind="visible: hasStarted, attr: { 'data-target': '#' + room.clientId + '_stats' }">Stats</button>
+                        <button type="button" class="btn btn-primary" data-toggle="collapse" data-bind="visible: status() !== 'Open', attr: { 'data-target': '#' + room.clientId + '_stats' }">Stats</button>
                         <!-- /ko -->
 
                         <!-- destroyTable -->
@@ -107,7 +113,7 @@
                 Players:
                 <span data-bind="if: table">
                     <!-- ko foreach: table().playerNames -->
-                    <span class="badge" data-bind="text: $data, css: { 'tg-active': $data === $parent.table().activePlayerName() }"></span>
+                    <span class="badge" data-bind="text: $data, css: { 'tg-active': $data === $parent.table().activePlayerName(), 'tg-winner': $parent.table().winnerNames.indexOf($data) > -1 }"></span>
                     <!-- /ko -->
                 </span>
             </div>

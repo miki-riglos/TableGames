@@ -7,14 +7,14 @@ namespace TableGames.Web.Entities
     public abstract class Game
     {
         public Table Table { get; private set; }
-        public bool IsFinalized { get; set; }
-        public List<string> WinnerNames { get; protected set; }
+        public bool IsEnded { get; set; }
+        public List<Player> Winners { get; protected set; }
         public List<IGameAction> Actions { get; protected set; }
 
         public Game(Table table) {
             Table = table;
-            WinnerNames = new List<string>();
-            IsFinalized = false;
+            Winners = new List<Player>();
+            IsEnded = false;
             Actions = new List<IGameAction>();
         }
 
@@ -39,10 +39,14 @@ namespace TableGames.Web.Entities
             return new Dictionary<Player, object>();
         }
 
+        public virtual bool IsEliminated(Player player) {
+            return false;
+        }
+
         public virtual object ToStats() {
             return new {
-                isFinalized = IsFinalized,
-                winnerNames = WinnerNames
+                isEnded = IsEnded,
+                winnerNames = Winners
             };
         }
     }

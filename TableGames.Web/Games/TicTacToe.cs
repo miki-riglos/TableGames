@@ -26,9 +26,9 @@ namespace TableGames.Web.Games
                 table = new {
                     activePlayerName = Table.ActivePlayer?.Name,
                 },
-                isFinalized = IsFinalized,
+                isEnded = IsEnded,
                 winningBoxes = WinningBoxes.Select(ab => ab.ToClient()),
-                winnerNames = WinnerNames
+                winnerNames = Winners.Select(p => p.Name)
             };
         }
 
@@ -62,16 +62,16 @@ namespace TableGames.Web.Games
                 var winningBoxCombination = TicTacToe.WinningBoxCombinations.FirstOrDefault(ids => ids.Intersect(playerBoxes.Select(ab => ab.Box.Id)).Count() == 3);
 
                 if (winningBoxCombination == null) {
-                    _ticTacToe.IsFinalized = _ticTacToe.Board.Count(ab => ab.PlayerName != null) >= 9;
+                    _ticTacToe.IsEnded = _ticTacToe.Board.Count(ab => ab.PlayerName != null) >= 9;
                 }
                 else {
-                    _ticTacToe.IsFinalized = true;
+                    _ticTacToe.IsEnded = true;
                     _ticTacToe.WinningBoxes = _ticTacToe.Board.Where(ab => winningBoxCombination.Contains(ab.Box.Id)).ToList();
-                    _ticTacToe.WinnerNames.Add(_ticTacToe.Table.ActivePlayer.Name);
+                    _ticTacToe.Winners.Add(_ticTacToe.Table.ActivePlayer);
                 }
 
                 // set next player if not finalized
-                if (!_ticTacToe.IsFinalized) {
+                if (!_ticTacToe.IsEnded) {
                     _ticTacToe.Table.SetNextPlayer();
                 }
 
@@ -79,12 +79,12 @@ namespace TableGames.Web.Games
                     row = row,
                     col = col,
                     table = new {
-                        activePlayerName = _ticTacToe.Table.ActivePlayer.Name,
+                        activePlayerName = _ticTacToe.Table.ActivePlayer?.Name,
                         stats = _ticTacToe.Table.Games.Select(g => g.ToStats())
                     },
-                    isFinalized = _ticTacToe.IsFinalized,
+                    isEnded = _ticTacToe.IsEnded,
                     winningBoxes = _ticTacToe.WinningBoxes.Select(ab => ab.ToClient()),
-                    winnerNames = _ticTacToe.WinnerNames
+                    winnerNames = _ticTacToe.Winners.Select(p => p.Name)
                 });
             }
             else {

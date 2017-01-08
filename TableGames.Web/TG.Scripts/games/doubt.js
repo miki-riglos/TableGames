@@ -16,11 +16,19 @@
 
         table.activePlayerName(gameState.table.activePlayerName);
 
-        self.finalize = function(gameChangeResults) {
+        self.end = function(gameChangeResults) {
             self.actualQuantity(gameChangeResults.actualQuantity);
             self.playerCups.update(gameChangeResults.playerCups);
-            self.isFinalized(gameChangeResults.isFinalized);
+            self.isEnded(gameChangeResults.isEnded);
+            
+            table.status(gameChangeResults.table.status);
+            table.activePlayerName(gameChangeResults.table.activePlayerName);
             table.stats(gameChangeResults.table.stats);
+
+            table.winnerNames.removeAll();
+            gameChangeResults.table.winnerNames.forEach(function(winnerName) {
+                table.winnerNames.push(winnerName);
+            });
         };
 
         // user game
@@ -126,7 +134,7 @@
             self.name = 'doubt';
 
             self.onExecuted = function(playerName, gameChangeResults) {
-                game.finalize(gameChangeResults);
+                game.end(gameChangeResults);
             };
         },
         function MatchAction(gameConfig, game, table) {
@@ -134,7 +142,7 @@
             self.name = 'match';
 
             self.onExecuted = function(playerName, gameChangeResults) {
-                game.finalize(gameChangeResults);
+                game.end(gameChangeResults);
             };
         }
     ];
@@ -180,7 +188,7 @@
         self.matchingColor = ko.computed({
             read: function() {
                 var color = 'white';
-                if (doubt && doubt.isFinalized()) {
+                if (doubt && doubt.isEnded()) {
                     if (doubt.dice.value() === self.value() || self.value() === 1) {
                         color = '#d9edf7';
                     }

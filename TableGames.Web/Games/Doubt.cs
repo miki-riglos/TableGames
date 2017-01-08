@@ -43,6 +43,15 @@ namespace TableGames.Web.Games
             }
         }
 
+        public void End() {
+            IsEnded = true;
+
+            // check if table ends
+            var playersWithDices = getPlayerDicesQty().Where(kvp => kvp.Value > 0).Select(kvp => kvp.Key);
+            if (playersWithDices.Count() == 1) {
+                Table.End(playersWithDices);
+            }
+        }
         public override object ToClient() {
             return new {
                 playerCups = PlayerCups.Select(pc => pc.ToClient()),
@@ -52,8 +61,8 @@ namespace TableGames.Web.Games
                 table = new {
                     activePlayerName = Table.ActivePlayer?.Name,
                 },
-                isFinalized = IsFinalized,
-                winnerNames = WinnerNames
+                isEnded = IsEnded,
+                winnerNames = Winners.Select(p => p.Name)
             };
         }
 
@@ -64,14 +73,19 @@ namespace TableGames.Web.Games
             );
         }
 
+        public override bool IsEliminated(Player player) {
+            return getPlayerDicesQty()[player] <= 0;
+        }
+
         private Dictionary<Player, int> getPlayerDicesQty() {
             Dictionary<Player, int> playerDicesQty;
-            if (!Table.Bag.ContainsKey("DicesPerPlayer")) {
+            var bagKey = "DicesPerPlayer";
+            if (!Table.Bag.ContainsKey(bagKey)) {
                 playerDicesQty = Table.Players.ToDictionary(p => p, p => 5);
-                Table.Bag.Add("DicesPerPlayer", playerDicesQty);
+                Table.Bag.Add(bagKey, playerDicesQty);
             }
             else {
-                playerDicesQty = (Dictionary<Player, int>)Table.Bag["DicesPerPlayer"];
+                playerDicesQty = (Dictionary<Player, int>)Table.Bag[bagKey];
             }
 
             return playerDicesQty;
@@ -79,8 +93,8 @@ namespace TableGames.Web.Games
 
         public override object ToStats() {
             return new {
-                isFinalized = IsFinalized,
-                winnerNames = WinnerNames,
+                isEnded = IsEnded,
+                winnerNames = Winners.Select(p => p.Name),
                 diceLoserName = DiceLoser?.Name,
                 diceWinnerName = DiceWinner?.Name
             };
@@ -135,7 +149,7 @@ namespace TableGames.Web.Games
                 quantity = _doubt.Quantity,
                 dice = _doubt.Dice.ToClient(),
                 table = new {
-                    activePlayerName = _doubt.Table.ActivePlayer.Name
+                    activePlayerName = _doubt.Table.ActivePlayer?.Name
                 }
             };
 
@@ -191,7 +205,7 @@ namespace TableGames.Web.Games
         public GameChangeResult Execute(dynamic gameChangeParameters) {
             _doubt.ActualQuantity = _doubt.GetActualQuantity();
             if (_doubt.Quantity > _doubt.ActualQuantity) {
-                _doubt.WinnerNames.Add(_doubt.Table.ActivePlayer.Name);
+                _doubt.Winners.Add(_doubt.Table.ActivePlayer);
                 _doubt.SetPlayerDicesQty(_doubt.Table.GetPreviousPlayer(), -1);
             }
             else {
@@ -199,17 +213,19 @@ namespace TableGames.Web.Games
             }
 
             _doubt.PlayerCups.ForEach(pc => pc.ExposeDices());
-            _doubt.IsFinalized = true;
+            _doubt.End();
 
             return new GameChangeResult(new {
                 actualQuantity = _doubt.ActualQuantity,
                 playerCups = _doubt.PlayerCups.Select(pc => pc.ToClient()),
                 table = new {
-                    activePlayerName = _doubt.Table.ActivePlayer.Name,
-                    stats = _doubt.Table.Games.Select(g => g.ToStats())
+                    status = _doubt.Table.Status.ToString(),
+                    activePlayerName = _doubt.Table.ActivePlayer?.Name,
+                    stats = _doubt.Table.Games.Select(g => g.ToStats()),
+                    winnerNames = _doubt.Table.Winners.Select(p => p.Name)
                 },
-                isFinalized = _doubt.IsFinalized,
-                winnerNames = _doubt.WinnerNames
+                isEnded = _doubt.IsEnded,
+                winnerNames = _doubt.Winners.Select(p => p.Name)
             });
         }
     }
@@ -227,7 +243,7 @@ namespace TableGames.Web.Games
         public GameChangeResult Execute(dynamic gameChangeParameters) {
             _doubt.ActualQuantity = _doubt.GetActualQuantity();
             if (_doubt.Quantity == _doubt.ActualQuantity) {
-                _doubt.WinnerNames.Add(_doubt.Table.ActivePlayer.Name);
+                _doubt.Winners.Add(_doubt.Table.ActivePlayer);
                 _doubt.SetPlayerDicesQty(_doubt.Table.ActivePlayer, 1);
             }
             else {
@@ -235,17 +251,19 @@ namespace TableGames.Web.Games
             }
 
             _doubt.PlayerCups.ForEach(pc => pc.ExposeDices());
-            _doubt.IsFinalized = true;
+            _doubt.End();
 
             return new GameChangeResult(new {
                 actualQuantity = _doubt.ActualQuantity,
                 playerCups = _doubt.PlayerCups.Select(pc => pc.ToClient()),
                 table = new {
-                    activePlayerName = _doubt.Table.ActivePlayer.Name,
-                    stats = _doubt.Table.Games.Select(g => g.ToStats())
+                    status = _doubt.Table.Status.ToString(),
+                    activePlayerName = _doubt.Table.ActivePlayer?.Name,
+                    stats = _doubt.Table.Games.Select(g => g.ToStats()),
+                    winnerNames = _doubt.Table.Winners.Select(p => p.Name)
                 },
-                isFinalized = _doubt.IsFinalized,
-                winnerNames = _doubt.WinnerNames
+                isEnded = _doubt.IsEnded,
+                winnerNames = _doubt.Winners.Select(p => p.Name)
             });
         }
     }

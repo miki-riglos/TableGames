@@ -216,7 +216,7 @@ namespace TableGames.Web.Hubs
         public void RestartGame(string hostName, string roomName) {
             var room = _getPlayer(hostName).GetRoom(roomName);  // will throw if player is not host
 
-            if (room.Table.Game.IsFinalized) {
+            if (room.Table.Game.IsEnded) {
                 room.Table.Start();
 
                 // initial game state
