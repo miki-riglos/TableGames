@@ -335,7 +335,8 @@
                     return hub.server.changeGame(room.hostName, room.name, authentication.userName(), actionName, gameChangeParameters);
                 },
                 table: room.table(),
-                authentication: authentication
+                authentication: authentication,
+                notification: notification
             };
             return gameConfig;
         }

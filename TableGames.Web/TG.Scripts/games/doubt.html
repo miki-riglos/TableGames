@@ -108,7 +108,7 @@
                 <div role="tabpanel" class="tab-pane fade" data-bind="attr: { 'id': $parent.table.room.clientId + '_action_doubt' }">
                     <div class="row">
                         <div class="col-xs-offset-8 col-xs-4">
-                            <button type="button" class="btn btn-primary tg-doubt-usergame-actionbutton" data-bind="click: $parent.actions.doubt.execute, enable: $parent.table.isUserTurn">Doubt</button>
+                            <button type="button" class="btn btn-primary tg-doubt-usergame-actionbutton" data-bind="click: $parent.actions.doubt.execute, enable: $parent.table.isUserTurn() && $parent.hasBet()">Doubt</button>
                         </div>
                     </div>
                 </div>
@@ -116,7 +116,7 @@
                 <div role="tabpanel" class="tab-pane fade" data-bind="attr: { 'id': $parent.table.room.clientId + '_action_match' }">
                     <div class="row">
                         <div class="col-xs-offset-8 col-xs-4">
-                            <button type="button" class="btn btn-primary tg-doubt-usergame-actionbutton" data-bind="click: $parent.actions.match.execute, enable: $parent.table.isUserTurn">Match</button>
+                            <button type="button" class="btn btn-primary tg-doubt-usergame-actionbutton" data-bind="click: $parent.actions.match.execute, enable: $parent.table.isUserTurn() && $parent.hasBet() && $parent.actions.match.isUserAllowed()">Match</button>
                         </div>
                     </div>
                 </div>

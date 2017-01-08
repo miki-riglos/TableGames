@@ -15,12 +15,14 @@ namespace TableGames.Web.Games
         public int ActualQuantity { get; set; }
         public Player DiceLoser { get; private set; }
         public Player DiceWinner { get; private set; }
+        public bool HasBet { get { return Dice.Value > 0; } }
 
         public Doubt(Table table) : base(table) {
             PlayerCups = new List<PlayerCup>(getPlayerDicesQty().Select(kvp => new PlayerCup(kvp.Key, kvp.Value)));
             Quantity = 0;
             Dice = new Dice() { IsExposed = true };
 
+            // first game of series
             if (Table.ActivePlayer == null) {
                 Table.SetNextPlayer();
             }
@@ -49,12 +51,17 @@ namespace TableGames.Web.Games
         public void End() {
             IsEnded = true;
 
+            if (IsEliminated(Table.ActivePlayer)) {
+                Table.SetNextPlayer();
+            }
+
             // check if table ends
             var playersWithDices = getPlayerDicesQty().Where(kvp => kvp.Value > 0).Select(kvp => kvp.Key);
             if (playersWithDices.Count() == 1) {
                 Table.End(playersWithDices);
             }
         }
+
         public override object ToClient() {
             return new {
                 playerCups = PlayerCups.Select(pc => pc.ToClient()),
@@ -206,10 +213,14 @@ namespace TableGames.Web.Games
         }
 
         public GameChangeResult Execute(dynamic gameChangeParameters) {
+            if (!_doubt.HasBet) {
+                throw new HubException("Invalid action.");
+            };
+
             _doubt.ActualQuantity = _doubt.GetActualQuantity();
             if (_doubt.Quantity > _doubt.ActualQuantity) {
                 _doubt.Winners.Add(_doubt.Table.ActivePlayer);
-                _doubt.SetPlayerDicesQty(_doubt.Table.GetPreviousPlayer(), -1);
+                _doubt.SetPlayerDicesQty(_doubt.Table.GetPreviousPlayer(_doubt.Table.ActivePlayer), -1);
             }
             else {
                 _doubt.SetPlayerDicesQty(_doubt.Table.ActivePlayer, -1);
@@ -236,6 +247,11 @@ namespace TableGames.Web.Games
     public class MatchAction : IGameAction
     {
         public string Name => "match";
+        public bool IsUserAllowed {
+            get {
+                return (_doubt.PlayerCups.FirstOrDefault(pc => pc.Player == _doubt.Table.ActivePlayer)?.Dices.Count ?? 5) < 5;
+            }
+        }
 
         private Doubt _doubt;
 
@@ -244,6 +260,10 @@ namespace TableGames.Web.Games
         }
 
         public GameChangeResult Execute(dynamic gameChangeParameters) {
+            if (!_doubt.HasBet || !IsUserAllowed) {
+                throw new HubException("Invalid action.");
+            };
+
             _doubt.ActualQuantity = _doubt.GetActualQuantity();
             if (_doubt.Quantity == _doubt.ActualQuantity) {
                 _doubt.Winners.Add(_doubt.Table.ActivePlayer);

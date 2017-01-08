@@ -42,6 +42,7 @@ namespace TableGames.Web.Entities
 
         public void Start() {
             if (Status == TableStatus.Ended) {
+                ActivePlayer = null;
                 Winners = new List<Player>();
                 Bag = new Dictionary<string, object>();
             }
@@ -68,14 +69,14 @@ namespace TableGames.Web.Entities
             ActivePlayer = player;
         }
 
-        public Player GetPreviousPlayer() {
+        public Player GetPreviousPlayer(Player player) {
             Player previousPlayer = null;
-            if (ActivePlayer != null) {
-                var previousIndex = Players.IndexOf(ActivePlayer);
+            if (player != null) {
+                var previousIndex = Players.IndexOf(player);
                 previousIndex = previousIndex >= 1 ? previousIndex - 1 : Players.Count - 1;
                 previousPlayer = Players[previousIndex];
                 if (Game.IsEliminated(previousPlayer)) {
-                    previousPlayer = GetPreviousPlayer();
+                    previousPlayer = GetPreviousPlayer(previousPlayer);
                 }
             }
             return previousPlayer;

@@ -14,6 +14,8 @@
             });
         };
 
+        self.hasBet = ko.computed(function() { return self.dice.value() > 0; });
+
         table.activePlayerName(gameState.table.activePlayerName);
 
         self.end = function(gameChangeResults) {
@@ -140,6 +142,13 @@
         function MatchAction(gameConfig, game, table) {
             var self = this;
             self.name = 'match';
+
+            self.isUserAllowed = ko.computed(function() {
+                var userCup = ko.utils.arrayFirst(game.playerCups, function(pc) { return pc.playerName === game.table.activePlayerName(); });
+                if (userCup) {
+                    return userCup.dices.length < 5;
+                }
+            });
 
             self.onExecuted = function(playerName, gameChangeResults) {
                 game.end(gameChangeResults);
