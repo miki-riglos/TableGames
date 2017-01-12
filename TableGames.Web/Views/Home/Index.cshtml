@@ -6,8 +6,8 @@
     <div class="col-sm-3">
         <!-- ko if: userPlayer -->
         <div class="panel panel-default">
-            <div class="panel-heading">My Rooms</div>
-            <div class="list-group">
+            <div class="panel-heading tg-collapse" data-toggle="collapse" data-target="#tgMyRooms">My Rooms</div>
+            <div class="list-group in" id="tgMyRooms">
                 <!-- ko template: { name: 'playerTemplate', data: userPlayer } --><!-- /ko -->
                 <!-- add room -->
                 <div class="list-group-item">
@@ -18,8 +18,8 @@
         <!-- /ko -->
         <!-- other players -->
         <div class="panel panel-default">
-            <div class="panel-heading">Other Rooms</div>
-            <div class="list-group" data-bind="template: { name: 'playerTemplate', foreach: otherPlayers }"></div>
+            <div class="panel-heading tg-collapse" data-toggle="collapse" data-target="#tgOtherRooms">Other Rooms</div>
+            <div class="list-group in" data-bind="template: { name: 'playerTemplate', foreach: otherPlayers }" id="tgOtherRooms"></div>
         </div>
         <!-- ko template: { name: 'chatTemplate', data: chat } --><!-- /ko -->
     </div>

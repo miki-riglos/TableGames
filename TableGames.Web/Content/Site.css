@@ -2,3 +2,22 @@
     padding-top: 60px;
     padding-bottom: 20px;
 }
+
+.tg-collapse::before {
+    margin-left: -5px;
+    font-family: 'Glyphicons Halflings';
+    font-size: 10px;
+    content: "\e080";
+    padding-right: 5px;
+    color: rgb(119, 119, 119);
+}
+
+.tg-collapse.collapsed::before {
+    content: "\e114";
+}
+
+@media (max-width: 575px) {
+    .panel {
+        margin: 0 -10px 10px;
+    }
+}

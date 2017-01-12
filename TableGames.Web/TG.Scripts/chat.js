@@ -1,9 +1,18 @@
 ﻿define(['knockout', 'jquery', 'authentication'], function(ko, $, Authentication) {
 
+    var counter = 0;
+
+    function getClientId() {
+        counter++;
+        return 'chat' + counter;
+    }
+
     function Chat(config) {
         var self = this;
         var authentication = Authentication.instance;
         self.authentication = authentication;
+
+        self.clientId = getClientId();
 
         self.messageToSend = ko.observable();
         self.messages = ko.observableArray();

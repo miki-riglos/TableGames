@@ -1,5 +1,6 @@
 ﻿<style>
-    .tg-chat > .list-group {
+    .tg-chat .list-group {
+        margin-bottom: 0;
         max-height: 216px;
         overflow-y: auto;
     }
@@ -24,17 +25,20 @@
 </style>
 
 <template id="chatTemplate">
-    <div class="panel panel-warning tg-chat">
-        <div class="panel-heading">Chat</div>
-        <div class="list-group" data-bind="foreach: messages">
-            <div class="list-group-item" data-bind="scroll">
-                <span class="tg-chat-username" data-bind="text: userName"></span>:
-                <span class="tg-chat-message" data-bind="text: message"></span>
-            </div>
-        </div>
+    <div class="panel panel-warning tg-chat" data-bind="attr: { 'id': clientId }">
+        <div class="panel-heading tg-collapse" data-toggle="collapse" data-bind="attr: { 'data-target': '#' + clientId + '_chat_container' }">Chat</div>
 
-        <!-- ko if: authentication.isLoggedIn -->
-        <input type="text" class="form-control" placeholder="Message" data-bind="value: messageToSend, onEnter: sendMessage" />
-        <!-- /ko -->
+        <div class="in" data-bind="attr: { 'id': clientId + '_chat_container' }">
+            <div class="list-group" data-bind="foreach: messages">
+                <div class="list-group-item" data-bind="scroll">
+                    <span class="tg-chat-username" data-bind="text: userName"></span>:
+                    <span class="tg-chat-message" data-bind="text: message"></span>
+                </div>
+            </div>
+
+            <!-- ko if: authentication.isLoggedIn -->
+            <input type="text" class="form-control" placeholder="Message" data-bind="value: messageToSend, onEnter: sendMessage" />
+            <!-- /ko -->
+        </div>
     </div>
 </template>

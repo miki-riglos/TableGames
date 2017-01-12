@@ -1,8 +1,4 @@
 ﻿<style>
-    .tg-doubt-qty, .tg-doubt-actualqty, .tg-doubt-playername {
-        line-height: 50px;
-    }
-
     .tg-doubt-playercups, .tg-doubt-usergame {
         margin-top: 20px;
     }
@@ -21,8 +17,8 @@
 
     .tg-doubt-dice {
         display: inline-block;
-        width: 50px;
-        height: 50px;
+        width: 35px;
+        height: 35px;
     }
 
     .tg-dial {
@@ -34,18 +30,18 @@
 <template id="doubtTemplate">
     <div class="tg-doubt">
         <div class="row">
-            <div class="col-xs-3 tg-doubt-qty">
+            <div class="col-xs-4">
                 Quantity: <span data-bind="text: quantity"></span>
             </div>
-            <div class="col-xs-3" data-bind="template: { name: 'doubtDiceTemplate', data: dice }"></div>
-            <div class="col-xs-6 tg-doubt-actualqty" data-bind="if: isEnded">
+            <div class="col-xs-4" data-bind="template: { name: 'doubtDiceTemplate', data: dice }"></div>
+            <div class="col-xs-4" data-bind="if: isEnded">
                 Count: <span data-bind="text: actualQuantity"></span>
             </div>
         </div>
 
         <div class="tg-doubt-playercups" data-bind="foreach: { data: playerCups, as: 'cup' }">
             <div class="row">
-                <div class="col-xs-3 tg-doubt-playername">
+                <div class="col-xs-4">
                     <span class="pull-right" data-bind="if: $parent.isEnded">
                         <!-- ko with: $parent.table.stats()[$parent.table.stats().length - 1] -->
                         <span class="glyphicon glyphicon-minus-sign" data-bind="visible: cup.playerName === diceLoserName" aria-hidden="true"></span>
@@ -56,12 +52,12 @@
                 </div>
 
                 <!-- ko if: playerName !== $root.authentication.userName() || $parent.isEnded() -->
-                <div class="col-xs-9" data-bind="template: { name: 'doubtDiceTemplate', foreach: cup.dices }"></div>
+                <div class="col-xs-8" data-bind="template: { name: 'doubtDiceTemplate', foreach: cup.dices }"></div>
                 <!-- /ko -->
 
                 <!-- ko if: playerName === $root.authentication.userName() && !$parent.isEnded() -->
                 <!-- ko with: $parent.userGame -->
-                <div class="col-xs-9" data-bind="template: { name: 'doubtDiceTemplate', foreach: dices }"></div>
+                <div class="col-xs-8" data-bind="template: { name: 'doubtDiceTemplate', foreach: dices }"></div>
                 <!-- /ko -->
                 <!-- /ko -->
             </div>
