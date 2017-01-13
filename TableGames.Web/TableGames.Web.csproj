@@ -203,6 +203,7 @@
     <Content Include="Scripts\text.js" />
     <Content Include="Scripts\_references.js" />
     <Content Include="TG.Scripts\authentication.js" />
+    <Content Include="TG.Scripts\beeper.js" />
     <Content Include="TG.Scripts\gameProvider.js" />
     <Content Include="TG.Scripts\games\doubt.html" />
     <Content Include="TG.Scripts\games\doubt.js" />

@@ -27,7 +27,7 @@
                 var action = new ActionConstructor(gameConfig, game, gameConfig.table);
                 action.getParameters = action.getParameters || function() { return {}; };
                 action.execute = action.execute || function() {
-                    if (gameConfig.table.isUserTurn()) {
+                    if (game.table.isUserTurn()) {
                         var gameChangeParameters = action.getParameters();
                         gameConfig.sendChangeToServer(action.name, gameChangeParameters)
                                   .catch(function(err) {
@@ -39,6 +39,9 @@
             });
 
             game.change = function(playerName, actionName, gameChangeResults) {
+                if (!game.table.isUserTurn()) {
+                    game.table.room.beeper.beep();
+                }
                 game.actions[actionName].onExecuted(playerName, gameChangeResults);
             };
 

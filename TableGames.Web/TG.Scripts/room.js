@@ -1,4 +1,4 @@
-﻿define(['knockout', 'authentication', 'chat', 'table'], function(ko, Authentication, Chat, Table) {
+﻿define(['knockout', 'authentication', 'chat', 'table', 'beeper'], function(ko, Authentication, Chat, Table, Beeper) {
 
     var counter = 0;
 
@@ -47,6 +47,8 @@
             self.destroyTable();
             self.chat(null);
         };
+
+        self.beeper = new Beeper();
     }
 
     return Room;

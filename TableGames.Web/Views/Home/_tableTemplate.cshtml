@@ -1,5 +1,5 @@
 ﻿<template id="tableTemplate">
-    <div class="panel panel-default tg-table">
+    <div class="panel panel-default tg-table" data-bind="css: hasJoined() ? 'panel-primary' : 'panel-default'">
         <div class="panel-heading">
             <!-- ko if: game -->
             <span class="pull-right glyphicon" data-bind="css: game().isEnded() ? 'glyphicon-pause' : 'glyphicon-play'" aria-hidden="true"></span>

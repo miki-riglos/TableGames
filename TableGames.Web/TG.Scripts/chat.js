@@ -1,4 +1,4 @@
-﻿define(['knockout', 'jquery', 'authentication'], function(ko, $, Authentication) {
+﻿define(['knockout', 'jquery', 'authentication', 'beeper'], function(ko, $, Authentication, Beeper) {
 
     var counter = 0;
 
@@ -17,6 +17,8 @@
         self.messageToSend = ko.observable();
         self.messages = ko.observableArray();
 
+        self.beeper = new Beeper();
+
         self.sendMessage = function() {
             if (authentication.isLoggedIn() && self.messageToSend()) {
                 config.sendMessageToServer(authentication.userName(), self.messageToSend())
@@ -31,6 +33,9 @@
                 userName: userName,
                 message: message
             });
+            if (authentication.userName() !== userName) {
+                self.beeper.beep();
+            }
         };
     }
 
