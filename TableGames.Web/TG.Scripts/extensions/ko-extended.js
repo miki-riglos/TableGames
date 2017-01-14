@@ -35,7 +35,10 @@
     ko.bindingHandlers.scroll = {
         update: function(element, valueAccessor, allBindings, viewModel) {
             var parentElement = element.parentElement;
-            parentElement.scrollTop = parentElement.scrollHeight;
+            // allow added element to be data bound and include height
+            window.setTimeout(function() {
+                parentElement.scrollTop = parentElement.scrollHeight;
+            }, 0);
         }
     };
 
