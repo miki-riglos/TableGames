@@ -13,6 +13,7 @@ namespace TableGames.Web.Games
         public int Quantity { get; set; }
         public Dice Dice { get; set; }
         public int ActualQuantity { get; set; }
+        public IGameAction EndAction { get; private set; }
         public Player DiceLoser { get; private set; }
         public Player DiceWinner { get; private set; }
         public bool HasBet { get { return Dice.Value > 0; } }
@@ -53,8 +54,9 @@ namespace TableGames.Web.Games
             Table.SetNextPlayer(player);
         }
 
-        public void End() {
+        public void End(IGameAction endAction) {
             IsEnded = true;
+            EndAction = endAction;
 
             // check if table ends
             var playersWithDices = getPlayerDicesQty().Where(kvp => kvp.Value > 0).Select(kvp => kvp.Key);
@@ -106,6 +108,7 @@ namespace TableGames.Web.Games
             return new {
                 isEnded = IsEnded,
                 winnerNames = Winners.Select(p => p.Name),
+                endActionName = EndAction?.Name,
                 diceLoserName = DiceLoser?.Name,
                 diceWinnerName = DiceWinner?.Name
             };
@@ -228,7 +231,7 @@ namespace TableGames.Web.Games
             }
 
             _doubt.PlayerCups.ForEach(pc => pc.ExposeDices());
-            _doubt.End();
+            _doubt.End(this);
 
             return new GameChangeResult(new {
                 actualQuantity = _doubt.ActualQuantity,
@@ -275,7 +278,7 @@ namespace TableGames.Web.Games
             }
 
             _doubt.PlayerCups.ForEach(pc => pc.ExposeDices());
-            _doubt.End();
+            _doubt.End(this);
 
             return new GameChangeResult(new {
                 actualQuantity = _doubt.ActualQuantity,
