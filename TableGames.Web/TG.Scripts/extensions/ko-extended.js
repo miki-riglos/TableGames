@@ -18,6 +18,7 @@
     };
 
     // bindings
+    // ... onEnter (keyup)
     ko.bindingHandlers.onEnter = {
         init: function(element, valueAccessor, allBindings, viewModel) {
             var action = valueAccessor();
@@ -32,13 +33,26 @@
         }
     };
 
-    ko.bindingHandlers.scroll = {
-        update: function(element, valueAccessor, allBindings, viewModel) {
-            var parentElement = element.parentElement;
-            // allow added element to be data bound and include height
-            window.setTimeout(function() {
-                parentElement.scrollTop = parentElement.scrollHeight;
-            }, 0);
+    // ... scrollForeach
+    ko.bindingHandlers.scrollForeach = {
+        init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+            var result = ko.bindingHandlers['foreach'].init(element, valueAccessor, allBindings, viewModel, bindingContext);
+            return result;
+        },
+        update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+            var newValueAccessor = function() {
+                return {
+                    data: ko.unwrap(valueAccessor()),
+                    afterAdd: function(elem) {
+                        if (elem.nodeType === 1) {
+                            var parentElement = elem.parentElement;
+                            parentElement.scrollTop = parentElement.scrollHeight;
+                        }
+                    }
+                };
+            };
+            var result = ko.bindingHandlers['foreach'].update(element, newValueAccessor, allBindings, viewModel, bindingContext);
+            return result;
         }
     };
 

@@ -36,8 +36,8 @@
         <div class="panel-heading tg-collapse" data-toggle="collapse" data-bind="css: { 'tg-chat-new': beeper.isBeeping }, attr: { 'data-target': '#' + clientId + '_chat_container' }">Chat</div>
 
         <div class="in" data-bind="attr: { 'id': clientId + '_chat_container' }">
-            <div class="list-group" data-bind="foreach: messages">
-                <div class="list-group-item" data-bind="scroll">
+            <div class="list-group" data-bind="scrollForeach: messages">
+                <div class="list-group-item">
                     <span class="tg-chat-username" data-bind="text: userName"></span>:
                     <span class="tg-chat-message" data-bind="text: message"></span>
                 </div>
