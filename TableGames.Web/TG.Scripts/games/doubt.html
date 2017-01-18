@@ -7,14 +7,26 @@
             min-height: 40px;
         }
 
+    .tg-doubt-playercup-lock.available {
+        visibility: hidden;
+    }
 
-        .tg-doubt-usergame .tab-content {
-            padding: 15px;
-            border-left: 1px solid #ddd;
-            border-right: 1px solid #ddd;
-            border-bottom: 1px solid #ddd;
-            border-radius: 0 0 5px 5px;
-        }
+    .tg-doubt-playercup-lock.locking {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .tg-doubt-playercup-lock.unavailable {
+        opacity: 0.25;
+    }
+
+    .tg-doubt-usergame .tab-content {
+        padding: 15px;
+        border-left: 1px solid #ddd;
+        border-right: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+        border-radius: 0 0 5px 5px;
+    }
 
     .tg-doubt-usergame-actionbutton {
         width: 100%;
@@ -59,7 +71,8 @@
                         <span class="glyphicon glyphicon-plus-sign" data-bind="visible: cup.playerName === diceWinnerName" aria-hidden="true"></span>
                         <!-- /ko -->
                     </span>
-                    <span class="" data-bind="text: cup.playerName"></span>
+                    <span class="glyphicon glyphicon-lock tg-doubt-playercup-lock" data-bind="css: cup.lockStatus.toLowerCase()" aria-hidden="true"></span>
+                    <span data-bind="text: cup.playerName"></span>
                 </div>
 
                 <!-- ko if: playerName !== $root.authentication.userName() || $parent.isEnded() -->

@@ -5,6 +5,7 @@
 
         self.quantity = ko.observable(gameState.quantity);
         self.dice = new Dice(gameState.dice);
+        self.hasLock = gameState.hasLock;
         self.actualQuantity = ko.observable(gameState.actualQuantity);
 
         self.playerCups = gameState.playerCups.map(function(playerCupState) { return new PlayerCup(playerCupState, self); });
@@ -90,6 +91,13 @@
 
             // dice
             self.dice = new Dice({ isExposed: true, value: game.dice.value() || 1 });
+            self.dice.enable = ko.computed(function() {
+                if (game.hasLock) {
+                    return !game.hasBet() && table.isUserTurn();
+                } else {
+                    return table.isUserTurn();
+                }
+            });
             self.dice.dial = {
                 up: {
                     execute: function() {
@@ -97,7 +105,7 @@
                             self.dice.value(self.dice.value() + 1);
                         }
                     },
-                    enable: table.isUserTurn
+                    enable: self.dice.enable
                 },
                 down: {
                     execute: function() {
@@ -105,7 +113,7 @@
                             self.dice.value(self.dice.value() - 1);
                         }
                     },
-                    enable: table.isUserTurn
+                    enable: self.dice.enable
                 }
             };
 
@@ -160,6 +168,7 @@
         var self = this;
         self.playerName = playerCupState.playerName;
         self.dices = playerCupState.dices.map(function(diceState) { return new Dice(diceState, doubt); });
+        self.lockStatus = playerCupState.lockStatus;
 
         self.updateDices = function(dicesState) {
             dicesState.forEach(function(diceState, index) {

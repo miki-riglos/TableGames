@@ -12,6 +12,7 @@ namespace TableGames.Web.Games
         public List<PlayerCup> PlayerCups { get; set; }
         public int Quantity { get; set; }
         public Dice Dice { get; set; }
+        public bool HasLock { get; set; }
         public int ActualQuantity { get; set; }
         public IGameAction EndAction { get; private set; }
         public Player DiceLoser { get; private set; }
@@ -19,7 +20,17 @@ namespace TableGames.Web.Games
         public bool HasBet { get { return Dice.Value > 0; } }
 
         public Doubt(Table table) : base(table) {
-            PlayerCups = new List<PlayerCup>(getPlayerDicesQty().Select(kvp => new PlayerCup(kvp.Key, kvp.Value)));
+            HasLock = false;
+
+            // transition lock status
+            foreach (var kvp in getPlayerBags()) {
+                if (kvp.Value.DicesQuantity == 1 && kvp.Value.LockStatus == LockStatus.Available) {
+                    kvp.Value.LockStatus = LockStatus.Locking;
+                    HasLock = true;
+                }
+            }
+
+            PlayerCups = new List<PlayerCup>(getPlayerBags().Select(kvp => new PlayerCup(kvp.Key, kvp.Value)));
             Quantity = 0;
             Dice = new Dice() { IsExposed = true };
 
@@ -44,7 +55,7 @@ namespace TableGames.Web.Games
         }
 
         public void SetPlayerDicesQty(Player player, int delta) {
-            getPlayerDicesQty()[player] += delta;
+            getPlayerBags()[player].DicesQuantity += delta;
             if (delta < 0) {
                 DiceLoser = player;
             }
@@ -55,15 +66,21 @@ namespace TableGames.Web.Games
         }
 
         public override bool IsEliminated(Player player) {
-            return getPlayerDicesQty()[player] <= 0;
+            return getPlayerBags()[player].DicesQuantity <= 0;
         }
 
         public void End(IGameAction endAction) {
             IsEnded = true;
             EndAction = endAction;
 
+            // transition lock status
+            if (HasLock) {
+                var playerLocking = PlayerCups.First(pc => pc.LockStatus == LockStatus.Locking).Player;
+                getPlayerBags()[playerLocking].LockStatus = LockStatus.Unavailable;
+            }
+
             // check if table ends
-            var playersWithDices = getPlayerDicesQty().Where(kvp => kvp.Value > 0).Select(kvp => kvp.Key);
+            var playersWithDices = getPlayerBags().Where(kvp => kvp.Value.DicesQuantity > 0).Select(kvp => kvp.Key);
             if (playersWithDices.Count() == 1) {
                 Table.End(playersWithDices);
             }
@@ -74,6 +91,7 @@ namespace TableGames.Web.Games
                 playerCups = PlayerCups.Select(pc => pc.ToClient()),
                 quantity = Quantity,
                 dice = Dice.ToClient(),
+                hasLock = HasLock,
                 actualQuantity = ActualQuantity,
                 table = new {
                     activePlayerName = Table.ActivePlayer?.Name,
@@ -100,18 +118,24 @@ namespace TableGames.Web.Games
             };
         }
 
-        private Dictionary<Player, int> getPlayerDicesQty() {
-            Dictionary<Player, int> playerDicesQty;
-            var bagKey = "DicesPerPlayer";
+        private Dictionary<Player, PlayerBag> getPlayerBags() {
+            Dictionary<Player, PlayerBag> playerBags;
+            var bagKey = "PlayerBag";
             if (!Table.Bag.ContainsKey(bagKey)) {
-                playerDicesQty = Table.Players.ToDictionary(p => p, p => 5);
-                Table.Bag.Add(bagKey, playerDicesQty);
+                playerBags = Table.Players.ToDictionary(
+                    p => p, 
+                    p => new PlayerBag() {
+                        DicesQuantity = 5,
+                        LockStatus = LockStatus.Available
+                    }
+                );
+                Table.Bag.Add(bagKey, playerBags);
             }
             else {
-                playerDicesQty = (Dictionary<Player, int>)Table.Bag[bagKey];
+                playerBags = (Dictionary<Player, PlayerBag>)Table.Bag[bagKey];
             }
 
-            return playerDicesQty;
+            return playerBags;
         }
     }
 
@@ -129,6 +153,12 @@ namespace TableGames.Web.Games
             var quantity = (int)gameChangeParameters.quantity;
             var diceValue = (int)gameChangeParameters.diceValue;
             var rollOthers = (bool)gameChangeParameters.rollOthers;
+
+            if (_doubt.HasLock && !_doubt.HasBet) {
+                if (diceValue != _doubt.Dice.Value) {
+                    throw new HubException("Dice value can't be changed when lock is in place.");
+                }
+            }
 
             if (!isValid(_doubt.Quantity, _doubt.Dice.Value, quantity, diceValue)) {
                 throw new HubException("Invalid bet.");
@@ -295,14 +325,23 @@ namespace TableGames.Web.Games
         }
     }
 
+    public enum LockStatus
+    {
+        Available,
+        Locking,
+        Unavailable
+    }
+
     public class PlayerCup
     {
         public Player Player { get; set; }
         public List<Dice> Dices { get; set; }
+        public LockStatus LockStatus { get; set; }
 
-        public PlayerCup(Player player, int dicesQuantity) {
+        public PlayerCup(Player player, PlayerBag playerBag) {
             Player = player;
-            Dices = new List<Dice>(Enumerable.Range(1, dicesQuantity).Select(i => new Dice(true)));
+            Dices = new List<Dice>(Enumerable.Range(1, playerBag.DicesQuantity).Select(i => new Dice(true)));
+            LockStatus = playerBag.LockStatus;
         }
 
         public void ExposeDices() {
@@ -312,9 +351,15 @@ namespace TableGames.Web.Games
         public object ToClient() {
             return new {
                 playerName = Player.Name,
-                dices = Dices.Select(d => d.ToClient())
+                dices = Dices.Select(d => d.ToClient()),
+                lockStatus = LockStatus.ToString()
             };
         }
+    }
+
+    public class PlayerBag {
+        public int DicesQuantity { get; set; }
+        public LockStatus LockStatus { get; set; }
     }
 
     public class Dice
