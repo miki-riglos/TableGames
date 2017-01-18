@@ -54,6 +54,10 @@ namespace TableGames.Web.Games
             Table.SetNextPlayer(player);
         }
 
+        public override bool IsEliminated(Player player) {
+            return getPlayerDicesQty()[player] <= 0;
+        }
+
         public void End(IGameAction endAction) {
             IsEnded = true;
             EndAction = endAction;
@@ -86,8 +90,14 @@ namespace TableGames.Web.Games
             );
         }
 
-        public override bool IsEliminated(Player player) {
-            return getPlayerDicesQty()[player] <= 0;
+        public override object ToStats() {
+            return new {
+                isEnded = IsEnded,
+                winnerNames = Winners.Select(p => p.Name),
+                endActionName = EndAction?.Name,
+                diceLoserName = DiceLoser?.Name,
+                diceWinnerName = DiceWinner?.Name
+            };
         }
 
         private Dictionary<Player, int> getPlayerDicesQty() {
@@ -102,16 +112,6 @@ namespace TableGames.Web.Games
             }
 
             return playerDicesQty;
-        }
-
-        public override object ToStats() {
-            return new {
-                isEnded = IsEnded,
-                winnerNames = Winners.Select(p => p.Name),
-                endActionName = EndAction?.Name,
-                diceLoserName = DiceLoser?.Name,
-                diceWinnerName = DiceWinner?.Name
-            };
         }
     }
 
