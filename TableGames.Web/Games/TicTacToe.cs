@@ -39,9 +39,9 @@ namespace TableGames.Web.Games
         };
     }
 
-    public class AssignBoxAction : IGameAction
+    public class AssignBoxAction : GameAction
     {
-        public string Name => "assignBox";
+        public override string Name => "assignBox";
 
         private TicTacToe _ticTacToe;
 
@@ -49,10 +49,7 @@ namespace TableGames.Web.Games
             _ticTacToe = ticTacToe;
         }
 
-        public GameChangeResult Execute(dynamic gameChangeParameters) {
-            var row = (int)gameChangeParameters.row;
-            var col = (int)gameChangeParameters.col;
-
+        public GameChangeResult Execute(int row, int col) {
             var assignedBox = _ticTacToe.Board.First(ab => ab.Box.Row == row && ab.Box.Col == col);
             if (assignedBox != null && assignedBox.PlayerName == null) {
                 assignedBox.PlayerName = _ticTacToe.Table.ActivePlayer.Name;

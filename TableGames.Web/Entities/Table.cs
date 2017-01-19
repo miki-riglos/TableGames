@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace TableGames.Web.Entities
@@ -82,7 +83,7 @@ namespace TableGames.Web.Entities
             return previousPlayer;
         }
 
-        public GameChangeResult ChangeGame(string playerName, string actionName, object gameChangeParameters) {
+        public GameChangeResult ChangeGame(string playerName, string actionName, JObject gameChangeParameters) {
             return Game.Change(playerName, actionName, gameChangeParameters);
         }
 

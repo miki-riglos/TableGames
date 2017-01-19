@@ -43,7 +43,7 @@ namespace TableGames.Web.Entities
         private static Lazy<IEnumerable<GameInfo>> _registry = new Lazy<IEnumerable<GameInfo>>(() => {
             var actionsRegistry = AppDomain.CurrentDomain.GetAssemblies()
                         .SelectMany(a => a.GetTypes())
-                        .Where(type => typeof(IGameAction).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract);
+                        .Where(type => typeof(GameAction).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract);
 
             return AppDomain.CurrentDomain.GetAssemblies()
                         .SelectMany(a => a.GetTypes())
@@ -66,7 +66,7 @@ namespace TableGames.Web.Entities
             var gameInfo = Registry.First(gi => gi.Name == gameName);
             var game = (Game)Activator.CreateInstance(gameInfo.Type, table);
 
-            game.Actions.AddRange(gameInfo.ActionTypes.Select(actionType => (IGameAction)Activator.CreateInstance(actionType, game)));
+            game.Actions.AddRange(gameInfo.ActionTypes.Select(actionType => (GameAction)Activator.CreateInstance(actionType, game)));
 
             return game;
         }

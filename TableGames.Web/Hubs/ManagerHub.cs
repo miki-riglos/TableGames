@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNet.SignalR;
+using Newtonsoft.Json.Linq;
 using System.Collections.Concurrent;
 using System.Linq;
 using TableGames.Web.Entities;
@@ -197,7 +198,7 @@ namespace TableGames.Web.Hubs
         }
 
         // ... Games
-        public void ChangeGame(string hostName, string roomName, string playerName, string actionName, object gameChangeParameters) {
+        public void ChangeGame(string hostName, string roomName, string playerName, string actionName, JObject gameChangeParameters) {
             var room = _getPlayer(hostName).GetRoom(roomName);  // will throw if player is not host
 
             var gameChangeResult = room.Table.ChangeGame(playerName, actionName, gameChangeParameters);

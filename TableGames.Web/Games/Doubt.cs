@@ -14,7 +14,7 @@ namespace TableGames.Web.Games
         public Dice Dice { get; set; }
         public bool HasLock { get; set; }
         public int ActualQuantity { get; set; }
-        public IGameAction EndAction { get; private set; }
+        public GameAction EndAction { get; private set; }
         public Player DiceLoser { get; private set; }
         public Player DiceWinner { get; private set; }
         public bool HasBet { get { return Dice.Value > 0; } }
@@ -69,7 +69,7 @@ namespace TableGames.Web.Games
             return getPlayerBags()[player].DicesQuantity <= 0;
         }
 
-        public void End(IGameAction endAction) {
+        public void End(GameAction endAction) {
             IsEnded = true;
             EndAction = endAction;
 
@@ -139,9 +139,9 @@ namespace TableGames.Web.Games
         }
     }
 
-    public class BetAction : IGameAction
+    public class BetAction : GameAction
     {
-        public string Name => "bet";
+        public override string Name => "bet";
 
         private Doubt _doubt;
 
@@ -149,11 +149,7 @@ namespace TableGames.Web.Games
             _doubt = doubt;
         }
 
-        public GameChangeResult Execute(dynamic gameChangeParameters) {
-            var quantity = (int)gameChangeParameters.quantity;
-            var diceValue = (int)gameChangeParameters.diceValue;
-            var rollOthers = (bool)gameChangeParameters.rollOthers;
-
+        public GameChangeResult Execute(int quantity, int diceValue, bool rollOthers) {
             if (_doubt.HasLock && !_doubt.HasBet) {
                 if (diceValue != _doubt.Dice.Value) {
                     throw new HubException("Dice value can't be changed when lock is in place.");
@@ -236,9 +232,9 @@ namespace TableGames.Web.Games
         }
     }
 
-    public class DoubtAction : IGameAction
+    public class DoubtAction : GameAction
     {
-        public string Name => "doubt";
+        public override string Name => "doubt";
 
         private Doubt _doubt;
 
@@ -246,7 +242,7 @@ namespace TableGames.Web.Games
             _doubt = doubt;
         }
 
-        public GameChangeResult Execute(dynamic gameChangeParameters) {
+        public GameChangeResult Execute() {
             if (!_doubt.HasBet) {
                 throw new HubException("Invalid action.");
             };
@@ -278,9 +274,9 @@ namespace TableGames.Web.Games
         }
     }
 
-    public class MatchAction : IGameAction
+    public class MatchAction : GameAction
     {
-        public string Name => "match";
+        public override string Name => "match";
         public bool IsUserAllowed {
             get {
                 return (_doubt.PlayerCups.FirstOrDefault(pc => pc.Player == _doubt.Table.ActivePlayer)?.Dices.Count ?? 5) < 5;
@@ -293,7 +289,7 @@ namespace TableGames.Web.Games
             _doubt = doubt;
         }
 
-        public GameChangeResult Execute(dynamic gameChangeParameters) {
+        public GameChangeResult Execute() {
             if (!_doubt.HasBet || !IsUserAllowed) {
                 throw new HubException("Invalid action.");
             };
