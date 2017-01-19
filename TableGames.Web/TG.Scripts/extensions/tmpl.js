@@ -2,7 +2,10 @@
 
     return {
         load: function(name, req, onLoad, config) {
-            req(['text!' + name + '.html'], function(templateText) {
+            var parts = name.split('/');
+            var fileUrl = '../GameTemplate?gameName=' + parts[0] + '&fileName=' + parts[1];
+
+            req(['text!' + fileUrl], function(templateText) {
                 var $container = $(templateText);
 
                 var $style = $container.filter('style');

@@ -35,8 +35,8 @@ namespace TableGames.Web.Entities
         public object ToClient() {
             return new {
                 name = Name,
-                constructorFileName = ConstructorFileName,
-                templateFileName = TemplateFileName
+                constructorFileName = $"{Name}/{ConstructorFileName}",
+                templateFileName = $"{Name}/{TemplateFileName}"
             };
         }
 

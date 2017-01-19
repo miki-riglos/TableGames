@@ -154,8 +154,8 @@
     <Compile Include="Entities\Table.cs" />
     <Compile Include="Entities\Room.cs" />
     <Compile Include="Entities\Player.cs" />
-    <Compile Include="Games\Doubt.cs" />
-    <Compile Include="Games\TicTacToe.cs" />
+    <Compile Include="Games\Doubt\Doubt.cs" />
+    <Compile Include="Games\TicTacToe\TicTacToe.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -204,11 +204,12 @@
     <Content Include="Scripts\_references.js" />
     <Content Include="TG.Scripts\authentication.js" />
     <Content Include="TG.Scripts\beeper.js" />
+    <Content Include="TG.Scripts\extensions\game.js" />
     <Content Include="TG.Scripts\gameProvider.js" />
-    <Content Include="TG.Scripts\games\doubt.html" />
-    <Content Include="TG.Scripts\games\doubt.js" />
+    <EmbeddedResource Include="Games\Doubt\doubt.html" />
+    <EmbeddedResource Include="Games\Doubt\doubt.js" />
     <Content Include="TG.Scripts\notification.js" />
-    <Content Include="TG.Scripts\games\ticTacToe.js" />
+    <EmbeddedResource Include="Games\TicTacToe\ticTacToe.js" />
     <Content Include="TG.Scripts\table.js" />
     <Content Include="TG.Scripts\room.js" />
     <Content Include="TG.Scripts\player.js" />
@@ -234,7 +235,7 @@
     <Content Include="Views\Home\_notificationTemplate.cshtml" />
     <Content Include="Views\Home\_roomTemplate.cshtml" />
     <Content Include="Views\Home\_tableTemplate.cshtml" />
-    <Content Include="TG.Scripts\games\ticTacToe.html" />
+    <EmbeddedResource Include="Games\TicTacToe\ticTacToe.html" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="TG.Scripts\extensions\tmpl.js" />
@@ -250,6 +251,9 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="TG.Scripts\games\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

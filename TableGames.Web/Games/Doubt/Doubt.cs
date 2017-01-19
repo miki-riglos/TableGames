@@ -6,7 +6,7 @@ using TableGames.Web.Entities;
 
 namespace TableGames.Web.Games
 {
-    [GameDescriptor("Doubt", "games/doubt")]
+    [GameDescriptor("Doubt", "doubt")]
     public class Doubt : Game
     {
         public List<PlayerCup> PlayerCups { get; set; }

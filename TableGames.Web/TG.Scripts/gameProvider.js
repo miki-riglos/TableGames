@@ -13,7 +13,7 @@
 
         var gameInfo = registry[gameName];
 
-        require([gameInfo.constructorFileName, 'tmpl!' + gameInfo.templateFileName], function(Constructor, templateName) {
+        require(['game!' + gameInfo.constructorFileName, 'tmpl!' + gameInfo.templateFileName], function(Constructor, templateName) {
             var game = new Constructor(gameConfig, gameState, gameConfig.table);
 
             game.table = gameConfig.table;
