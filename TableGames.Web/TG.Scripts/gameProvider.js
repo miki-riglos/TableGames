@@ -13,7 +13,7 @@
 
         var gameInfo = registry[gameName];
 
-        require(['game!' + gameInfo.constructorFileName, 'tmpl!' + gameInfo.templateFileName], function(Constructor, templateName) {
+        require(['game!' + gameInfo.constructorFileName], function(Constructor) {
             var game = new Constructor(gameConfig, gameState, gameConfig.table);
 
             game.table = gameConfig.table;
@@ -48,7 +48,11 @@
             game.setUserGame = game.setUserGame || function(userGameState) { };
             game.changeUserGame = game.changeUserGame || function(actionName, userGameChangeResults) { };
 
-            game.templateName = templateName;
+            // templates
+            game.table.gameTemplateName(Constructor.templateName);
+            if (Constructor.statsTemplateName) {
+                game.table.statsTemplateName(Constructor.statsTemplateName);
+            }
 
             return dfd.resolve(game);
         });

@@ -1,0 +1,17 @@
+﻿<style>
+    .tg-doubt-dial {
+        display: inline-block;
+        width: 40px;
+    }
+</style>
+
+<template id="doubtDialTemplate">
+    <div class="tg-doubt-dial">
+        <button type="button" class="btn btn-default" data-bind="click: up.execute, enable: up.enable">
+            <span class="glyphicon glyphicon-triangle-top" aria-hidden="true"></span>
+        </button>
+        <button type="button" class="btn btn-default" data-bind="click: down.execute, enable: down.enable">
+            <span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true"></span>
+        </button>
+    </div>
+</template>

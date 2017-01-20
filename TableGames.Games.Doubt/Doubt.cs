@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNet.SignalR;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TableGames.Web.Entities;
+using TableGames.Domain;
 
-namespace TableGames.Web.Games
+namespace TableGames.Games.Doubt
 {
     [GameDescriptor("Doubt", "doubt")]
     public class Doubt : Game
@@ -152,12 +151,12 @@ namespace TableGames.Web.Games
         public GameChangeResult Execute(int quantity, int diceValue, bool rollOthers) {
             if (_doubt.HasLock && !_doubt.HasBet) {
                 if (diceValue != _doubt.Dice.Value) {
-                    throw new HubException("Dice value can't be changed when lock is in place.");
+                    throw new Exception("Dice value can't be changed when lock is in place.");
                 }
             }
 
             if (!isValid(_doubt.Quantity, _doubt.Dice.Value, quantity, diceValue)) {
-                throw new HubException("Invalid bet.");
+                throw new Exception("Invalid bet.");
             };
 
             _doubt.Quantity = quantity;
@@ -244,7 +243,7 @@ namespace TableGames.Web.Games
 
         public GameChangeResult Execute() {
             if (!_doubt.HasBet) {
-                throw new HubException("Invalid action.");
+                throw new Exception("Invalid action.");
             };
 
             _doubt.ActualQuantity = _doubt.GetActualQuantity();
@@ -291,7 +290,7 @@ namespace TableGames.Web.Games
 
         public GameChangeResult Execute() {
             if (!_doubt.HasBet || !IsUserAllowed) {
-                throw new HubException("Invalid action.");
+                throw new Exception("Invalid action.");
             };
 
             _doubt.ActualQuantity = _doubt.GetActualQuantity();
@@ -318,73 +317,6 @@ namespace TableGames.Web.Games
                 isEnded = _doubt.IsEnded,
                 winnerNames = _doubt.Winners.Select(p => p.Name)
             });
-        }
-    }
-
-    public enum LockStatus
-    {
-        Available,
-        Locking,
-        Unavailable
-    }
-
-    public class PlayerCup
-    {
-        public Player Player { get; set; }
-        public List<Dice> Dices { get; set; }
-        public LockStatus LockStatus { get; set; }
-
-        public PlayerCup(Player player, PlayerBag playerBag) {
-            Player = player;
-            Dices = new List<Dice>(Enumerable.Range(1, playerBag.DicesQuantity).Select(i => new Dice(true)));
-            LockStatus = playerBag.LockStatus;
-        }
-
-        public void ExposeDices() {
-            Dices.ForEach(d => d.IsExposed = true);
-        }
-
-        public object ToClient() {
-            return new {
-                playerName = Player.Name,
-                dices = Dices.Select(d => d.ToClient()),
-                lockStatus = LockStatus.ToString()
-            };
-        }
-    }
-
-    public class PlayerBag {
-        public int DicesQuantity { get; set; }
-        public LockStatus LockStatus { get; set; }
-    }
-
-    public class Dice
-    {
-        private Random _random = new Random(Guid.NewGuid().GetHashCode());
-
-        public bool IsExposed { get; set; }
-        public int Value { get; set; }
-        public int RollCount { get; private set; }
-
-        public Dice(bool roll = false) {
-            IsExposed = false;
-            RollCount = 0;
-            if (roll) {
-                Roll();
-            }
-        }
-
-        public void Roll() {
-            Value = _random.Next(1, 7);
-            RollCount++;
-        }
-
-        public object ToClient(bool includeValue = false) {
-            return new {
-                isExposed = IsExposed,
-                value = IsExposed || includeValue ? Value : 0,
-                rollCount = RollCount
-            };
         }
     }
 }

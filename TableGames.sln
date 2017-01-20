@@ -5,6 +5,12 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableGames.Web", "TableGames.Web\TableGames.Web.csproj", "{4A2C8540-8344-4F64-BDE6-5BA27DD90DCA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableGames.Games.TicTacToe", "TableGames.Games.TicTacToe\TableGames.Games.TicTacToe.csproj", "{EFDCBB53-75DD-4735-955B-8651C48C1405}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableGames.Domain", "TableGames.Domain\TableGames.Domain.csproj", "{DFED5373-80E0-44A8-A49D-391179E64372}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableGames.Games.Doubt", "TableGames.Games.Doubt\TableGames.Games.Doubt.csproj", "{5A785B03-1A69-4972-8660-084B4AA70F5E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +21,18 @@ Global
 		{4A2C8540-8344-4F64-BDE6-5BA27DD90DCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A2C8540-8344-4F64-BDE6-5BA27DD90DCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A2C8540-8344-4F64-BDE6-5BA27DD90DCA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFDCBB53-75DD-4735-955B-8651C48C1405}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFDCBB53-75DD-4735-955B-8651C48C1405}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFDCBB53-75DD-4735-955B-8651C48C1405}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFDCBB53-75DD-4735-955B-8651C48C1405}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFED5373-80E0-44A8-A49D-391179E64372}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFED5373-80E0-44A8-A49D-391179E64372}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFED5373-80E0-44A8-A49D-391179E64372}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFED5373-80E0-44A8-A49D-391179E64372}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A785B03-1A69-4972-8660-084B4AA70F5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A785B03-1A69-4972-8660-084B4AA70F5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A785B03-1A69-4972-8660-084B4AA70F5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A785B03-1A69-4972-8660-084B4AA70F5E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

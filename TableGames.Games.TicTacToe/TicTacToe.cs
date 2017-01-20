@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNet.SignalR;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TableGames.Web.Entities;
+using TableGames.Domain;
 
-namespace TableGames.Web.Games
+namespace TableGames.Games.TicTacToe
 {
     [GameDescriptor("Tic Tac Toe", "ticTacToe")]
     public class TicTacToe : Game
@@ -85,38 +85,8 @@ namespace TableGames.Web.Games
                 });
             }
             else {
-                throw new HubException("TicTacToe AssignBox error.");
+                throw new Exception("TicTacToe AssignBox error.");
             }
-        }
-    }
-
-    public class Box
-    {
-        public int Row { get; set; }
-        public int Col { get; set; }
-        public int Id { get { return Row * 10 + Col; } }
-
-        public Box(int row, int col) {
-            Row = row;
-            Col = col;
-        }
-    }
-
-    public class AssignedBox
-    {
-        public Box Box { get; set; }
-        public string PlayerName { get; set; }
-
-        public AssignedBox(int row, int col) {
-            Box = new Box(row, col);
-        }
-
-        public object ToClient() {
-            return new {
-                row = Box.Row,
-                col = Box.Col,
-                playerName = PlayerName
-            };
         }
     }
 }

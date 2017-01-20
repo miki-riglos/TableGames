@@ -1,7 +1,5 @@
-﻿using System.IO;
-using System.Linq;
-using System.Web.Mvc;
-using TableGames.Web.Entities;
+﻿using System.Web.Mvc;
+using TableGames.Domain;
 
 namespace TableGames.Web.Controllers
 {
@@ -14,26 +12,12 @@ namespace TableGames.Web.Controllers
         // Using QS parameters to avoid issues with file extensions (MVC and requirejs)
         [Route("GameScript")]
         public ActionResult Script(string gameName, string fileName) {
-            var gameAssembly = GameInfo.Registry.First(gi => gi.Name == gameName).Type.Assembly;
-            var resourceName =  gameAssembly.GetManifestResourceNames().First(name => name.EndsWith($"{fileName}.js"));
-
-            using (Stream stream = gameAssembly.GetManifestResourceStream(resourceName)) {
-                using (var reader = new StreamReader(stream)) {
-                    return JavaScript(reader.ReadToEnd());
-                }
-            }
+            return JavaScript(GameInfo.GetGameScript(gameName, fileName));
         }
 
         [Route("GameTemplate")]
         public ActionResult Template(string gameName, string fileName) {
-            var gameAssembly = GameInfo.Registry.First(gi => gi.Name == gameName).Type.Assembly;
-            var resourceName = gameAssembly.GetManifestResourceNames().First(name => name.EndsWith($"{fileName}.html"));
-
-            using (Stream stream = gameAssembly.GetManifestResourceStream(resourceName)) {
-                using (var reader = new StreamReader(stream)) {
-                    return Content(reader.ReadToEnd());
-                }
-            }
+            return Content(GameInfo.GetGameTemplate(gameName, fileName));
         }
     }
 }

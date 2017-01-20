@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace TableGames.Web.Entities
+namespace TableGames.Domain
 {
     public class Room
     {

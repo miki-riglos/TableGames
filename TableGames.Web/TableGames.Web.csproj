@@ -149,13 +149,6 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Entities\GameInfo.cs" />
-    <Compile Include="Entities\Game.cs" />
-    <Compile Include="Entities\Table.cs" />
-    <Compile Include="Entities\Room.cs" />
-    <Compile Include="Entities\Player.cs" />
-    <Compile Include="Games\Doubt\Doubt.cs" />
-    <Compile Include="Games\TicTacToe\TicTacToe.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -206,10 +199,7 @@
     <Content Include="TG.Scripts\beeper.js" />
     <Content Include="TG.Scripts\extensions\game.js" />
     <Content Include="TG.Scripts\gameProvider.js" />
-    <EmbeddedResource Include="Games\Doubt\doubt.html" />
-    <EmbeddedResource Include="Games\Doubt\doubt.js" />
     <Content Include="TG.Scripts\notification.js" />
-    <EmbeddedResource Include="Games\TicTacToe\ticTacToe.js" />
     <Content Include="TG.Scripts\table.js" />
     <Content Include="TG.Scripts\room.js" />
     <Content Include="TG.Scripts\player.js" />
@@ -235,7 +225,6 @@
     <Content Include="Views\Home\_notificationTemplate.cshtml" />
     <Content Include="Views\Home\_roomTemplate.cshtml" />
     <Content Include="Views\Home\_tableTemplate.cshtml" />
-    <EmbeddedResource Include="Games\TicTacToe\ticTacToe.html" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="TG.Scripts\extensions\tmpl.js" />
@@ -252,8 +241,20 @@
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="TG.Scripts\games\" />
+    <ProjectReference Include="..\TableGames.Domain\TableGames.Domain.csproj">
+      <Project>{dfed5373-80e0-44a8-a49d-391179e64372}</Project>
+      <Name>TableGames.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TableGames.Games.Doubt\TableGames.Games.Doubt.csproj">
+      <Project>{5a785b03-1a69-4972-8660-084b4aa70f5e}</Project>
+      <Name>TableGames.Games.Doubt</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TableGames.Games.TicTacToe\TableGames.Games.TicTacToe.csproj">
+      <Project>{efdcbb53-75dd-4735-955b-8651c48c1405}</Project>
+      <Name>TableGames.Games.TicTacToe</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

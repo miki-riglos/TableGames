@@ -11,8 +11,9 @@
             <!-- ko ifnot: game -->
             Waiting for players to join.
             <!-- /ko -->
+
             <!-- ko if: game -->
-            <!-- ko template: { name: game().templateName, data: game } --><!-- /ko -->
+            <!-- ko template: { name: gameTemplateName, data: game } --><!-- /ko -->
             <!-- /ko -->
         </div>
     </div>

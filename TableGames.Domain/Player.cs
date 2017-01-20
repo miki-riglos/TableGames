@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNet.SignalR;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Linq;
 
-namespace TableGames.Web.Entities
+namespace TableGames.Domain
 {
     public class Player
     {
@@ -21,7 +21,7 @@ namespace TableGames.Web.Entities
                 return room;
             }
             else {
-                throw new HubException("Player AddRoom error.");
+                throw new Exception("Player AddRoom error.");
             }
         }
 
@@ -31,7 +31,7 @@ namespace TableGames.Web.Entities
                 return room;
             }
             else {
-                throw new HubException("Player GetRoom error.");
+                throw new Exception("Player GetRoom error.");
             }
         }
 
@@ -41,7 +41,7 @@ namespace TableGames.Web.Entities
                 return;
             }
             else {
-                throw new HubException("Player RemoveRoom error.");
+                throw new Exception("Player RemoveRoom error.");
             }
         }
 

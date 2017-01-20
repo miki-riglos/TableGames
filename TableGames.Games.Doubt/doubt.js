@@ -1,4 +1,4 @@
-﻿define(['knockout'], function(ko) {
+﻿define(['knockout', 'tmpl!Doubt/doubt', 'game!Doubt/dice', 'game!Doubt/playerCup', 'tmpl!Doubt/stats', 'tmpl!Doubt/dial'], function(ko, doubtTemplateName, Dice, PlayerCup, statsTemplateName, dialTemplateName) {
 
     function Doubt(gameConfig, gameState, table) {
         var self = this;
@@ -60,10 +60,9 @@
                 self.userGame().dices[index].rollCount = diceState.rollCount;
             });
         };
-
-        // stats template
-        table.statsTemplateName('doubtStatsTemplate');
     }
+    Doubt.templateName = doubtTemplateName;
+    Doubt.statsTemplateName = statsTemplateName;
 
     Doubt.ActionConstructors = [
         function BetAction(gameConfig, game, table) {
@@ -163,59 +162,6 @@
             };
         }
     ];
-
-    function PlayerCup(playerCupState, doubt) {
-        var self = this;
-        self.playerName = playerCupState.playerName;
-        self.dices = playerCupState.dices.map(function(diceState) { return new Dice(diceState, doubt); });
-        self.lockStatus = playerCupState.lockStatus;
-
-        self.updateDices = function(dicesState) {
-            dicesState.forEach(function(diceState, index) {
-                self.dices[index].value(diceState.value);
-                self.dices[index].isExposed(diceState.isExposed);
-            });
-        };
-    }
-
-    function Dice(diceState, doubt) {
-        var self = this;
-        self.isExposed = ko.observable(diceState.isExposed);
-        self.value = ko.observable(diceState.value);
-        self.rollCount = diceState.rollCount || 0;
-
-        // roll dice
-        self.roll = function(value) {
-            var promise = $.when();
-            for (var i = 1; i <= 8; i++) {
-                promise = promise.then(self.roll.step);
-            }
-            promise = promise.then(function() {
-                self.value(value);
-            });
-        };
-        self.roll.step = function() {
-            var dfd = $.Deferred();
-            var stepValue = Math.floor(Math.random() * 6) + 1;
-            self.value(stepValue);
-            setTimeout(function() { dfd.resolve(stepValue); }, 100);
-            return dfd.promise();
-        };
-
-        self.color = ko.computed(function() { return self.isExposed() ? '#545454' : '#939393'; });
-        self.matchingColor = ko.computed({
-            read: function() {
-                var color = 'white';
-                if (doubt && doubt.isEnded()) {
-                    if (doubt.dice.value() === self.value() || self.value() === 1) {
-                        color = '#d9edf7';
-                    }
-                }
-                return color;
-            },
-            deferEvaluation: true
-        });
-    }
 
     return Doubt;
 });

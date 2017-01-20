@@ -16,6 +16,7 @@
 
         self.room = room;
 
+        self.gameTemplateName = ko.observable();
         self.game = ko.observable();
 
         self.isStarted = ko.computed(function() {

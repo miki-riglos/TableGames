@@ -1,4 +1,4 @@
-﻿define(['knockout'], function(ko) {
+﻿define(['knockout', 'tmpl!TicTacToe/ticTacToe'], function(ko, ticTacToeTemplateName) {
 
     function TicTacToe(gameConfig, gameState, table) {
         var self = this;
@@ -31,6 +31,8 @@
 
         table.activePlayerName(gameState.table.activePlayerName);
     }
+    TicTacToe.templateName = ticTacToeTemplateName;
+
 
     TicTacToe.ActionConstructors = [
         function AssignBoxAction(gameConfig, game, table) {

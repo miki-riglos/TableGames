@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System.Collections.Concurrent;
 using System.Linq;
-using TableGames.Web.Entities;
+using TableGames.Domain;
 
 namespace TableGames.Web.Hubs
 {
