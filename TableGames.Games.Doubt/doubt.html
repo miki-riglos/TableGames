@@ -41,12 +41,10 @@
             </div>
             <div class="col-xs-3" data-bind="template: { name: 'doubtDiceTemplate', data: dice }"></div>
             <div class="col-xs-5" data-bind="if: isEnded">
-                <!-- ko with: table.stats()[table.stats().length - 1] -->
                 <span class="badge pull-right">
                     <span class="glyphicon" data-bind="css: winnerNames.length ? 'glyphicon-ok': 'glyphicon-remove'" aria-hidden="true"></span>
                     <span data-bind="text: endActionName"></span>
                 </span>
-                <!-- /ko -->
                 Count: <span data-bind="text: actualQuantity"></span>
             </div>
         </div>
@@ -55,10 +53,8 @@
             <div class="row">
                 <div class="col-xs-4">
                     <span class="pull-right" data-bind="if: $parent.isEnded">
-                        <!-- ko with: $parent.table.stats()[$parent.table.stats().length - 1] -->
-                        <span class="glyphicon glyphicon-minus-sign" data-bind="visible: cup.playerName === diceLoserName" aria-hidden="true"></span>
-                        <span class="glyphicon glyphicon-plus-sign" data-bind="visible: cup.playerName === diceWinnerName" aria-hidden="true"></span>
-                        <!-- /ko -->
+                        <span class="glyphicon glyphicon-minus-sign" data-bind="visible: cup.playerName === $parent.diceLoserName()" aria-hidden="true"></span>
+                        <span class="glyphicon glyphicon-plus-sign" data-bind="visible: cup.playerName === $parent.diceWinnerName()" aria-hidden="true"></span>
                     </span>
                     <span class="glyphicon glyphicon-lock tg-doubt-playercup-lock" data-bind="css: cup.lockStatus.toLowerCase()" aria-hidden="true"></span>
                     <span data-bind="text: cup.playerName"></span>
@@ -131,7 +127,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 </template>
 

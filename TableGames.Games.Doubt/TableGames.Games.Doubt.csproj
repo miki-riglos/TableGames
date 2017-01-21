@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Dice.cs" />
+    <Compile Include="DoubtInitial.cs" />
     <Compile Include="PlayerBag.cs" />
     <Compile Include="PlayerCup.cs" />
     <Compile Include="Doubt.cs" />
@@ -72,6 +73,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="stats.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="doubtInitial.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="doubtInitial.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

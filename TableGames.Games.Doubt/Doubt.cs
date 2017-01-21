@@ -68,7 +68,7 @@ namespace TableGames.Games.Doubt
             return getPlayerBags()[player].DicesQuantity <= 0;
         }
 
-        public void End(GameAction endAction) {
+        public GameChangeResult End(GameAction endAction) {
             IsEnded = true;
             EndAction = endAction;
 
@@ -83,6 +83,24 @@ namespace TableGames.Games.Doubt
             if (playersWithDices.Count() == 1) {
                 Table.End(playersWithDices);
             }
+
+            var gameEndResult = new GameChangeResult(new {
+                actualQuantity = ActualQuantity,
+                playerCups = PlayerCups.Select(pc => pc.ToClient()),
+                table = new {
+                    status = Table.Status.ToString(),
+                    activePlayerName = Table.ActivePlayer?.Name,
+                    stats = Table.Games.Select(g => g.ToStats()),
+                    winnerNames = Table.Winners.Select(p => p.Name)
+                },
+                isEnded = IsEnded,
+                winnerNames = Winners.Select(p => p.Name),
+                endActionName = EndAction?.Name,
+                diceLoserName = DiceLoser?.Name,
+                diceWinnerName = DiceWinner?.Name
+            });
+
+            return gameEndResult;
         }
 
         public override object ToClient() {
@@ -96,7 +114,10 @@ namespace TableGames.Games.Doubt
                     activePlayerName = Table.ActivePlayer?.Name,
                 },
                 isEnded = IsEnded,
-                winnerNames = Winners.Select(p => p.Name)
+                winnerNames = Winners.Select(p => p.Name),
+                endActionName = EndAction?.Name,
+                diceLoserName = DiceLoser?.Name,
+                diceWinnerName = DiceWinner?.Name
             };
         }
 
@@ -149,7 +170,7 @@ namespace TableGames.Games.Doubt
         }
 
         public GameChangeResult Execute(int quantity, int diceValue, bool rollOthers) {
-            if (_doubt.HasLock && !_doubt.HasBet) {
+            if (_doubt.HasLock && _doubt.HasBet) {
                 if (diceValue != _doubt.Dice.Value) {
                     throw new Exception("Dice value can't be changed when lock is in place.");
                 }
@@ -256,20 +277,10 @@ namespace TableGames.Games.Doubt
             }
 
             _doubt.PlayerCups.ForEach(pc => pc.ExposeDices());
-            _doubt.End(this);
 
-            return new GameChangeResult(new {
-                actualQuantity = _doubt.ActualQuantity,
-                playerCups = _doubt.PlayerCups.Select(pc => pc.ToClient()),
-                table = new {
-                    status = _doubt.Table.Status.ToString(),
-                    activePlayerName = _doubt.Table.ActivePlayer?.Name,
-                    stats = _doubt.Table.Games.Select(g => g.ToStats()),
-                    winnerNames = _doubt.Table.Winners.Select(p => p.Name)
-                },
-                isEnded = _doubt.IsEnded,
-                winnerNames = _doubt.Winners.Select(p => p.Name)
-            });
+            var gameEndResult = _doubt.End(this);
+
+            return gameEndResult;
         }
     }
 
@@ -303,20 +314,10 @@ namespace TableGames.Games.Doubt
             }
 
             _doubt.PlayerCups.ForEach(pc => pc.ExposeDices());
-            _doubt.End(this);
 
-            return new GameChangeResult(new {
-                actualQuantity = _doubt.ActualQuantity,
-                playerCups = _doubt.PlayerCups.Select(pc => pc.ToClient()),
-                table = new {
-                    status = _doubt.Table.Status.ToString(),
-                    activePlayerName = _doubt.Table.ActivePlayer?.Name,
-                    stats = _doubt.Table.Games.Select(g => g.ToStats()),
-                    winnerNames = _doubt.Table.Winners.Select(p => p.Name)
-                },
-                isEnded = _doubt.IsEnded,
-                winnerNames = _doubt.Winners.Select(p => p.Name)
-            });
+            var gameEndResult = _doubt.End(this);
+
+            return gameEndResult;
         }
     }
 }

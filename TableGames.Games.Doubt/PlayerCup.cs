@@ -23,6 +23,11 @@ namespace TableGames.Games.Doubt
             LockStatus = playerBag.LockStatus;
         }
 
+        public PlayerCup(Player player) {
+            Player = player;
+            Dices = new List<Dice>();
+        }
+
         public void ExposeDices() {
             Dices.ForEach(d => d.IsExposed = true);
         }

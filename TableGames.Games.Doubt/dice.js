@@ -2,6 +2,7 @@
 
     function Dice(diceState, doubt) {
         var self = this;
+
         self.isExposed = ko.observable(diceState.isExposed);
         self.value = ko.observable(diceState.value);
         self.rollCount = diceState.rollCount || 0;
@@ -15,6 +16,7 @@
             promise = promise.then(function() {
                 self.value(value);
             });
+            return promise;
         };
         self.roll.step = function() {
             var dfd = $.Deferred();
@@ -25,15 +27,22 @@
         };
 
         self.color = ko.computed(function() { return self.isExposed() ? '#545454' : '#939393'; });
-        self.matchingColor = ko.computed({
+
+        self.isHighlighted = ko.observable(false);
+
+        self.backgroundColor = ko.computed({
             read: function() {
-                var color = 'white';
-                if (doubt && doubt.isEnded()) {
-                    if (doubt.dice.value() === self.value() || self.value() === 1) {
-                        color = '#d9edf7';
+                var backgroundColor = 'white';
+                if (self.isHighlighted()) {
+                    backgroundColor = '#d9edf7';
+                } else {
+                    if (doubt && doubt.isEnded()) {
+                        if (doubt.dice.value() === self.value() || self.value() === 1) {
+                            backgroundColor = '#d9edf7';
+                        }
                     }
                 }
-                return color;
+                return backgroundColor;
             },
             deferEvaluation: true
         });

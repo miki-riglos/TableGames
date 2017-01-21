@@ -15,21 +15,28 @@
             });
         };
 
+        self.endActionName = ko.observable(gameState.endActionName);
+        self.diceLoserName = ko.observable(gameState.diceLoserName);
+        self.diceWinnerName = ko.observable(gameState.diceWinnerName);
+
         self.hasBet = ko.computed(function() { return self.dice.value() > 0; });
 
         table.activePlayerName(gameState.table.activePlayerName);
 
-        self.end = function(gameChangeResults) {
-            self.actualQuantity(gameChangeResults.actualQuantity);
-            self.playerCups.update(gameChangeResults.playerCups);
-            self.isEnded(gameChangeResults.isEnded);
-            
-            table.status(gameChangeResults.table.status);
-            table.activePlayerName(gameChangeResults.table.activePlayerName);
-            table.stats(gameChangeResults.table.stats);
+        self.end = function(gameEndResults) {
+            self.actualQuantity(gameEndResults.actualQuantity);
+            self.playerCups.update(gameEndResults.playerCups);
+            self.isEnded(gameEndResults.isEnded);
+            self.endActionName(gameEndResults.endActionName);
+            self.diceLoserName(gameEndResults.diceLoserName);
+            self.diceWinnerName(gameEndResults.diceWinnerName);
+
+            table.status(gameEndResults.table.status);
+            table.activePlayerName(gameEndResults.table.activePlayerName);
+            table.stats(gameEndResults.table.stats);
 
             table.winnerNames.removeAll();
-            gameChangeResults.table.winnerNames.forEach(function(winnerName) {
+            gameEndResults.table.winnerNames.forEach(function(winnerName) {
                 table.winnerNames.push(winnerName);
             });
         };

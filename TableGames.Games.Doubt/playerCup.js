@@ -1,15 +1,16 @@
-﻿define(['game!Doubt/dice'], function(Dice) {
+﻿define(['knockout', 'game!Doubt/dice'], function(ko, Dice) {
 
     function PlayerCup(playerCupState, doubt) {
         var self = this;
         self.playerName = playerCupState.playerName;
-        self.dices = playerCupState.dices.map(function(diceState) { return new Dice(diceState, doubt); });
+        self.dices = ko.observableArray(playerCupState.dices.map(function(diceState) { return new Dice(diceState, doubt); }));
         self.lockStatus = playerCupState.lockStatus;
 
         self.updateDices = function(dicesState) {
             dicesState.forEach(function(diceState, index) {
-                self.dices[index].value(diceState.value);
-                self.dices[index].isExposed(diceState.isExposed);
+                var dice = self.dices()[index];
+                dice.value(diceState.value);
+                dice.isExposed(diceState.isExposed);
             });
         };
     }

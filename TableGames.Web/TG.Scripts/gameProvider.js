@@ -23,6 +23,7 @@
 
             // instantiate actions and attach to game
             game.actions = {};
+            Constructor.ActionConstructors = Constructor.ActionConstructors || [];
             Constructor.ActionConstructors.forEach(function(ActionConstructor) {
                 var action = new ActionConstructor(gameConfig, game, gameConfig.table);
                 action.getParameters = action.getParameters || function() { return {}; };
