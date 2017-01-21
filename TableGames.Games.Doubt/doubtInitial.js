@@ -17,10 +17,12 @@
             playerCupState.dices.forEach(function(diceState) {
                 var dice = new Dice(diceState);
                 if (!gameState.inProgress) {
-                    playerPromises[playerCupState.playerName] = playerPromises[playerCupState.playerName].then(function() {
-                        playerCup.dices.push(dice);
-                        return dice.roll(diceState.value);
-                    })
+                    playerPromises[playerCupState.playerName] = playerPromises[playerCupState.playerName]
+                        .then(function() {
+                            playerCup.dices.push(dice);
+                            return dice.roll(diceState.value);
+                        })
+                        .then(delay);
                 } else {
                     playerCup.dices.push(dice);
                 }
@@ -41,6 +43,12 @@
         });
     }
     DoubtInitial.templateName = doubtInitialTemplateName;
+
+    function delay() {
+        var dfd = $.Deferred();
+        setTimeout(function() { dfd.resolve(); }, 1000);
+        return dfd.promise();
+    }
 
     return DoubtInitial;
 });

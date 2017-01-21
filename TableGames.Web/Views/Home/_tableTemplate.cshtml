@@ -8,7 +8,7 @@
             <span data-bind="text: gameName"></span>
         </div>
         <div class="panel-body">
-            <!-- ko ifnot: game -->
+            <!-- ko if: status() === 'Open' -->
             Waiting for players to join.
             <!-- /ko -->
 

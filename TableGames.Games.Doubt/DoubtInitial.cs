@@ -4,7 +4,7 @@ using TableGames.Domain;
 
 namespace TableGames.Games.Doubt
 {
-    [GameDescriptor("Doubt Initial", "doubtInitial")]
+    [GameDescriptor("DoubtInitial", "doubtInitial")]
     public class DoubtInitial : Game
     {
         public List<PlayerCup> PlayerCups { get; set; }

@@ -197,7 +197,7 @@
     <Content Include="Scripts\_references.js" />
     <Content Include="TG.Scripts\authentication.js" />
     <Content Include="TG.Scripts\beeper.js" />
-    <Content Include="TG.Scripts\extensions\game.js" />
+    <Content Include="TG.Scripts\extensions\gameScriptLoader.js" />
     <Content Include="TG.Scripts\gameProvider.js" />
     <Content Include="TG.Scripts\notification.js" />
     <Content Include="TG.Scripts\table.js" />
@@ -227,7 +227,7 @@
     <Content Include="Views\Home\_tableTemplate.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="TG.Scripts\extensions\tmpl.js" />
+    <Content Include="TG.Scripts\extensions\gameTemplateLoader.js" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

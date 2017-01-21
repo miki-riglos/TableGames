@@ -14,6 +14,7 @@ namespace TableGames.Domain
     public class Table
     {
         public string GameName { get; private set; }
+        public string InstanceGameName { get; private set; }
         public TableStatus Status { get; private set; }
         public List<Player> Players { get; private set; }
         public Player ActivePlayer { get; private set; }
@@ -42,13 +43,20 @@ namespace TableGames.Domain
         }
 
         public void Start() {
+            InstanceGameName = GameName;
+            if (Status != TableStatus.Started) {
+                var initialGameName = $"{GameName}Initial";
+                if (GameInfo.Registry.Any(gi => gi.Name == initialGameName)) {
+                    InstanceGameName = initialGameName;
+                }
+            }
             if (Status == TableStatus.Ended) {
                 ActivePlayer = null;
                 Winners = new List<Player>();
                 Bag = new Dictionary<string, object>();
             }
             Status = TableStatus.Started;
-            Game = GameInfo.CreateGame(GameName, this);
+            Game = GameInfo.CreateGame(InstanceGameName, this);
             Games.Add(Game);
         }
 
@@ -96,6 +104,7 @@ namespace TableGames.Domain
         public object ToClient() {
             return new {
                 gameName = GameName,
+                instanceGameName = InstanceGameName,
                 status = Status.ToString(),
                 playerNames = Players.Select(p => p.Name),
                 game = Game?.ToClient(),

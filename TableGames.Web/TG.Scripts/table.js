@@ -53,7 +53,8 @@
             self.stats(tableState.stats);
             gamePromise = gamePromise
                             .then(function() {
-                                return gameProvider.createGame(self.gameName, gameConfig, tableState.game);
+                                self.game(null);    // avoid game/template mismatch
+                                return gameProvider.createGame(tableState.instanceGameName, gameConfig, tableState.game);
                             })
                             .then(function(game) {
                                 self.game(game);

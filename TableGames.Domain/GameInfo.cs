@@ -17,7 +17,8 @@ namespace TableGames.Domain
         public object ToClient() {
             return new {
                 name = Name,
-                constructorFileName = $"{UrlName}/{ConstructorFileName}"
+                constructorFileName = $"{UrlName}/{ConstructorFileName}",
+                isOption = !Name.EndsWith("Initial")
             };
         }
 

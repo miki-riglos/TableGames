@@ -3,9 +3,9 @@
         'knockout': '../Scripts/knockout-3.4.0.debug',
         'text': '../Scripts/text',
         'ko-ext': './extensions/ko-extended',
-        'game': './extensions/game',
-        'tmpl': './extensions/tmpl'        
-}
+        'game': './extensions/gameScriptLoader',
+        'tmpl': './extensions/gameTemplateLoader'
+    }
 });
 
 define('jquery', function() { return window.jQuery; });    // already loaded in _layout.cshtml
