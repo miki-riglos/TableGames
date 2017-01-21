@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -21,7 +20,7 @@ namespace TableGames.Domain
 
         public GameChangeResult Change(string playerName, string actionName, JObject gameChangeParameters) {
             if (playerName != Table.ActivePlayer.Name) {
-                throw new Exception("It is not your turn.");
+                throw new TableGamesException("It is not your turn.");
             }
 
             var gameAction = Actions.FirstOrDefault(a => a.Name == actionName);
@@ -30,7 +29,7 @@ namespace TableGames.Domain
                 return gameAction.Execute(gameChangeParameters);
             }
             else {
-                throw new Exception("Game Change error.");
+                throw new TableGamesException("Game Change error.");
             }
         }
 

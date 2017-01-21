@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using TableGames.Domain;
 
@@ -85,7 +84,7 @@ namespace TableGames.Games.TicTacToe
                 });
             }
             else {
-                throw new Exception("TicTacToe AssignBox error.");
+                throw new TableGamesException("TicTacToe AssignBox error.");
             }
         }
     }

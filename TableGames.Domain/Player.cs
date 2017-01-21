@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Linq;
 
 namespace TableGames.Domain
@@ -21,7 +20,7 @@ namespace TableGames.Domain
                 return room;
             }
             else {
-                throw new Exception("Player AddRoom error.");
+                throw new TableGamesException("Player AddRoom error.");
             }
         }
 
@@ -31,7 +30,7 @@ namespace TableGames.Domain
                 return room;
             }
             else {
-                throw new Exception("Player GetRoom error.");
+                throw new TableGamesException("Player GetRoom error.");
             }
         }
 
@@ -41,7 +40,7 @@ namespace TableGames.Domain
                 return;
             }
             else {
-                throw new Exception("Player RemoveRoom error.");
+                throw new TableGamesException("Player RemoveRoom error.");
             }
         }
 

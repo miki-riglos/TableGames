@@ -172,12 +172,12 @@ namespace TableGames.Games.Doubt
         public GameChangeResult Execute(int quantity, int diceValue, bool rollOthers) {
             if (_doubt.HasLock && _doubt.HasBet) {
                 if (diceValue != _doubt.Dice.Value) {
-                    throw new Exception("Dice value can't be changed when lock is in place.");
+                    throw new TableGamesException("Dice value can't be changed when lock is in place.");
                 }
             }
 
             if (!isValid(_doubt.Quantity, _doubt.Dice.Value, quantity, diceValue)) {
-                throw new Exception("Invalid bet.");
+                throw new TableGamesException("Invalid bet.");
             };
 
             _doubt.Quantity = quantity;
@@ -264,7 +264,7 @@ namespace TableGames.Games.Doubt
 
         public GameChangeResult Execute() {
             if (!_doubt.HasBet) {
-                throw new Exception("Invalid action.");
+                throw new TableGamesException("Invalid action.");
             };
 
             _doubt.ActualQuantity = _doubt.GetActualQuantity();
@@ -301,7 +301,7 @@ namespace TableGames.Games.Doubt
 
         public GameChangeResult Execute() {
             if (!_doubt.HasBet || !IsUserAllowed) {
-                throw new Exception("Invalid action.");
+                throw new TableGamesException("Invalid action.");
             };
 
             _doubt.ActualQuantity = _doubt.GetActualQuantity();
