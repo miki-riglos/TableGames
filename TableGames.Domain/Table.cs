@@ -101,6 +101,10 @@ namespace TableGames.Domain
             Winners.AddRange(winners);
         }
 
+        public IEnumerable<object> GetStats() {
+            return Games.Select(g => g.ToStats()).Where(s => s != null);
+        }
+
         public object ToClient() {
             return new {
                 gameName = GameName,
@@ -108,7 +112,7 @@ namespace TableGames.Domain
                 status = Status.ToString(),
                 playerNames = Players.Select(p => p.Name),
                 game = Game?.ToClient(),
-                stats = Games.Select(g => g.ToStats()),
+                stats = GetStats(),
                 winnerNames = Winners.Select(p => p.Name)
             };
         }

@@ -76,7 +76,7 @@ namespace TableGames.Games.TicTacToe
                     col = col,
                     table = new {
                         activePlayerName = _ticTacToe.Table.ActivePlayer?.Name,
-                        stats = _ticTacToe.Table.Games.Select(g => g.ToStats())
+                        stats = _ticTacToe.Table.GetStats()
                     },
                     isEnded = _ticTacToe.IsEnded,
                     winningBoxes = _ticTacToe.WinningBoxes.Select(ab => ab.ToClient()),

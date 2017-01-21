@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using TableGames.Domain;
 
@@ -90,7 +89,7 @@ namespace TableGames.Games.Doubt
                 table = new {
                     status = Table.Status.ToString(),
                     activePlayerName = Table.ActivePlayer?.Name,
-                    stats = Table.Games.Select(g => g.ToStats()),
+                    stats = Table.GetStats(),
                     winnerNames = Table.Winners.Select(p => p.Name)
                 },
                 isEnded = IsEnded,
