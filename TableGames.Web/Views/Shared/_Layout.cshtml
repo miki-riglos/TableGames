@@ -30,12 +30,16 @@
                     </div>
                     <button type="button" class="btn btn-default" data-bind="click: login, visible: !authentication.isLoggedIn()">Login</button>
                     <button type="button" class="btn btn-default" data-bind="click: logout, visible: authentication.isLoggedIn">Logout</button>
+                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#tgUserSettings" data-bind="visible: authentication.isLoggedIn">
+                        <span class="glyphicon glyphicon-cog" aria-hidden="true" ></span> 
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
     @Html.Partial("_about")
+    @Html.Partial("_userSettings")
     
     <div class="container-fluid" style="display: none;" data-bind="visible: true">
         @RenderBody()

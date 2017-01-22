@@ -21,7 +21,7 @@
         self.authentication = authentication;
 
         // user settings
-        var userSettings = UserSettings.instance;
+        var userSettings = ko.observable(UserSettings.default);
         self.userSettings = userSettings;
 
         // main
@@ -65,8 +65,7 @@
                                 self.enterRoom(room);
                             }
                         });
-                        // user defaults
-                        userSettings.update(loginResult.userSettings);
+                        userSettings(new UserSettings(loginResult.userSettings));
                     })
                     .catch(function(err) {
                         notification.addError(err.message);
@@ -91,6 +90,7 @@
                     }));
                 })
                 .then(function() {
+                    userSettings(UserSettings.default);
                     authentication.logout();
                 })
                 .catch(function(err) {
@@ -100,6 +100,16 @@
 
         hub.client.onLoggedOut = function(userName) {
             notification.addInfo(userName + ' just logged out.');
+        };
+
+        // ... save user settings
+        self.saveUserSettings = function() {
+            if (authentication.isLoggedIn()) {
+                hub.server.saveUserSettings(authentication.userName(), ko.toJS(userSettings()))
+                    .catch(function(err) {
+                        notification.addError(err.message);
+                    });
+            }
         };
 
         // chat
@@ -158,7 +168,7 @@
         self.enterRoom = function(room) {
             if (!self.attendedRooms.contains(room)) {
                 hub.server.enterRoom(room.hostName, room.name, authentication.userName());
-                room.joinTable.afterRoomEntered = userSettings.joinTableAfterRoomEntered();
+                room.joinTable.afterRoomEntered = userSettings().joinTableAfterRoomEntered();
             }
         };
 
@@ -231,7 +241,7 @@
         self.createTable = function(room, gameName) {
             if (authentication.isLoggedIn() && authentication.userName() === room.hostName) {
                 hub.server.createTable(room.hostName, room.name, gameName);
-                room.joinTable.afterTableCreated = userSettings.joinTableAfterTableCreated();
+                room.joinTable.afterTableCreated = userSettings().joinTableAfterTableCreated();
             }
         };
 

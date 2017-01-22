@@ -1,18 +1,13 @@
 ﻿define(['knockout'], function(ko) {
 
-    function UserSettings() {
+    function UserSettings(userSettingsState) {
         var self = this;
 
-        self.joinTableAfterRoomEntered = ko.observable(false);
-        self.joinTableAfterTableCreated = ko.observable(true);
-
-        self.update = function(userSettingsState) {
-            self.joinTableAfterRoomEntered(userSettingsState.joinTableAfterRoomEntered);
-            self.joinTableAfterTableCreated(userSettingsState.joinTableAfterTableCreated);
-        };
+        self.joinTableAfterRoomEntered = ko.observable(userSettingsState.joinTableAfterRoomEntered);
+        self.joinTableAfterTableCreated = ko.observable(userSettingsState.joinTableAfterTableCreated);
     }
 
-    UserSettings.instance = new UserSettings();
+    UserSettings.default = new UserSettings({});
 
     return UserSettings;
 });

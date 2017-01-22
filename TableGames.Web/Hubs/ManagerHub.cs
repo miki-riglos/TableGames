@@ -64,6 +64,16 @@ namespace TableGames.Web.Hubs
             }
         }
 
+        public void SaveUserSettings(string userName, UserSettings userSettings) {
+            Player player;
+            if (_players.TryGetValue(userName, out player)) {
+                player.UserSettings = userSettings;
+            }
+            else {
+                throw new HubException("Save User Settings error.");
+            }
+        }
+
         // Chat
         public void SendMessage(string userName, string message) {
             Clients.All.onMessageSent(userName, message);
