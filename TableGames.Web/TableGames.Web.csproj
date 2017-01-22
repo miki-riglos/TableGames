@@ -200,6 +200,7 @@
     <Content Include="TG.Scripts\extensions\gameScriptLoader.js" />
     <Content Include="TG.Scripts\gameProvider.js" />
     <Content Include="TG.Scripts\notification.js" />
+    <Content Include="TG.Scripts\userSettings.js" />
     <Content Include="TG.Scripts\table.js" />
     <Content Include="TG.Scripts\room.js" />
     <Content Include="TG.Scripts\player.js" />

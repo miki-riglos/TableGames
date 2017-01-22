@@ -7,10 +7,12 @@ namespace TableGames.Domain
     {
         public string Name { get; set; }
         public ConcurrentDictionary<string, Room> Rooms { get; set; }
+        public UserSettings UserSettings { get; set; }
 
         public Player(string name) {
             Name = name;
             Rooms = new ConcurrentDictionary<string, Room>();
+            UserSettings = new UserSettings();
         }
 
         public Room AddRoom(string roomName) {
@@ -50,6 +52,5 @@ namespace TableGames.Domain
                 rooms = Rooms.Values.Select(r => r.ToClient())
             };
         }
-
     }
 }

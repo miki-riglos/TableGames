@@ -49,6 +49,12 @@
         };
 
         self.beeper = new Beeper();
+
+        // flags for joining table automatically
+        self.joinTable = {
+            afterRoomEntered: false,
+            afterTableCreated: false
+        };
     }
 
     return Room;

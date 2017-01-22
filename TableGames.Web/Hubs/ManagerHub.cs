@@ -44,11 +44,13 @@ namespace TableGames.Web.Hubs
                     throw new HubException("Login error.");
                 }
             }
-            var attendedRoom = _players.Values.SelectMany(p => p.Rooms.Values)
+
+            return new {
+                attendedRooms = _players.Values.SelectMany(p => p.Rooms.Values)
                                     .Where(r => r.PlayerAttendees.Any(p => p.Name == userName))
-                                    .Select(r => r.ToClient())
-                                    .ToList();
-            return attendedRoom;
+                                    .Select(r => r.ToClient()),
+                userSettings = player.UserSettings.ToClient()
+            };
         }
 
         public void Logout(string userName) {

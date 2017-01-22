@@ -1,4 +1,4 @@
-﻿define(['knockout', 'jquery', 'notification', 'authentication', 'chat', 'player', 'gameProvider'], function(ko, $, Notification, Authentication, Chat, Player, gameProvider) {
+﻿define(['knockout', 'jquery', 'notification', 'authentication', 'chat', 'player', 'gameProvider', 'userSettings'], function(ko, $, Notification, Authentication, Chat, Player, gameProvider, UserSettings) {
 
     function Manager(hub) {
         var self = this;
@@ -19,6 +19,10 @@
         // authentication
         var authentication = Authentication.instance;
         self.authentication = authentication;
+
+        // user settings
+        var userSettings = UserSettings.instance;
+        self.userSettings = userSettings;
 
         // main
         self.userPlayer = ko.computed(function() { return players.first(function(player) { return player.name === authentication.userName(); }); });
@@ -42,25 +46,27 @@
         self.login = function() {
             if (!authentication.isLoggedIn() && authentication.nameToLogin()) {
                 hub.server.login(authentication.nameToLogin())
-                    .then(function(attendedRoomState) {
+                    .then(function(loginResult) {
                         // leave rooms attended anonymously
                         return $.when.apply($, self.attendedRooms().map(function(room) {
                             return self.leaveRoom(room);
                         })).then(function() {
-                            return attendedRoomState;
+                            return loginResult;
                         });
                     })
-                    .then(function(attendedRoomState) {
+                    .then(function(loginResult) {
                         // login
                         authentication.login();
                         // enter attended roomNames
-                        attendedRoomState.forEach(function(roomState) {
+                        loginResult.attendedRooms.forEach(function(roomState) {
                             var host = getPlayer(roomState.hostName);
                             var room = host ? host.getRoom(roomState.name) : null;
                             if (room) {
                                 self.enterRoom(room);
                             }
                         });
+                        // user defaults
+                        userSettings.update(loginResult.userSettings);
                     })
                     .catch(function(err) {
                         notification.addError(err.message);
@@ -152,6 +158,7 @@
         self.enterRoom = function(room) {
             if (!self.attendedRooms.contains(room)) {
                 hub.server.enterRoom(room.hostName, room.name, authentication.userName());
+                room.joinTable.afterRoomEntered = userSettings.joinTableAfterRoomEntered();
             }
         };
 
@@ -182,6 +189,9 @@
                         userGameState.inProgress = true;
                         room.table().setUserGame(userGameState);
                     }
+                }
+                if (room.joinTable.afterRoomEntered && room.table() && room.table().canJoin()) {
+                    self.joinTable(room.table());
                 }
             }
         };
@@ -221,6 +231,7 @@
         self.createTable = function(room, gameName) {
             if (authentication.isLoggedIn() && authentication.userName() === room.hostName) {
                 hub.server.createTable(room.hostName, room.name, gameName);
+                room.joinTable.afterTableCreated = userSettings.joinTableAfterTableCreated();
             }
         };
 
@@ -228,6 +239,9 @@
             var room = getPlayer(hostName).getRoom(roomName);
             room.createTable(tableState);
             notification.addInfo(tableState.gameName + ' opened in room ' + hostName + '/' + roomName + '.');
+            if (room.joinTable.afterTableCreated) {
+                self.joinTable(room.table());
+            }
         };
 
         // ... join
