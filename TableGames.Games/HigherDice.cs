@@ -2,14 +2,14 @@
 using System.Linq;
 using TableGames.Domain;
 
-namespace TableGames.Games.Doubt
+namespace TableGames.Games
 {
-    [GameDescriptor("DoubtInitial", "doubtInitial")]
-    public class DoubtInitial : Game
+    [GameDescriptor("Higher Dice", IsTableGame = true)]
+    public class HigherDice : Game
     {
         public List<PlayerCup> PlayerCups { get; set; }
 
-        public DoubtInitial(Table table) : base(table) {
+        public HigherDice(Table table) : base(table) {
             PlayerCups = new List<PlayerCup>(Table.Players.Select(p => new PlayerCup(p)));
 
             rollDices(PlayerCups);

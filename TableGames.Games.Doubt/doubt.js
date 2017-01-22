@@ -1,4 +1,4 @@
-﻿define(['knockout', 'tmpl!Doubt/doubt', 'game!Doubt/dice', 'game!Doubt/playerCup', 'tmpl!Doubt/stats', 'tmpl!Doubt/dial'], function(ko, doubtTemplateName, Dice, PlayerCup, statsTemplateName, dialTemplateName) {
+﻿define(['knockout', 'tmpl!Doubt/doubt', 'game!dice', 'game!playerCup', 'tmpl!Doubt/stats', 'tmpl!dial'], function(ko, doubtTemplateName, Dice, PlayerCup, statsTemplateName, dialTemplateName) {
 
     function Doubt(gameConfig, gameState, table) {
         var self = this;

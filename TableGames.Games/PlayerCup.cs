@@ -2,7 +2,7 @@
 using System.Linq;
 using TableGames.Domain;
 
-namespace TableGames.Games.Doubt
+namespace TableGames.Games
 {
     public enum LockStatus
     {
@@ -17,10 +17,10 @@ namespace TableGames.Games.Doubt
         public List<Dice> Dices { get; set; }
         public LockStatus LockStatus { get; set; }
 
-        public PlayerCup(Player player, PlayerBag playerBag) {
+        public PlayerCup(Player player, int dicesQuantity, LockStatus lockStatus) {
             Player = player;
-            Dices = new List<Dice>(Enumerable.Range(1, playerBag.DicesQuantity).Select(i => new Dice(true)));
-            LockStatus = playerBag.LockStatus;
+            Dices = new List<Dice>(Enumerable.Range(1, dicesQuantity).Select(i => new Dice(true)));
+            LockStatus = lockStatus;
         }
 
         public PlayerCup(Player player) {

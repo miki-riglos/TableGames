@@ -1,6 +1,6 @@
-﻿define(['knockout', 'jquery', 'tmpl!Doubt/doubtInitial', 'game!Doubt/dice', 'game!Doubt/playerCup'], function(ko, $, doubtInitialTemplateName, Dice, PlayerCup) {
+﻿define(['knockout', 'jquery', 'tmpl!higherDice', 'game!dice', 'game!playerCup'], function(ko, $, higherDiceTemplateName, Dice, PlayerCup) {
 
-    function DoubtInitial(gameConfig, gameState, table) {
+    function HigherDice(gameConfig, gameState, table) {
         var self = this;
         var playerPromises = {};
 
@@ -42,7 +42,7 @@
             self.isEnded(gameState.isEnded);
         });
     }
-    DoubtInitial.templateName = doubtInitialTemplateName;
+    HigherDice.templateName = higherDiceTemplateName;
 
     function delay() {
         var dfd = $.Deferred();
@@ -50,5 +50,5 @@
         return dfd.promise();
     }
 
-    return DoubtInitial;
+    return HigherDice;
 });

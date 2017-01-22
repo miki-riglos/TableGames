@@ -1,4 +1,4 @@
-﻿define(['knockout', 'jquery', 'tmpl!Doubt/dice'], function(ko, $, diceTemplateName) {
+﻿define(['knockout', 'jquery', 'tmpl!dice'], function(ko, $, diceTemplateName) {
 
     function Dice(diceState, doubt) {
         var self = this;

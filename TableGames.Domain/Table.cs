@@ -45,9 +45,9 @@ namespace TableGames.Domain
         public void Start() {
             InstanceGameName = GameName;
             if (Status != TableStatus.Started) {
-                var initialGameName = $"{GameName}Initial";
-                if (GameInfo.Registry.Any(gi => gi.Name == initialGameName)) {
-                    InstanceGameName = initialGameName;
+                var initialGameType = GameInfo.Registry.FirstOrDefault(gi => gi.Name == GameName)?.InitialGameType;
+                if (initialGameType != null) {
+                    InstanceGameName = GameInfo.Registry.First(gi => gi.Type == initialGameType).Name;
                 }
             }
             if (Status == TableStatus.Ended) {

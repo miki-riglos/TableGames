@@ -36,7 +36,7 @@
         self.setState = function(currentState) {
             players(currentState.players.map(function(playerState) { return new Player(playerState); }));
             self.gameNames = currentState.gameInfoRegistry
-                                            .filter(function(gameInfo) { return gameInfo.isOption; })
+                                            .filter(function(gameInfo) { return gameInfo.isTableGame; })
                                             .map(function(gameInfo) { return gameInfo.name; });
             gameProvider.register(currentState.gameInfoRegistry);
             notification.addInfo('Connection established.');

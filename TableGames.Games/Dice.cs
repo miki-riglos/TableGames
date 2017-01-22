@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TableGames.Games.Doubt
+namespace TableGames.Games
 {
     public class Dice
     {

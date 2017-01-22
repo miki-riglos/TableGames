@@ -2,8 +2,17 @@
 
     return {
         load: function(name, req, onLoad, config) {
+            var data = {
+                fileName: name
+            };
+
             var parts = name.split('/');
-            var fileUrl = '/GameTemplate?gameName=' + parts[0] + '&fileName=' + parts[1];
+            if (parts.length > 1) {
+                data.gameName = parts[0];
+                data.fileName = parts[1];
+            }
+
+            var fileUrl = '/GameTemplate?' + $.param(data);
 
             req(['text!' + fileUrl], function(templateText) {
                 var $container = $(templateText);

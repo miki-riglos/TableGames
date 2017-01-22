@@ -257,6 +257,10 @@
       <Project>{efdcbb53-75dd-4735-955b-8651c48c1405}</Project>
       <Name>TableGames.Games.TicTacToe</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TableGames.Games\TableGames.Games.csproj">
+      <Project>{02b10a7e-ac22-4c5b-9c69-69ac1d635354}</Project>
+      <Name>TableGames.Games</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

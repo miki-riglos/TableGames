@@ -1,4 +1,4 @@
-﻿define(['knockout', 'game!Doubt/dice'], function(ko, Dice) {
+﻿define(['knockout', 'game!dice'], function(ko, Dice) {
 
     function PlayerCup(playerCupState, doubt) {
         var self = this;

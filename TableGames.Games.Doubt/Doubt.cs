@@ -4,7 +4,7 @@ using TableGames.Domain;
 
 namespace TableGames.Games.Doubt
 {
-    [GameDescriptor("Doubt", "doubt")]
+    [GameDescriptor("Doubt", InitialGameType = typeof(HigherDice))]
     public class Doubt : Game
     {
         public List<PlayerCup> PlayerCups { get; set; }
@@ -28,7 +28,7 @@ namespace TableGames.Games.Doubt
                 }
             }
 
-            PlayerCups = new List<PlayerCup>(getPlayerBags().Select(kvp => new PlayerCup(kvp.Key, kvp.Value)));
+            PlayerCups = new List<PlayerCup>(getPlayerBags().Select(kvp => new PlayerCup(kvp.Key, kvp.Value.DicesQuantity, kvp.Value.LockStatus)));
             Quantity = 0;
             Dice = new Dice() { IsExposed = true };
 

@@ -1,0 +1,15 @@
+﻿<template id="higherDiceTemplate">
+    <div class="tg-higherdice">
+        <div data-bind="foreach: { data: playerCups, as: 'cup' }">
+            <div class="row">
+                <div class="col-xs-4">
+                    <span data-bind="text: cup.playerName"></span>
+                </div>
+
+                <div class="col-xs-8" data-bind="template: { name: 'diceTemplate', foreach: cup.dices }"></div>
+            </div>
+        </div>
+    </div>
+</template>
+
+

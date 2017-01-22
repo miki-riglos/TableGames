@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableGames.Domain", "TableG
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableGames.Games.Doubt", "TableGames.Games.Doubt\TableGames.Games.Doubt.csproj", "{5A785B03-1A69-4972-8660-084B4AA70F5E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableGames.Games", "TableGames.Games\TableGames.Games.csproj", "{02B10A7E-AC22-4C5B-9C69-69AC1D635354}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{5A785B03-1A69-4972-8660-084B4AA70F5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A785B03-1A69-4972-8660-084B4AA70F5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A785B03-1A69-4972-8660-084B4AA70F5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02B10A7E-AC22-4C5B-9C69-69AC1D635354}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02B10A7E-AC22-4C5B-9C69-69AC1D635354}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02B10A7E-AC22-4C5B-9C69-69AC1D635354}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02B10A7E-AC22-4C5B-9C69-69AC1D635354}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

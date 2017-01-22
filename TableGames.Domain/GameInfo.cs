@@ -3,22 +3,25 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace TableGames.Domain
 {
     public class GameInfo
     {
-        public string Name { get; set; }
+        public string Name { get; private set; }
         public string UrlName { get { return Name.Replace(" ", string.Empty); } }
-        public Type Type { get; set; }
-        public string ConstructorFileName { get; set; }
-        public IEnumerable<Type> ActionTypes { get; set; }
+        public Type Type { get; private set; }
+        public string ConstructorFileName { get; private set; }
+        public IEnumerable<Type> ActionTypes { get; private set; }
+        public Type InitialGameType { get; private set; }
+        public bool IsTableGame { get; private set; }
 
         public object ToClient() {
             return new {
                 name = Name,
                 constructorFileName = $"{UrlName}/{ConstructorFileName}",
-                isOption = !Name.EndsWith("Initial")
+                isTableGame = IsTableGame
             };
         }
 
@@ -36,7 +39,9 @@ namespace TableGames.Domain
                                 Name = gameDescriptor.Name,
                                 Type = type,
                                 ConstructorFileName = gameDescriptor.ConstructorFileName,
-                                ActionTypes = actionsRegistry.Where(t => t.GetConstructor(new[] { type }) != null)
+                                ActionTypes = actionsRegistry.Where(t => t.GetConstructor(new[] { type }) != null),
+                                InitialGameType = gameDescriptor.InitialGameType,
+                                IsTableGame = gameDescriptor.IsTableGame
                             };
                         });
         });
@@ -71,7 +76,7 @@ namespace TableGames.Domain
                 return gameResource;
             }
 
-            var gameAssembly = GameInfo.Registry.First(gi => gi.UrlName == gameName).Type.Assembly;
+            var gameAssembly = getGameAssembly(gameName);
             var resourceName = gameAssembly.GetManifestResourceNames().First(name => name.EndsWith($"{fileName}.{fileExtension}"));
             using (Stream stream = gameAssembly.GetManifestResourceStream(resourceName)) {
                 using (var reader = new StreamReader(stream)) {
@@ -86,7 +91,7 @@ namespace TableGames.Domain
 #else
         private static string getGameResource(string gameName, string fileName, string fileExtension) {
             string gameResource;
-            var gameAssembly = GameInfo.Registry.First(gi => gi.UrlName == gameName).Type.Assembly;
+            var gameAssembly = getGameAssembly(gameName);
             var resourcePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"../{gameAssembly.GetName().Name}/{fileName}.{fileExtension}");
             using (StreamReader reader = new StreamReader(resourcePath)) {
                 gameResource = reader.ReadToEnd();
@@ -94,5 +99,16 @@ namespace TableGames.Domain
             return gameResource;
         }
 #endif
+
+        private static Assembly getGameAssembly(string gameName) {
+            Assembly gameAssembly;
+            if (string.IsNullOrEmpty(gameName)) {
+                gameAssembly = AppDomain.CurrentDomain.GetAssemblies().First(a => a.FullName.StartsWith("TableGames.Games, Version="));
+            }
+            else {
+                gameAssembly = GameInfo.Registry.First(gi => gi.UrlName == gameName).Type.Assembly;
+            }
+            return gameAssembly;
+        }
     }
 }
