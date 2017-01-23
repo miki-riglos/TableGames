@@ -22,9 +22,10 @@ namespace TableGames.Games
                 maxPlayerCups = PlayerCups.Where(pc => pc.Dices.Last().Value == maxDiceValue).ToList();
             }
 
-            var winner = maxPlayerCups.First().Player;
-            Winners.Add(winner);
-            Table.SetNextPlayer(winner);
+            var winnerPlayerCup = maxPlayerCups.First();
+            winnerPlayerCup.Dices.Last().IsHighlighted = true;
+            Winners.Add(winnerPlayerCup.Player);
+            Table.SetNextPlayer(winnerPlayerCup.Player);
 
             IsEnded = true;
         }

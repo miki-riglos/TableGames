@@ -1,4 +1,4 @@
-﻿define(['knockout', 'tmpl!Doubt/doubt', 'game!dice', 'game!playerCup', 'tmpl!Doubt/stats', 'tmpl!dial'], function(ko, doubtTemplateName, Dice, PlayerCup, statsTemplateName, dialTemplateName) {
+﻿define(['knockout', 'tmpl!Doubt/doubt', 'game!dice', 'game!Doubt/doubtPlayerCup', 'tmpl!Doubt/doubtStats', 'tmpl!dial'], function(ko, doubtTemplateName, Dice, DoubtPlayerCup, doubtStatsTemplateName, dialTemplateName) {
 
     function Doubt(gameConfig, gameState, table) {
         var self = this;
@@ -8,7 +8,7 @@
         self.hasLock = gameState.hasLock;
         self.actualQuantity = ko.observable(gameState.actualQuantity);
 
-        self.playerCups = gameState.playerCups.map(function(playerCupState) { return new PlayerCup(playerCupState, self); });
+        self.playerCups = gameState.playerCups.map(function(playerCupState) { return new DoubtPlayerCup(playerCupState); });
         self.playerCups.update = function(playerCupsState) {
             playerCupsState.forEach(function(playerCupState, index) {
                 self.playerCups[index].updateDices(playerCupState.dices);
@@ -69,7 +69,7 @@
         };
     }
     Doubt.templateName = doubtTemplateName;
-    Doubt.statsTemplateName = statsTemplateName;
+    Doubt.statsTemplateName = doubtStatsTemplateName;
 
     Doubt.ActionConstructors = [
         function BetAction(gameConfig, game, table) {

@@ -9,6 +9,7 @@ namespace TableGames.Games
         public bool IsExposed { get; set; }
         public int Value { get; set; }
         public int RollCount { get; private set; }
+        public bool IsHighlighted { get; set; }
 
         public Dice(bool roll = false) {
             IsExposed = false;
@@ -27,7 +28,8 @@ namespace TableGames.Games
             return new {
                 isExposed = IsExposed,
                 value = IsExposed || includeValue ? Value : 0,
-                rollCount = RollCount
+                rollCount = RollCount,
+                isHighlighted = IsHighlighted
             };
         }
     }

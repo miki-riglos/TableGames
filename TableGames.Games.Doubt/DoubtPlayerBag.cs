@@ -1,6 +1,6 @@
 ﻿namespace TableGames.Games.Doubt
 {
-    public class PlayerBag {
+    public class DoubtPlayerBag {
         public int DicesQuantity { get; set; }
         public LockStatus LockStatus { get; set; }
     }

@@ -1,11 +1,12 @@
 ﻿define(['knockout', 'jquery', 'tmpl!dice'], function(ko, $, diceTemplateName) {
 
-    function Dice(diceState, doubt) {
+    function Dice(diceState) {
         var self = this;
 
         self.isExposed = ko.observable(diceState.isExposed);
         self.value = ko.observable(diceState.value);
         self.rollCount = diceState.rollCount || 0;
+        self.isHighlighted = ko.observable(diceState.isHighlighted);
 
         // roll dice
         self.roll = function(value) {
@@ -27,25 +28,7 @@
         };
 
         self.color = ko.computed(function() { return self.isExposed() ? '#545454' : '#939393'; });
-
-        self.isHighlighted = ko.observable(false);
-
-        self.backgroundColor = ko.computed({
-            read: function() {
-                var backgroundColor = 'white';
-                if (self.isHighlighted()) {
-                    backgroundColor = '#d9edf7';
-                } else {
-                    if (doubt && doubt.isEnded()) {
-                        if (doubt.dice.value() === self.value() || self.value() === 1) {
-                            backgroundColor = '#d9edf7';
-                        }
-                    }
-                }
-                return backgroundColor;
-            },
-            deferEvaluation: true
-        });
+        self.backgroundColor = ko.computed(function() { return self.isHighlighted() ? '#d9edf7' : 'white'; });
     }
     Dice.templateName = diceTemplateName;
 

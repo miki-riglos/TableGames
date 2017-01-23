@@ -7,15 +7,15 @@ namespace TableGames.Games.Doubt
     [GameDescriptor("Doubt", InitialGameType = typeof(HigherDice))]
     public class Doubt : Game
     {
-        public List<PlayerCup> PlayerCups { get; set; }
+        public List<DoubtPlayerCup> PlayerCups { get; set; }
         public int Quantity { get; set; }
         public Dice Dice { get; set; }
         public bool HasLock { get; set; }
-        public int ActualQuantity { get; set; }
         public GameAction EndAction { get; private set; }
         public Player DiceLoser { get; private set; }
         public Player DiceWinner { get; private set; }
         public bool HasBet { get { return Dice.Value > 0; } }
+        public int ActualQuantity { get { return PlayerCups.SelectMany(pc => pc.Dices).Count(d => d.Value == Dice.Value || d.Value == 1); } }
 
         public Doubt(Table table) : base(table) {
             HasLock = false;
@@ -28,7 +28,7 @@ namespace TableGames.Games.Doubt
                 }
             }
 
-            PlayerCups = new List<PlayerCup>(getPlayerBags().Select(kvp => new PlayerCup(kvp.Key, kvp.Value.DicesQuantity, kvp.Value.LockStatus)));
+            PlayerCups = new List<DoubtPlayerCup>(getPlayerBags().Select(kvp => new DoubtPlayerCup(kvp.Key, kvp.Value)));
             Quantity = 0;
             Dice = new Dice() { IsExposed = true };
 
@@ -41,15 +41,6 @@ namespace TableGames.Games.Doubt
                     Table.SetNextPlayer();
                 }
             }
-        }
-
-        public int GetActualQuantity() {
-            var actualQuantiy = PlayerCups.SelectMany(pc => pc.Dices).Count(d => d.Value == Dice.Value);
-            // add wildcards
-            if (Dice.Value > 1) {
-                actualQuantiy += PlayerCups.SelectMany(pc => pc.Dices).Count(d => d.Value == 1);
-            }
-            return actualQuantiy;
         }
 
         public void SetPlayerDicesQty(Player player, int delta) {
@@ -76,6 +67,11 @@ namespace TableGames.Games.Doubt
                 var playerLocking = PlayerCups.First(pc => pc.LockStatus == LockStatus.Locking).Player;
                 getPlayerBags()[playerLocking].LockStatus = LockStatus.Unavailable;
             }
+
+            // highlight matching dices
+            foreach (var matchingDice in PlayerCups.SelectMany(pc => pc.Dices).Where(d => d.Value == Dice.Value || d.Value == 1)) {
+                matchingDice.IsHighlighted = true;
+            }            
 
             // check if table ends
             var playersWithDices = getPlayerBags().Where(kvp => kvp.Value.DicesQuantity > 0).Select(kvp => kvp.Key);
@@ -137,13 +133,13 @@ namespace TableGames.Games.Doubt
             };
         }
 
-        private Dictionary<Player, PlayerBag> getPlayerBags() {
-            Dictionary<Player, PlayerBag> playerBags;
+        private Dictionary<Player, DoubtPlayerBag> getPlayerBags() {
+            Dictionary<Player, DoubtPlayerBag> playerBags;
             var bagKey = "PlayerBag";
             if (!Table.Bag.ContainsKey(bagKey)) {
                 playerBags = Table.Players.ToDictionary(
                     p => p, 
-                    p => new PlayerBag() {
+                    p => new DoubtPlayerBag() {
                         DicesQuantity = 5,
                         LockStatus = LockStatus.Available
                     }
@@ -151,7 +147,7 @@ namespace TableGames.Games.Doubt
                 Table.Bag.Add(bagKey, playerBags);
             }
             else {
-                playerBags = (Dictionary<Player, PlayerBag>)Table.Bag[bagKey];
+                playerBags = (Dictionary<Player, DoubtPlayerBag>)Table.Bag[bagKey];
             }
 
             return playerBags;
@@ -266,7 +262,6 @@ namespace TableGames.Games.Doubt
                 throw new TableGamesException("Invalid action.");
             };
 
-            _doubt.ActualQuantity = _doubt.GetActualQuantity();
             if (_doubt.Quantity > _doubt.ActualQuantity) {
                 _doubt.Winners.Add(_doubt.Table.ActivePlayer);
                 _doubt.SetPlayerDicesQty(_doubt.Table.GetPreviousPlayer(_doubt.Table.ActivePlayer), -1);
@@ -303,7 +298,6 @@ namespace TableGames.Games.Doubt
                 throw new TableGamesException("Invalid action.");
             };
 
-            _doubt.ActualQuantity = _doubt.GetActualQuantity();
             if (_doubt.Quantity == _doubt.ActualQuantity) {
                 _doubt.Winners.Add(_doubt.Table.ActivePlayer);
                 _doubt.SetPlayerDicesQty(_doubt.Table.ActivePlayer, 1);

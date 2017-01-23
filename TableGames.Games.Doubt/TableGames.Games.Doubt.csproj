@@ -40,7 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PlayerBag.cs" />
+    <Compile Include="DoubtPlayerCup.cs" />
+    <Compile Include="DoubtPlayerBag.cs" />
     <Compile Include="Doubt.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -61,7 +62,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="stats.html" />
+    <EmbeddedResource Include="doubtStats.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="doubtPlayerCup.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
