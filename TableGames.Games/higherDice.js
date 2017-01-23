@@ -37,14 +37,13 @@
             return playerCup;
         });
 
-        // set active player
+        // set active player after animation
         self.isEnded = ko.observable(false);
-        playerPromises[gameState.table.activePlayerName].then(function() {
+        self.initPromise = playerPromises[gameState.table.activePlayerName].then(function() {
             winnerDice.isHighlighted(true);
             table.activePlayerName(gameState.table.activePlayerName);
             self.isEnded(gameState.isEnded);
         });
-
     }
     HigherDice.templateName = higherDiceTemplateName;
 

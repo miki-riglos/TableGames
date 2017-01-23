@@ -44,7 +44,6 @@
 
         self.changeGame = function(playerName, actionName, gameChangeResults) {
             gamePromise = gamePromise.then(function() {
-                if (!self) return;  // in case table was destroyed before game change
                 self.game().change(playerName, actionName, gameChangeResults);
             });
         };
@@ -52,6 +51,9 @@
         self.startGame = function(tableState, gameConfig) {
             self.stats(tableState.stats);
             gamePromise = gamePromise
+                            .then(function() {
+                                return self.game() && self.game().initPromise;  // make sure current game is done before creating next one
+                            })
                             .then(function() {
                                 self.game(null);    // avoid game/template mismatch
                                 return gameProvider.createGame(tableState.instanceGameName, gameConfig, tableState.game);
@@ -65,14 +67,12 @@
         // user game
         self.setUserGame = function(userGameState) {
             gamePromise = gamePromise.then(function() {
-                if (!self) return;  // in case table was destroyed before game change
                 self.game().setUserGame(userGameState);
             });
         };
 
         self.changeUserGame = function(actionName, userGameChangeResults) {
             gamePromise = gamePromise.then(function() {
-                if (!self) return;  // in case table was destroyed before game change
                 self.game().changeUserGame(actionName, userGameChangeResults);
             });
         };
