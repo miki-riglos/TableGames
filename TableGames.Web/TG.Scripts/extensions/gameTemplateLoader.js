@@ -1,18 +1,8 @@
-﻿define(['jquery'], function($) {
+﻿define(['jquery', 'extensions/gameNameParser'], function($, gameNameParser) {
 
     return {
         load: function(name, req, onLoad, config) {
-            var data = {
-                fileName: name
-            };
-
-            var parts = name.split('/');
-            if (parts.length > 1) {
-                data.gameName = parts[0];
-                data.fileName = parts[1];
-            }
-
-            var fileUrl = '/GameTemplate?' + $.param(data);
+            var fileUrl = '/GameTemplate?' + $.param(gameNameParser(name));
 
             req(['text!' + fileUrl], function(templateText) {
                 var $container = $(templateText);

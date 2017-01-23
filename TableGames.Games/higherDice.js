@@ -1,4 +1,4 @@
-﻿define(['knockout', 'jquery', 'tmpl!higherDice', 'game!dice', 'game!playerCup'], function(ko, $, higherDiceTemplateName, Dice, PlayerCup) {
+﻿define(['knockout', 'jquery', 'tmpl!higherDice', 'game!dice', 'game!playerCup', 'game!delay'], function(ko, $, higherDiceTemplateName, Dice, PlayerCup, delay) {
 
     function HigherDice(gameConfig, gameState, table) {
         var self = this;
@@ -38,7 +38,7 @@
         });
 
         // set active player after animation
-        self.isEnded = ko.observable(false);
+        self.isEnded = ko.observable(false);    // reset
         self.initPromise = playerPromises[gameState.table.activePlayerName].then(function() {
             winnerDice.isHighlighted(true);
             table.activePlayerName(gameState.table.activePlayerName);
@@ -46,12 +46,6 @@
         });
     }
     HigherDice.templateName = higherDiceTemplateName;
-
-    function delay() {
-        var dfd = $.Deferred();
-        setTimeout(function() { dfd.resolve(); }, 1000);
-        return dfd.promise();
-    }
 
     return HigherDice;
 });

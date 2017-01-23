@@ -27,7 +27,6 @@ require(['ko-ext', 'jquery', 'manager'], function(ko, $, Manager) {
     // bootstrap events
     // ... user settings modal
     $('#tgUserSettings').on('hide.bs.modal', function() {
-        manager.saveUserSettings()
-    })
-
+        manager.saveUserSettings();
+    });
 });
