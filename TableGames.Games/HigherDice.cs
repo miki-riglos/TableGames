@@ -41,10 +41,6 @@ namespace TableGames.Games
             };
         }
 
-        public override object ToStats() {
-            return null;
-        }
-
         private void rollDices(List<PlayerCup> playerCups) {
             foreach (var playerCup in playerCups) {
                 playerCup.Dices.Add(new Dice(true) { IsExposed = true });

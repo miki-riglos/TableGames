@@ -43,11 +43,13 @@ namespace TableGames.Domain
         }
 
         public void Start() {
+            var isInitialGame = false;
             InstanceGameName = GameName;
             if (Status != TableStatus.Started) {
                 var initialGameType = GameInfo.Registry.FirstOrDefault(gi => gi.Name == GameName)?.InitialGameType;
                 if (initialGameType != null) {
                     InstanceGameName = GameInfo.Registry.First(gi => gi.Type == initialGameType).Name;
+                    isInitialGame = true;
                 }
             }
             if (Status == TableStatus.Ended) {
@@ -57,6 +59,7 @@ namespace TableGames.Domain
             }
             Status = TableStatus.Started;
             Game = GameInfo.CreateGame(InstanceGameName, this);
+            Game.IsInitialGame = isInitialGame;
             Games.Add(Game);
         }
 
@@ -102,7 +105,7 @@ namespace TableGames.Domain
         }
 
         public IEnumerable<object> GetStats() {
-            return Games.Select(g => g.ToStats()).Where(s => s != null);
+            return Games.Where(g => !g.IsInitialGame).Select(g => g.ToStats());
         }
 
         public object ToClient() {

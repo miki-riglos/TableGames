@@ -7,6 +7,7 @@ namespace TableGames.Domain
     public abstract class Game
     {
         public Table Table { get; private set; }
+        public bool IsInitialGame { get; set; }
         public bool IsEnded { get; set; }
         public List<Player> Winners { get; protected set; }
         public List<GameAction> Actions { get; protected set; }

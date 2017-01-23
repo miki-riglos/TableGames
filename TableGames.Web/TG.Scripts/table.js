@@ -49,10 +49,9 @@
         };
 
         self.startGame = function(tableState, gameConfig) {
-            self.stats(tableState.stats);
             gamePromise = gamePromise
                             .then(function() {
-                                return self.game() && self.game().initPromise;  // make sure current game is done before creating next one
+                                return self.game() && self.game().initPromise;  // make sure current game initialized before creating next one
                             })
                             .then(function() {
                                 self.game(null);    // avoid game/template mismatch
@@ -60,6 +59,10 @@
                             })
                             .then(function(game) {
                                 self.game(game);
+                                return game.initPromise;
+                            })
+                            .then(function() {
+                                self.stats(tableState.stats);   // update stats after new game is initialized
                             });
         };
         self.canRestartGame = ko.computed(function() { return self.room.isHost() && self.isStarted() && self.game() && self.game().isEnded(); });
