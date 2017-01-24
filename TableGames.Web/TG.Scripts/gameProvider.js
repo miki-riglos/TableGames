@@ -8,6 +8,10 @@
         });
     }
 
+    function getGameInfo(gameName) {
+        return registry[gameName];
+    }
+
     function createGame(gameName, gameConfig, gameState) {
         var dfd = $.Deferred();
 
@@ -65,6 +69,7 @@
 
     return {
         register: register,
+        getGameInfo: getGameInfo,
         createGame: createGame
     };
 });

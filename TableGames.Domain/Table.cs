@@ -13,6 +13,9 @@ namespace TableGames.Domain
 
     public class Table
     {
+        private object _lock = new object();
+        private GameInfo _gameInfo;
+
         public string GameName { get; private set; }
         public string InstanceGameName { get; private set; }
         public TableStatus Status { get; private set; }
@@ -32,35 +35,52 @@ namespace TableGames.Domain
             Games = new List<Game>();
             Winners = new List<Player>();
             Bag = new Dictionary<string, object>();
+
+            _gameInfo = GameInfo.Registry.First(gi => gi.Name == gameName);
         }
 
         public void AddPlayer(Player player) {
+            if (Status != TableStatus.Open) {
+                throw new TableGamesException("Table is no longer open.");
+            }
+            if (Players.Count >= _gameInfo.MaxPlayers) {
+                throw new TableGamesException("Table has the maximum number of players.");
+            }
             Players.Add(player);
         }
 
         public void RemovePlayer(Player player) {
+            if (Status != TableStatus.Open) {
+                throw new TableGamesException("Table is no longer open.");
+            }
             Players.Remove(player);
         }
 
         public void Start() {
-            var isInitialGame = false;
-            InstanceGameName = GameName;
-            if (Status != TableStatus.Started) {
-                var initialGameType = GameInfo.Registry.FirstOrDefault(gi => gi.Name == GameName)?.InitialGameType;
-                if (initialGameType != null) {
-                    InstanceGameName = GameInfo.Registry.First(gi => gi.Type == initialGameType).Name;
-                    isInitialGame = true;
+            // if user has more than one connection, auto-start will call this method more than once
+            lock (_lock) {
+                if (Game != null && !Game.IsEnded) {
+                    return;
                 }
+                var isInitialGame = false;
+                InstanceGameName = GameName;
+                if (Status != TableStatus.Started) {
+                    var initialGameType = GameInfo.Registry.FirstOrDefault(gi => gi.Name == GameName)?.InitialGameType;
+                    if (initialGameType != null) {
+                        InstanceGameName = GameInfo.Registry.First(gi => gi.GameType == initialGameType).Name;
+                        isInitialGame = true;
+                    }
+                }
+                if (Status == TableStatus.Ended) {
+                    ActivePlayer = null;
+                    Winners = new List<Player>();
+                    Bag = new Dictionary<string, object>();
+                }
+                Status = TableStatus.Started;
+                Game = GameInfo.CreateGame(InstanceGameName, this);
+                Game.IsInitialGame = isInitialGame;
+                Games.Add(Game);
             }
-            if (Status == TableStatus.Ended) {
-                ActivePlayer = null;
-                Winners = new List<Player>();
-                Bag = new Dictionary<string, object>();
-            }
-            Status = TableStatus.Started;
-            Game = GameInfo.CreateGame(InstanceGameName, this);
-            Game.IsInitialGame = isInitialGame;
-            Games.Add(Game);
         }
 
         public void SetNextPlayer() {

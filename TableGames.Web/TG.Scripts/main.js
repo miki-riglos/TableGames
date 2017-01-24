@@ -12,12 +12,10 @@ define('jquery', function() { return window.jQuery; });    // already loaded in 
 
 require(['ko-ext', 'jquery', 'manager'], function(ko, $, Manager) {
 
-    var hub = $.connection.managerHub;
-
-    var manager = new Manager(hub);
+    var manager = Manager.instance;
 
     $.connection.hub.start().then(function() {
-        hub.server.getState().then(function(currentState) {
+        manager.hub.server.getState().then(function(currentState) {
             manager.setState(currentState);
         });
     });

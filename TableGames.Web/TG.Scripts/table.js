@@ -1,7 +1,8 @@
-﻿define(['knockout', 'jquery', 'authentication', 'gameProvider'], function(ko, $, Authentication, gameProvider) {
+﻿define(['knockout', 'jquery', 'authentication', 'gameProvider', 'game!delay'], function(ko, $, Authentication, gameProvider, delay) {
 
     function Table(tableState, room) {
         var self = this;
+        var gameInfo = gameProvider.getGameInfo(tableState.gameName);
         var authentication = Authentication.instance;
         var gamePromise = $.when();
 
@@ -25,6 +26,14 @@
 
         self.addPlayerName = function(playerName) {
             self.playerNames.push(playerName);
+            if (self.canStart() && self.playerNames().length === gameInfo.maxPlayers) {
+                delay.repeat(3).then(function() {
+                    if (self.canStart() && self.playerNames().length === gameInfo.maxPlayers) {
+                        var manager = require('manager').instance;  // require here to avoid circular reference
+                        manager.startTable(self);
+                    }
+                });
+            }
         };
         self.removePlayerName = function(playerName) {
             self.playerNames.remove(playerName);
@@ -32,7 +41,7 @@
 
         self.hasJoined = ko.computed(function() { return self.playerNames.contains(authentication.userName()); });
 
-        self.canJoin = ko.computed(function() { return authentication.isLoggedIn() && !self.isStarted() && !self.hasJoined(); });
+        self.canJoin = ko.computed(function() { return authentication.isLoggedIn() && !self.isStarted() && !self.hasJoined() && self.playerNames().length < gameInfo.maxPlayers; });
         self.canLeave = ko.computed(function() { return authentication.isLoggedIn() && !self.isStarted() && self.hasJoined(); });
 
         self.start = function(tableState, gameConfig) {

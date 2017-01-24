@@ -12,6 +12,8 @@
             return player;
         };
 
+        self.hub = hub;
+
         // notification
         var notification = Notification.instance;
         self.notification = notification;
@@ -370,6 +372,8 @@
             return gameConfig;
         }
     }
+
+    Manager.instance = new Manager($.connection.managerHub);
 
     return Manager;
 });

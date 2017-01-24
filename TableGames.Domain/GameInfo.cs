@@ -4,24 +4,28 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using TableGames.Domain.Extensions;
 
 namespace TableGames.Domain
 {
-    public class GameInfo
+    public class GameInfo : GameDescriptorAttribute
     {
-        public string Name { get; private set; }
-        public string UrlName { get { return Name.Replace(" ", string.Empty); } }
-        public Type Type { get; private set; }
-        public string ConstructorFileName { get; private set; }
+        public Type GameType { get; private set; }
         public IEnumerable<Type> ActionTypes { get; private set; }
-        public Type InitialGameType { get; private set; }
-        public bool IsTableGame { get; private set; }
+
+        public GameInfo(GameDescriptorAttribute gameDescriptor, Type gameType, IEnumerable<Type> actionTypes) {
+            this.SetPropertiesFrom(gameDescriptor);
+            GameType = gameType;
+            ActionTypes = actionTypes;
+        }
 
         public object ToClient() {
             return new {
                 name = Name,
                 constructorFileName = $"{UrlName}/{ConstructorFileName}",
-                isTableGame = IsTableGame
+                isTableGame = IsTableGame,
+                minPlayers = MinPlayers,
+                maxPlayers = MaxPlayers
             };
         }
 
@@ -33,16 +37,10 @@ namespace TableGames.Domain
             return AppDomain.CurrentDomain.GetAssemblies()
                         .SelectMany(a => a.GetTypes())
                         .Where(type => typeof(Game).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
-                        .Select(type => {
-                            var gameDescriptor = (GameDescriptorAttribute)type.GetCustomAttributes(typeof(GameDescriptorAttribute), false).FirstOrDefault();
-                            return new GameInfo() {
-                                Name = gameDescriptor.Name,
-                                Type = type,
-                                ConstructorFileName = gameDescriptor.ConstructorFileName,
-                                ActionTypes = actionsRegistry.Where(t => t.GetConstructor(new[] { type }) != null),
-                                InitialGameType = gameDescriptor.InitialGameType,
-                                IsTableGame = gameDescriptor.IsTableGame
-                            };
+                        .Select(gameType => {
+                            var gameDescriptor = (GameDescriptorAttribute)gameType.GetCustomAttributes(typeof(GameDescriptorAttribute), false).FirstOrDefault();
+                            var actionTypes = actionsRegistry.Where(t => t.GetConstructor(new[] { gameType }) != null);
+                            return new GameInfo(gameDescriptor, gameType, actionTypes);
                         });
         });
 
@@ -50,7 +48,7 @@ namespace TableGames.Domain
 
         public static Game CreateGame(string gameName, Table table) {
             var gameInfo = Registry.First(gi => gi.Name == gameName);
-            var game = (Game)Activator.CreateInstance(gameInfo.Type, table);
+            var game = (Game)Activator.CreateInstance(gameInfo.GameType, table);
 
             game.Actions.AddRange(gameInfo.ActionTypes.Select(actionType => (GameAction)Activator.CreateInstance(actionType, game)));
 
@@ -106,7 +104,7 @@ namespace TableGames.Domain
                 gameAssembly = AppDomain.CurrentDomain.GetAssemblies().First(a => a.FullName.StartsWith("TableGames.Games, Version="));
             }
             else {
-                gameAssembly = GameInfo.Registry.First(gi => gi.UrlName == gameName).Type.Assembly;
+                gameAssembly = GameInfo.Registry.First(gi => gi.UrlName == gameName).GameType.Assembly;
             }
             return gameAssembly;
         }
