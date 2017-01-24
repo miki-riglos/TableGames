@@ -39,28 +39,42 @@ namespace TableGames.Domain
             _gameInfo = GameInfo.Registry.First(gi => gi.Name == gameName);
         }
 
-        public void AddPlayer(Player player) {
+        public bool AddPlayer(Player player) {
             if (Status != TableStatus.Open) {
                 throw new TableGamesException("Table is no longer open.");
             }
             if (Players.Count >= _gameInfo.MaxPlayers) {
                 throw new TableGamesException("Table has the maximum number of players.");
             }
-            Players.Add(player);
+            lock (_lock) {
+                bool success = false;
+                if (!Players.Contains(player)) {
+                    Players.Add(player);
+                    success = true;
+                }
+                return success;
+            }
         }
 
-        public void RemovePlayer(Player player) {
+        public bool RemovePlayer(Player player) {
             if (Status != TableStatus.Open) {
                 throw new TableGamesException("Table is no longer open.");
             }
-            Players.Remove(player);
+            lock (_lock) {
+                bool success = false;
+                if (Players.Contains(player)) {
+                    Players.Remove(player);
+                    success = true;
+                }
+                return success;
+            }
         }
 
-        public void Start() {
+        public bool Start() {
             // if user has more than one connection, auto-start will call this method more than once
             lock (_lock) {
                 if (Game != null && !Game.IsEnded) {
-                    return;
+                    return false;
                 }
                 var isInitialGame = false;
                 InstanceGameName = GameName;
@@ -80,6 +94,7 @@ namespace TableGames.Domain
                 Game = GameInfo.CreateGame(InstanceGameName, this);
                 Game.IsInitialGame = isInitialGame;
                 Games.Add(Game);
+                return true;
             }
         }
 

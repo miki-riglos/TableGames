@@ -167,14 +167,10 @@ namespace TableGames.Web.Hubs
             var room = _getPlayer(hostName).GetRoom(roomName);
             var player = _getPlayer(playerName);
 
-            if (!room.Table.Players.Contains(player)) {
-                room.Table.AddPlayer(player);
+            if (room.Table.AddPlayer(player)) {
                 room.GetGroups().ForEach(groupId => {
                     Clients.Group(groupId).onPlayerJoinedTable(hostName, roomName, playerName);
                 });
-            }
-            else {
-                throw new HubException("JoinTable error.");
             }
         }
 
@@ -182,30 +178,26 @@ namespace TableGames.Web.Hubs
             var room = _getPlayer(hostName).GetRoom(roomName);
             var player = _getPlayer(playerName);
 
-            if (room.Table.Players.Contains(player) && room.Table.Status == TableStatus.Open) {
-                room.Table.RemovePlayer(player);
+            if (room.Table.RemovePlayer(player)) {
                 room.GetGroups().ForEach(groupId => {
                     Clients.Group(groupId).onPlayerLeftTable(hostName, roomName, playerName);
                 });
-            }
-            else {
-                throw new HubException("LeaveTable error.");
             }
         }
 
         public void StartTable(string hostName, string roomName) {
             var room = _getPlayer(hostName).GetRoom(roomName);  // will throw if player is not host
 
-            room.Table.Start();
+            if (room.Table.Start()) {
+                // initial game state
+                room.GetGroups().ForEach(groupId => {
+                    Clients.Group(groupId).onTableStarted(hostName, roomName, room.Table.ToClient());
+                });
 
-            // initial game state
-            room.GetGroups().ForEach(groupId => {
-                Clients.Group(groupId).onTableStarted(hostName, roomName, room.Table.ToClient());
-            });
-
-            // initial players state
-            foreach (var kvp in room.Table.Game.GetPlayerGameStates()) {
-                Clients.Group(kvp.Key.Name).onUserGameStarted(hostName, roomName, kvp.Value);
+                // initial players state
+                foreach (var kvp in room.Table.Game.GetPlayerGameStates()) {
+                    Clients.Group(kvp.Key.Name).onUserGameStarted(hostName, roomName, kvp.Value);
+                }
             }
         }
 
@@ -229,9 +221,7 @@ namespace TableGames.Web.Hubs
         public void RestartGame(string hostName, string roomName) {
             var room = _getPlayer(hostName).GetRoom(roomName);  // will throw if player is not host
 
-            if (room.Table.Game.IsEnded) {
-                room.Table.Start();
-
+            if (room.Table.Start()) {
                 // initial game state
                 room.GetGroups().ForEach(groupId => {
                     Clients.Group(groupId).onGameRestarted(hostName, roomName, room.Table.ToClient());
@@ -241,9 +231,6 @@ namespace TableGames.Web.Hubs
                 foreach (var kvp in room.Table.Game.GetPlayerGameStates()) {
                     Clients.Group(kvp.Key.Name).onUserGameStarted(hostName, roomName, kvp.Value);
                 }
-            }
-            else {
-                throw new HubException("RestartGame error.");
             }
         }
 
