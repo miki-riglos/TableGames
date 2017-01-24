@@ -288,7 +288,7 @@
 
         // ... start
         self.startTable = function(table) {
-            if (authentication.userName() === table.room.hostName) {
+            if (table.canStart()) {
                 hub.server.startTable(table.room.hostName, table.room.name);
             }
         };
@@ -332,7 +332,7 @@
         // ... ... restart game
         self.restartGame = function(table) {
             var room = table.room;
-            if (authentication.userName() === room.hostName) {
+            if (table.canRestartGame()) {
                 hub.server.restartGame(room.hostName, room.name);
             }
         };

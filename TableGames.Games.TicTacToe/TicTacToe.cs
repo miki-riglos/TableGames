@@ -4,7 +4,7 @@ using TableGames.Domain;
 
 namespace TableGames.Games.TicTacToe
 {
-    [GameDescriptor("Tic Tac Toe", MaxPlayers = 2)]
+    [GameDescriptor("Tic Tac Toe", MaxPlayers = 2, AutoRestartAfter = 0)]
     public class TicTacToe : Game
     {
         public List<AssignedBox> Board { get; private set; }

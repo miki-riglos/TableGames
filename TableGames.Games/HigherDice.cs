@@ -4,7 +4,7 @@ using TableGames.Domain;
 
 namespace TableGames.Games
 {
-    [GameDescriptor("Higher Dice", IsTableGame = true)]
+    [GameDescriptor("Higher Dice", AutoRestartAfter = 0)]
     public class HigherDice : Game
     {
         public List<PlayerCup> PlayerCups { get; set; }

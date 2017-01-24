@@ -2,9 +2,12 @@
 
     function Table(tableState, room) {
         var self = this;
-        var gameInfo = gameProvider.getGameInfo(tableState.gameName);
+        var manager = require('manager').instance;  // require here to avoid circular reference
         var authentication = Authentication.instance;
         var gamePromise = $.when();
+
+        var gameInfo = gameProvider.getGameInfo(tableState.gameName);
+        self.gameInfo = gameInfo;
 
         self.gameName = tableState.gameName;
         self.status = ko.observable(tableState.status);
@@ -26,10 +29,9 @@
 
         self.addPlayerName = function(playerName) {
             self.playerNames.push(playerName);
-            if (self.canStart() && self.playerNames().length === gameInfo.maxPlayers) {
-                delay.repeat(3).then(function() {
-                    if (self.canStart() && self.playerNames().length === gameInfo.maxPlayers) {
-                        var manager = require('manager').instance;  // require here to avoid circular reference
+            if (self.canStart() && gameInfo.autoStartAfter && self.playerNames().length === gameInfo.maxPlayers) {
+                delay.repeat(gameInfo.autoStartAfter).then(function() {
+                    if (self.playerNames().length === gameInfo.maxPlayers) {
                         manager.startTable(self);
                     }
                 });
@@ -68,6 +70,17 @@
                             })
                             .then(function(game) {
                                 self.game(game);
+                                // auto restart game
+                                if (gameInfo.autoRestartAfter) {
+                                    var subscription = game.isEnded.subscribe(function(isEnded) {
+                                        if (isEnded) {
+                                            delay.repeat(gameInfo.autoRestartAfter).then(function() {
+                                                manager.restartGame(self);
+                                            });
+                                            subscription.dispose();
+                                        }
+                                    });
+                                }
                                 return game.initPromise;
                             })
                             .then(function() {

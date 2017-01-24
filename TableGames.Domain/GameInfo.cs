@@ -25,7 +25,9 @@ namespace TableGames.Domain
                 constructorFileName = $"{UrlName}/{ConstructorFileName}",
                 isTableGame = IsTableGame,
                 minPlayers = MinPlayers,
-                maxPlayers = MaxPlayers
+                maxPlayers = MaxPlayers,
+                autoStartAfter = AutoStartAfter,
+                autoRestartAfter = AutoRestartAfter
             };
         }
 
