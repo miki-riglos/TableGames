@@ -1,4 +1,30 @@
-﻿<template id="tableTemplate">
+﻿<style>
+    .tg-table, .tg-table .panel-heading, .tg-table .panel-heading .badge {
+        transition: all .5s ease-in-out;
+    }
+
+    .tg-table-players-metrics {
+        margin-bottom: 10px;
+    }
+
+    .tg-table-players-indicator span {
+        font-size: 20px;
+        color: #777;
+        transform: rotate(90deg);
+        transition: all .5s ease-in-out;
+    }
+
+        .tg-table-players-indicator span.tg-player-in {
+            color: #337ab7;
+            transform: rotate(0deg);
+        }
+
+        .tg-table-players-indicator span.tg-player-min {
+            font-size: 22px;
+        }
+</style>
+
+<template id="tableTemplate">
     <div class="panel panel-default tg-table" data-bind="css: hasJoined() ? 'panel-primary' : 'panel-default'">
         <div class="panel-heading">
             <!-- ko if: game -->
@@ -8,9 +34,19 @@
             <span data-bind="text: gameName"></span>
         </div>
         <div class="panel-body">
-            <!-- ko if: status() === 'Open' -->
-            Waiting for players to join.
-            <!-- /ko -->
+            <div class="tg-table-open" data-bind="if: status() === 'Open'">
+                <p>Waiting for players to join.</p>
+                <div class="row tg-table-players-metrics">
+                    <div class="col-sm-4">Min: <span class="badge" data-bind="text: gameInfo.minPlayers"></span></div>
+                    <div class="col-sm-4">Current: <span class="badge" data-bind="text: playerNames().length"></span></div>
+                    <div class="col-sm-4">Max: <span class="badge" data-bind="text: gameInfo.maxPlayers"></span></div>
+                </div>
+                <div class="row tg-table-players-indicator">
+                    <div class="col-sm-12" data-bind="foreach: Array(gameInfo.maxPlayers)">
+                        <span class="glyphicon glyphicon-play-circle" data-bind="css: { 'tg-player-in': $index() + 1 <= $parent.playerNames().length, 'tg-player-min': $index() + 1 === $parent.gameInfo.minPlayers } " aria-hidden="true"></span>
+                    </div>
+                </div>
+            </div>
 
             <!-- ko if: game -->
             <!-- ko template: { name: gameTemplateName, data: game } --><!-- /ko -->

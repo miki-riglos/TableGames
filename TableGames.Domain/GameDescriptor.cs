@@ -21,7 +21,7 @@ namespace TableGames.Domain
             ConstructorFileName = (name.Substring(0, 1).ToLower() + name.Substring(1)).Replace(" ", string.Empty);
             IsTableGame = true;
             MinPlayers = 2;
-            MaxPlayers = int.MaxValue;
+            MaxPlayers = 10;
             AutoStartAfter = 3;
             AutoRestartAfter = 4;
         }

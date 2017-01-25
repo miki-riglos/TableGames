@@ -31,7 +31,7 @@
             self.playerNames.push(playerName);
             if (self.canStart() && gameInfo.autoStartAfter && self.playerNames().length === gameInfo.maxPlayers) {
                 delay.repeat(gameInfo.autoStartAfter).then(function() {
-                    if (self.playerNames().length === gameInfo.maxPlayers) {
+                    if (self.playerNames().length === gameInfo.maxPlayers && room.table() === self) {
                         manager.startTable(self);
                     }
                 });
@@ -51,7 +51,7 @@
             self.winnerNames.removeAll();
             self.startGame(tableState, gameConfig);
         };
-        self.canStart = ko.computed(function() { return self.room.isHost() && !self.isStarted(); });
+        self.canStart = ko.computed(function() { return self.room.isHost() && self.playerNames().length >= gameInfo.minPlayers && !self.isStarted(); });
 
         self.changeGame = function(playerName, actionName, gameChangeResults) {
             gamePromise = gamePromise.then(function() {
@@ -75,7 +75,9 @@
                                     var subscription = game.isEnded.subscribe(function(isEnded) {
                                         if (isEnded) {
                                             delay.repeat(gameInfo.autoRestartAfter).then(function() {
-                                                manager.restartGame(self);
+                                                if (room.table() === self) {    // if still current table
+                                                    manager.restartGame(self);
+                                                }
                                             });
                                             subscription.dispose();
                                         }

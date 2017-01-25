@@ -99,21 +99,25 @@ namespace TableGames.Domain
         }
 
         public void SetNextPlayer() {
-            if (ActivePlayer == null) {
-                ActivePlayer = Players[0];
-            }
-            else {
-                var activeIndex = Players.IndexOf(ActivePlayer);
-                activeIndex = activeIndex < (Players.Count - 1) ? activeIndex + 1 : 0;
-                ActivePlayer = Players[activeIndex];
-                if (Game.IsEliminated(ActivePlayer)) {
-                    SetNextPlayer();
+            lock (_lock) {
+                if (ActivePlayer == null) {
+                    ActivePlayer = Players[0];
+                }
+                else {
+                    var activeIndex = Players.IndexOf(ActivePlayer);
+                    activeIndex = activeIndex < (Players.Count - 1) ? activeIndex + 1 : 0;
+                    ActivePlayer = Players[activeIndex];
+                    if (Game.IsEliminated(ActivePlayer)) {
+                        SetNextPlayer();
+                    }
                 }
             }
         }
 
         public void SetNextPlayer(Player player) {
-            ActivePlayer = player;
+            lock (_lock) {
+                ActivePlayer = player;
+            }
         }
 
         public Player GetPreviousPlayer(Player player) {
@@ -130,7 +134,9 @@ namespace TableGames.Domain
         }
 
         public GameChangeResult ChangeGame(string playerName, string actionName, JObject gameChangeParameters) {
-            return Game.Change(playerName, actionName, gameChangeParameters);
+            lock (_lock) {
+                return Game.Change(playerName, actionName, gameChangeParameters);
+            }
         }
 
         public void End(IEnumerable<Player> winners) {
