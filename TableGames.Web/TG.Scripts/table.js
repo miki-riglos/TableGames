@@ -62,7 +62,10 @@
         self.startGame = function(tableState, gameConfig) {
             gamePromise = gamePromise
                             .then(function() {
-                                return self.game() && self.game().initPromise;  // make sure current game initialized before creating next one
+                                return self.game() && self.game().activate();   // make sure current game has been activated before creating next one
+                            })
+                            .then(function() {
+                                return self.game() && self.game().deactivate(); // make sure current game has been deactivated before creating next one
                             })
                             .then(function() {
                                 self.game(null);    // avoid game/template mismatch
@@ -83,7 +86,7 @@
                                         }
                                     });
                                 }
-                                return game.initPromise;
+                                return game.activate();
                             })
                             .then(function() {
                                 self.stats(tableState.stats);   // update stats after new game is initialized

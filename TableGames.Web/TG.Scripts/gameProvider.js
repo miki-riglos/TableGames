@@ -53,7 +53,8 @@
             game.setUserGame = game.setUserGame || function(userGameState) { };
             game.changeUserGame = game.changeUserGame || function(actionName, userGameChangeResults) { };
 
-            game.initPromise = game.initPromise || $.when();
+            game.activate = game.activate || $.when;
+            game.deactivate = game.deactivate || $.when;
 
             // templates
             game.table.gameTemplateName(Constructor.templateName);
