@@ -21,10 +21,4 @@ require(['ko-ext', 'jquery', 'manager'], function(ko, $, Manager) {
     });
 
     ko.applyBindings(manager);
-
-    // bootstrap events
-    // ... user settings modal
-    $('#tgUserSettings').on('hide.bs.modal', function() {
-        manager.saveUserSettings();
-    });
 });

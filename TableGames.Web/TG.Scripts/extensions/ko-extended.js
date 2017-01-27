@@ -56,6 +56,23 @@
         }
     };
 
+    // ... popover
+    ko.bindingHandlers.popover = {
+        init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+            var options = valueAccessor() || {};
+
+            if (options.target) {
+                options.html = true;
+                options.content = function() {
+                    return $(options.target).html();
+                };
+                options.container = 'body';
+            }
+
+            $(element).popover(options);
+        }
+    };
+
     return ko;
 });
 

@@ -71,6 +71,16 @@
     Doubt.templateName = doubtTemplateName;
     Doubt.statsTemplateName = doubtStatsTemplateName;
 
+    function PossibleBet(minQuantity, minDiceValue, maxDiceValue) {
+        var self = this;
+
+        self.minQuantity = Math.floor(minQuantity);
+        self.validDices = [];
+        for (var i = minDiceValue; i <= maxDiceValue; i++) {
+            self.validDices.push(new Dice({ isExposed: true, value: i }));
+        }
+    }
+
     Doubt.ActionConstructors = [
         function BetAction(gameConfig, game, table) {
             var self = this;
@@ -125,6 +135,28 @@
 
             // roll other dices
             self.rollOthers = ko.observable(false);
+
+            // possible bets
+            self.possibleBets = ko.computed(function() {
+                var possibleBets = [];
+                var quantity = game.quantity();
+                var diceValue = game.dice.value();
+
+                if (diceValue === 0) {
+                    possibleBets.push(new PossibleBet(quantity + 1, 1, 6));
+                } else if (diceValue === 1) {
+                    possibleBets.push(new PossibleBet(quantity + 1, 1, 1));
+                    possibleBets.push(new PossibleBet(quantity * 2 + 1, 2, 6));
+                } else if (diceValue <= 6) {
+                    possibleBets.push(new PossibleBet(quantity / 2 + 1, 1, 1));
+                    possibleBets.push(new PossibleBet(quantity + 1, 2, diceValue));
+                    if (diceValue < 6) {
+                        possibleBets.push(new PossibleBet(quantity, diceValue + 1, 6));
+                    }
+                }
+
+                return possibleBets;
+            }).extend({ deferred: true });
 
             self.getParameters = function() {
                 return {
