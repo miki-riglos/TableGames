@@ -191,7 +191,7 @@ namespace TableGames.Web.Hubs
             if (room.Table.Start()) {
                 // initial game state
                 room.GetGroups().ForEach(groupId => {
-                    Clients.Group(groupId).onTableStarted(hostName, roomName, room.Table.ToClient());
+                    Clients.Group(groupId).onTableStarted(hostName, roomName, room.Table.Token, room.Table.ToClient());
                 });
 
                 // initial players state
@@ -202,14 +202,18 @@ namespace TableGames.Web.Hubs
         }
 
         // ... Games
-        public void ChangeGame(string hostName, string roomName, string playerName, string actionName, JObject gameChangeParameters) {
+        public void ChangeGame(string hostName, string roomName, int tableToken, string playerName, string actionName, JObject gameChangeParameters) {
             var room = _getPlayer(hostName).GetRoom(roomName);  // will throw if player is not host
+
+            if (!room.Table.IsValidToken(tableToken)) {
+                return;
+            }
 
             var gameChangeResult = room.Table.ChangeGame(playerName, actionName, gameChangeParameters);
 
             // game state
             room.GetGroups().ForEach(groupId => {
-                Clients.Group(groupId).onGameChanged(hostName, roomName, playerName, actionName, gameChangeResult.GameState);
+                Clients.Group(groupId).onGameChanged(hostName, roomName, room.Table.Token, playerName, actionName, gameChangeResult.GameState);
             });
 
             // players state
@@ -218,13 +222,17 @@ namespace TableGames.Web.Hubs
             }
         }
 
-        public void RestartGame(string hostName, string roomName) {
+        public void RestartGame(string hostName, string roomName, int tableToken) {
             var room = _getPlayer(hostName).GetRoom(roomName);  // will throw if player is not host
+
+            if (!room.Table.IsValidToken(tableToken)) {
+                return;
+            }
 
             if (room.Table.Start()) {
                 // initial game state
                 room.GetGroups().ForEach(groupId => {
-                    Clients.Group(groupId).onGameRestarted(hostName, roomName, room.Table.ToClient());
+                    Clients.Group(groupId).onGameRestarted(hostName, roomName, room.Table.Token, room.Table.ToClient());
                 });
 
                 // initial players state

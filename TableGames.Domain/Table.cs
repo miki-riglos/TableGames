@@ -13,11 +13,14 @@ namespace TableGames.Domain
 
     public class Table
     {
-        private object _lock = new object();
+        private object _lock = new object();    // lock for methods (entry points) that requires single-threaded execution
+        private int _token = 0;                 // token for methods that have to be executed sequentially
+
         private GameInfo _gameInfo;
 
         public string GameName { get; private set; }
         public string InstanceGameName { get; private set; }
+        public int Token { get { return _token;  }  }
         public TableStatus Status { get; private set; }
         public List<Player> Players { get; private set; }
         public Player ActivePlayer { get; private set; }
@@ -70,12 +73,15 @@ namespace TableGames.Domain
             }
         }
 
+        public bool IsValidToken(int token) {
+            return token == _token;
+        }
+
         public bool Start() {
-            // if user has more than one connection, auto-start will call this method more than once
+            if (Game != null && !Game.IsEnded) {
+                return false;
+            }
             lock (_lock) {
-                if (Game != null && !Game.IsEnded) {
-                    return false;
-                }
                 var isInitialGame = false;
                 InstanceGameName = GameName;
                 if (Status != TableStatus.Started) {
@@ -94,30 +100,27 @@ namespace TableGames.Domain
                 Game = GameInfo.CreateGame(InstanceGameName, this);
                 Game.IsInitialGame = isInitialGame;
                 Games.Add(Game);
+                _token++;
                 return true;
             }
         }
 
         public void SetNextPlayer() {
-            lock (_lock) {
-                if (ActivePlayer == null) {
-                    ActivePlayer = Players[0];
-                }
-                else {
-                    var activeIndex = Players.IndexOf(ActivePlayer);
-                    activeIndex = activeIndex < (Players.Count - 1) ? activeIndex + 1 : 0;
-                    ActivePlayer = Players[activeIndex];
-                    if (Game.IsEliminated(ActivePlayer)) {
-                        SetNextPlayer();
-                    }
+            if (ActivePlayer == null) {
+                ActivePlayer = Players[0];
+            }
+            else {
+                var activeIndex = Players.IndexOf(ActivePlayer);
+                activeIndex = activeIndex < (Players.Count - 1) ? activeIndex + 1 : 0;
+                ActivePlayer = Players[activeIndex];
+                if (Game.IsEliminated(ActivePlayer)) {
+                    SetNextPlayer();
                 }
             }
         }
 
         public void SetNextPlayer(Player player) {
-            lock (_lock) {
-                ActivePlayer = player;
-            }
+            ActivePlayer = player;
         }
 
         public Player GetPreviousPlayer(Player player) {
@@ -135,7 +138,9 @@ namespace TableGames.Domain
 
         public GameChangeResult ChangeGame(string playerName, string actionName, JObject gameChangeParameters) {
             lock (_lock) {
-                return Game.Change(playerName, actionName, gameChangeParameters);
+                var gameChangeResult = Game.Change(playerName, actionName, gameChangeParameters);
+                _token++;
+                return gameChangeResult;
             }
         }
 
@@ -153,6 +158,7 @@ namespace TableGames.Domain
             return new {
                 gameName = GameName,
                 instanceGameName = InstanceGameName,
+                token = Token,
                 status = Status.ToString(),
                 playerNames = Players.Select(p => p.Name),
                 game = Game?.ToClient(),

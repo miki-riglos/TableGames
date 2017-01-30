@@ -293,18 +293,20 @@
             }
         };
 
-        hub.client.onTableStarted = function(hostName, roomName, tableState) {
+        hub.client.onTableStarted = function(hostName, roomName, tableToken, tableState) {
             var room = getPlayer(hostName).getRoom(roomName);
             var table = room.table();
+            table.token = tableToken;
 
             table.start(tableState, getGameConfig(room));
             notification.addInfo('Table ' + table.gameName + ' in room ' + hostName + '/' + roomName + ' just started.');
         };
 
         // ... ... games 
-        hub.client.onGameChanged = function(hostName, roomName, playerName, actionName, gameChangeResults) {
+        hub.client.onGameChanged = function(hostName, roomName, tableToken, playerName, actionName, gameChangeResults) {
             var room = getPlayer(hostName).getRoom(roomName);
             var table = room.table();
+            table.token = tableToken;
 
             table.changeGame(playerName, actionName, gameChangeResults);
             notification.addInfo(table.gameName + ' changed in room ' + hostName + '/' + roomName + '.');
@@ -333,13 +335,14 @@
         self.restartGame = function(table) {
             var room = table.room;
             if (table.canRestartGame()) {
-                hub.server.restartGame(room.hostName, room.name);
+                hub.server.restartGame(room.hostName, room.name, table.token);
             }
         };
 
-        hub.client.onGameRestarted = function(hostName, roomName, tableState) {
+        hub.client.onGameRestarted = function(hostName, roomName, tableToken, tableState) {
             var room = getPlayer(hostName).getRoom(roomName);
             var table = room.table();
+            table.token = tableToken;
 
             table.startGame(tableState, getGameConfig(room));
             notification.addInfo('Table ' + table.gameName + ' in room ' + hostName + '/' + roomName + ' just restarted.');
@@ -363,7 +366,7 @@
         function getGameConfig(room) {
             var gameConfig = {
                 sendChangeToServer: function(actionName, gameChangeParameters) {
-                    return hub.server.changeGame(room.hostName, room.name, authentication.userName(), actionName, gameChangeParameters);
+                    return hub.server.changeGame(room.hostName, room.name, room.table().token, authentication.userName(), actionName, gameChangeParameters);
                 },
                 table: room.table(),
                 authentication: authentication,

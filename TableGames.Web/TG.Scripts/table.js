@@ -10,6 +10,7 @@
         self.gameInfo = gameInfo;
 
         self.gameName = tableState.gameName;
+        self.token = tableState.token;
         self.status = ko.observable(tableState.status);
         self.playerNames = ko.observableArray(tableState.playerNames);
         self.activePlayerName = ko.observable(tableState.activePlayerName);
