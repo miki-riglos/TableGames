@@ -41,6 +41,14 @@
     @Html.Partial("_about")
     @Html.Partial("_userSettings")
     
+    <div class="container" data-bind="visible: false" >
+        <div class="progress">
+            <div class="progress-bar progress-bar-striped active" role="progressbar" style="width: 100%">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+
     <div class="container-fluid" style="display: none;" data-bind="visible: true">
         @RenderBody()
     </div>

@@ -30,7 +30,7 @@ namespace TableGames.Domain
                 return gameAction.Execute(gameChangeParameters);
             }
             else {
-                throw new TableGamesException("Game Change error.");
+                throw new TableGamesException("Invalid action.");
             }
         }
 

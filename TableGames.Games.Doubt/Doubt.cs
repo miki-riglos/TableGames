@@ -172,7 +172,7 @@ namespace TableGames.Games.Doubt
             }
 
             if (!isValid(_doubt.Quantity, _doubt.Dice.Value, quantity, diceValue)) {
-                throw new TableGamesException("Invalid bet.");
+                throw new TableGamesException("Invalid action. See possible bets.");
             };
 
             _doubt.Quantity = quantity;
@@ -259,7 +259,7 @@ namespace TableGames.Games.Doubt
 
         public GameChangeResult Execute() {
             if (!_doubt.HasBet) {
-                throw new TableGamesException("Invalid action.");
+                throw new TableGamesException("Invalid action. There is no bet.");
             };
 
             if (_doubt.Quantity > _doubt.ActualQuantity) {
@@ -295,7 +295,7 @@ namespace TableGames.Games.Doubt
 
         public GameChangeResult Execute() {
             if (!_doubt.HasBet || !IsUserAllowed) {
-                throw new TableGamesException("Invalid action.");
+                throw new TableGamesException("Invalid action. Match is only available when less than five dices.");
             };
 
             if (_doubt.Quantity == _doubt.ActualQuantity) {

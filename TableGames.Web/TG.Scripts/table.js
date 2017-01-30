@@ -5,6 +5,7 @@
         var manager = require('manager').instance;  // require here to avoid circular reference
         var authentication = Authentication.instance;
         var gamePromise = $.when();
+        var autoRestartGameSubscription = { dispose: function() { } };
 
         var gameInfo = gameProvider.getGameInfo(tableState.gameName);
         self.gameInfo = gameInfo;
@@ -66,6 +67,7 @@
                                 return self.game() && self.game().activate();   // make sure current game has been activated before creating next one
                             })
                             .then(function() {
+                                autoRestartGameSubscription.dispose();          // make sure auto-restart game subscription is disposed
                                 return self.game() && self.game().deactivate(); // make sure current game has been deactivated before creating next one
                             })
                             .then(function() {
@@ -76,14 +78,14 @@
                                 self.game(game);
                                 // auto restart game
                                 if (gameInfo.autoRestartAfter) {
-                                    var subscription = game.isEnded.subscribe(function(isEnded) {
+                                    autoRestartGameSubscription = game.isEnded.subscribe(function(isEnded) {
                                         if (isEnded) {
                                             delay.repeat(gameInfo.autoRestartAfter).then(function() {
                                                 if (room.table() === self) {    // if still current table
                                                     manager.restartGame(self);
                                                 }
                                             });
-                                            subscription.dispose();
+                                            autoRestartGameSubscription.dispose();
                                         }
                                     });
                                 }

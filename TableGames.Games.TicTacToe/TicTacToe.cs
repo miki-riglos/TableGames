@@ -84,7 +84,7 @@ namespace TableGames.Games.TicTacToe
                 });
             }
             else {
-                throw new TableGamesException("TicTacToe AssignBox error.");
+                throw new TableGamesException("Invalid action. Box must be unassigned.");
             }
         }
     }

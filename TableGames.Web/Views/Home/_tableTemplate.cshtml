@@ -37,12 +37,12 @@
             <div class="tg-table-open" data-bind="if: status() === 'Open'">
                 <p>Waiting for players to join.</p>
                 <div class="row tg-table-players-metrics">
-                    <div class="col-sm-4">Min: <span class="badge" data-bind="text: gameInfo.minPlayers"></span></div>
-                    <div class="col-sm-4">Current: <span class="badge" data-bind="text: playerNames().length"></span></div>
-                    <div class="col-sm-4">Max: <span class="badge" data-bind="text: gameInfo.maxPlayers"></span></div>
+                    <div class="col-xs-4">Min: <span class="badge" data-bind="text: gameInfo.minPlayers"></span></div>
+                    <div class="col-xs-4">Current: <span class="badge" data-bind="text: playerNames().length"></span></div>
+                    <div class="col-xs-4">Max: <span class="badge" data-bind="text: gameInfo.maxPlayers"></span></div>
                 </div>
                 <div class="row tg-table-players-indicator">
-                    <div class="col-sm-12" data-bind="foreach: Array(gameInfo.maxPlayers)">
+                    <div class="col-xs-12" data-bind="foreach: Array(gameInfo.maxPlayers)">
                         <span class="glyphicon glyphicon-play-circle" data-bind="css: { 'tg-player-in': $index() + 1 <= $parent.playerNames().length, 'tg-player-min': $index() + 1 === $parent.gameInfo.minPlayers } " aria-hidden="true"></span>
                     </div>
                 </div>
