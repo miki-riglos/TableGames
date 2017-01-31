@@ -8,6 +8,11 @@
         margin-bottom: 0;
     }
 
+        .tg-room > .navbar .btn-group.pull-right {
+            margin-top: 8px;
+            margin-right: 5px;
+        }
+
         .tg-room > .navbar .navbar-brand[data-toggle="collapse"]::before {
             font-family: 'Glyphicons Halflings';
             font-size: 14px;
@@ -16,10 +21,6 @@
 
         .tg-room > .navbar .navbar-brand[data-toggle="collapse"].collapsed::before {
             content: "\e114";
-        }
-
-        .tg-room > .navbar .navbar-collapse.in {
-            overflow-y: visible; /* make game dropdown list visible when small */
         }
 
         .tg-room > .navbar .btn-toolbar {
@@ -59,6 +60,10 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
+
+                    <!-- createTable-->
+                    <div class="btn-group pull-right hidden-md" role="group" data-bind="visible: canCreateTable, template: 'createTableTemplate'"></div>
+
                     <span class="navbar-brand" data-toggle="collapse" data-bind="attr: { 'data-target': '#' + clientId + '_body_container' }">
                         <span data-bind="text: hostName + '/' + name"></span>
                     </span>
@@ -70,14 +75,7 @@
                 <div class="navbar-collapse collapse" data-bind="attr: { 'id': clientId + '_toolbar_container' }">
                     <div class="btn-toolbar pull-right" role="toolbar">
                         <!-- createTable -->
-                        <div class="btn-group" role="group" data-bind="visible: canCreateTable">
-                            <button type="button" class="btn btn-default dropdown-toggle" data-bind="enable: canCreateTable" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Open Table <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu" data-bind="foreach: $root.gameNames">
-                                <li><a href="#" data-bind="text: $data, click: $root.createTable.bind($parent, $parent, $data)"></a></li>
-                            </ul>
-                        </div>
+                        <div class="btn-group" role="group" data-bind="visible: canCreateTable() && !$root.isSmall(), template: 'createTableTemplate'"></div>
 
                         <!-- ko with: table -->
                         <button type="button" class="btn btn-primary" data-bind="visible: canJoin, click: $root.joinTable">Join Table</button>
@@ -122,4 +120,13 @@
             </div>
         </div>
     </div>
+</template>
+
+<template id="createTableTemplate">
+    <button type="button" class="btn btn-default dropdown-toggle" data-bind="enable: canCreateTable" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Open Table <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" data-bind="foreach: $root.gameNames">
+        <li><a href="#" data-bind="text: $data, click: $root.createTable.bind($parent, $parent, $data)"></a></li>
+    </ul>
 </template>
