@@ -24,7 +24,7 @@
                     Table Games
                 </span>
             </div>
-            <div id="mainNavBar" class="navbar-collapse collapse">
+            <div id="mainNavBar" class="navbar-collapse collapse" data-bind="event: { 'shown.bs.collapse': navbarShown, 'hidden.bs.collapse': navbarHidden }">
                 <ul class="nav navbar-nav">
                     <li><a href="#" data-toggle="modal" data-target="#tgAbout">About</a></li>
                 </ul>

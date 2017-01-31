@@ -26,8 +26,11 @@
         var userSettings = ko.observable(UserSettings.default);
         self.userSettings = userSettings;
 
-        // main
-        // ... visible on small devices
+        // small devices
+        self.navbar = null;
+        self.navbarShown = function(mgr, event) { self.navbar = $(event.target).data('bs.collapse'); };
+        self.navbarHidden = function(mgr, event) { self.navbar = null; };
+
         self.isRoomListVisible = ko.observable(true);
         self.isRoomListVisible.toggle = function() { self.isRoomListVisible(!self.isRoomListVisible()); };
 
@@ -49,11 +52,15 @@
             }
         }
 
-
-        self.userPlayer = ko.computed(function() { return players.first(function(player) { return player.name === authentication.userName(); }); });
+        // main
+        self.userPlayer = ko.computed(function() {
+            return players.first(function(player) { return player.name === authentication.userName(); });
+        });
         self.roomToAdd = ko.observable();
 
-        self.otherPlayers = ko.computed(function() { return players.filter(function(player) { return player.name !== authentication.userName(); }); });
+        self.otherPlayers = ko.computed(function() {
+            return players.filter(function(player) { return player.name !== authentication.userName(); });
+        });
         self.attendedRooms = ko.observableArray();
         self.attendedRooms.subscribe(function(attendedRooms) {
             if (attendedRooms.length === 0) {
@@ -97,6 +104,9 @@
                             }
                         });
                         userSettings(new UserSettings(loginResult.userSettings));
+                        if (self.navbar) {
+                            self.navbar.hide(); // collapse navbar on small devices
+                        }
                     })
                     .catch(function(err) {
                         notification.addError(err.message);
