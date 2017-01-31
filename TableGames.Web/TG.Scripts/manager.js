@@ -28,14 +28,39 @@
 
         // main
         // ... visible on small devices
-        self.showRoomList = ko.observable(true);
-        self.showRoomList.toggle = function() { self.showRoomList(!self.showRoomList()); };
+        self.isRoomListVisible = ko.observable(true);
+        self.isRoomListVisible.toggle = function() { self.isRoomListVisible(!self.isRoomListVisible()); };
+
+        self.isSmall = ko.observable();
+        self.isSmall.subscribe(function(isSmall) {
+            if (!isSmall) {
+                self.isRoomListVisible(true);
+            }
+        })
+
+        self.hideRoomList = function() {
+            if (self.isSmall()) {
+                self.isRoomListVisible(false);
+            }
+        }
+        self.showRoomList = function() {
+            if (self.isSmall()) {
+                self.isRoomListVisible(true);
+            }
+        }
+
 
         self.userPlayer = ko.computed(function() { return players.first(function(player) { return player.name === authentication.userName(); }); });
         self.roomToAdd = ko.observable();
 
         self.otherPlayers = ko.computed(function() { return players.filter(function(player) { return player.name !== authentication.userName(); }); });
         self.attendedRooms = ko.observableArray();
+        self.attendedRooms.subscribe(function(attendedRooms) {
+            if (attendedRooms.length === 0) {
+                self.showRoomList();
+            }
+        });
+
         self.gameNames = [];
 
         // set state
@@ -175,6 +200,7 @@
             if (!self.attendedRooms.contains(room)) {
                 hub.server.enterRoom(room.hostName, room.name, authentication.userName());
                 room.joinTable.afterRoomEntered = userSettings().joinTableAfterRoomEntered();
+                room.isEntering = true;
             }
         };
 
@@ -182,6 +208,10 @@
             var room = getPlayer(hostName).getRoom(roomState.name);
             room.attendance(roomState.attendance);
             notification.addInfo((userName || 'Attendee') + ' entered ' + hostName + '/' + roomState.name + '.');
+            if (room.isEntering) {
+                room.isEntering = false;
+                self.hideRoomList();
+            }
             // update attendedRooms if is userName, avoid dups when multiple logins
             if (authentication.isLoggedIn() && authentication.userName() === userName) {
                 hub.client.onRoomAttended(hostName, roomState, tableState, userGameState);

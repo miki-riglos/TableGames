@@ -18,6 +18,24 @@
     };
 
     // bindings
+    // ... notify visibility
+    ko.bindingHandlers.notifyVisibility = {
+        init: function(element, valueAccessor) {
+            var timeoutId;
+            function updateVisibility() {
+                var isVisible = valueAccessor();
+                isVisible($(element).is(':visible'));
+            }
+
+            $(window).resize(function(event) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(updateVisibility, 250);
+            });
+
+            updateVisibility();
+        }
+    };
+
     // ... onEnter (keyup)
     ko.bindingHandlers.onEnter = {
         init: function(element, valueAccessor, allBindings, viewModel) {
@@ -58,7 +76,7 @@
 
     // ... popover
     ko.bindingHandlers.popover = {
-        init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+        init: function(element, valueAccessor) {
             var options = valueAccessor() || {};
 
             if (options.target) {
@@ -74,7 +92,7 @@
 
     // ... show collapsible
     ko.bindingHandlers.showCollapsible = {
-        update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+        update: function(element, valueAccessor) {
             var showCollapsible = ko.unwrap(valueAccessor());
             $(element).collapse(showCollapsible ? 'show' : 'hide');
         }

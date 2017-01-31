@@ -55,6 +55,8 @@
             afterRoomEntered: false,
             afterTableCreated: false
         };
+        // flag for hiding room list after entering when IsSmall
+        self.isEntering = false;
     }
 
     return Room;
