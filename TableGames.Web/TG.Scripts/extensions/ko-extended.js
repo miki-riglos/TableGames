@@ -66,10 +66,17 @@
                 options.content = function() {
                     return $(options.target).html();
                 };
-                options.container = 'body';
             }
 
             $(element).popover(options);
+        }
+    };
+
+    // ... show collapsible
+    ko.bindingHandlers.showCollapsible = {
+        update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+            var showCollapsible = ko.unwrap(valueAccessor());
+            $(element).collapse(showCollapsible ? 'show' : 'hide');
         }
     };
 

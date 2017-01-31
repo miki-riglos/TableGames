@@ -27,6 +27,10 @@
         self.userSettings = userSettings;
 
         // main
+        // ... visible on small devices
+        self.showRoomList = ko.observable(true);
+        self.showRoomList.toggle = function() { self.showRoomList(!self.showRoomList()); };
+
         self.userPlayer = ko.computed(function() { return players.first(function(player) { return player.name === authentication.userName(); }); });
         self.roomToAdd = ko.observable();
 
