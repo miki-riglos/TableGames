@@ -100,8 +100,8 @@
         <div class="panel-collapse collapse in" data-bind="attr: { 'id': clientId + '_body_container' }">
             <div class="panel-body">
                 <div class="row">
-                    <div class="col-sm-8" data-bind="if: table">
-                        <!-- ko template: { name: 'tableTemplate', data: table } --><!-- /ko -->
+                    <div class="col-sm-8">
+                        <!-- ko template: { name: 'tableTemplate', if: table, data: table } --><!-- /ko -->
                     </div>
 
                     <div class="col-sm-4">
