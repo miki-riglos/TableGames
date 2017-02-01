@@ -98,6 +98,21 @@
         }
     };
 
+    // ... modalWith
+    ko.bindingHandlers.modalWith = {
+        init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+            ko.bindingHandlers['with'].init(element, valueAccessor, allBindings, viewModel, bindingContext);
+            $(element).on('hidden.bs.modal', function(e) {
+                var current = valueAccessor();
+                current(null);
+            });
+        },
+        update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+            var dialog = ko.unwrap(valueAccessor());
+            $(element).modal(dialog ? 'show' : 'hide');
+        }
+    };
+
     return ko;
 });
 

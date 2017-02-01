@@ -1,4 +1,4 @@
-﻿define(['knockout', 'jquery', 'notification', 'authentication', 'chat', 'player', 'gameProvider', 'userSettings'], function(ko, $, Notification, Authentication, Chat, Player, gameProvider, UserSettings) {
+﻿define(['knockout', 'jquery', 'notification', 'dialog', 'authentication', 'chat', 'player', 'gameProvider', 'userSettings'], function(ko, $, Notification, Dialog, Authentication, Chat, Player, gameProvider, UserSettings) {
 
     function Manager(hub) {
         var self = this;
@@ -17,6 +17,8 @@
         // notification
         var notification = Notification.instance;
         self.notification = notification;
+
+        self.dialog = Dialog.current;
 
         // authentication
         var authentication = Authentication.instance;
@@ -395,7 +397,11 @@
         // ... destroy
         self.destroyTable = function(room) {
             if (authentication.userName() === room.hostName) {
-                hub.server.destroyTable(room.hostName, room.name);
+                Dialog.confirm('Are you sure you want to end active table?').then(function(option) {
+                    if (option.label === "Yes") {
+                        hub.server.destroyTable(room.hostName, room.name);
+                    }
+                });
             }
         };
 

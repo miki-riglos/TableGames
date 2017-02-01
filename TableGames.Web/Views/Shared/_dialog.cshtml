@@ -1,0 +1,16 @@
+﻿<div id="tgDialog" class="modal fade" data-bind="modalWith: dialog" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" data-bind="text: title"></h4>
+            </div>
+
+            <div class="modal-body" data-bind="text: message"></div>
+
+            <div class="modal-footer" data-bind="foreach: options">
+                <button type="button" class="btn" data-bind="css: classNames, text: label, click: $parent.selected"></button>
+            </div>
+        </div>
+    </div>
+</div>

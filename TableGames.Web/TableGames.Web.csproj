@@ -200,6 +200,7 @@
     <Content Include="TG.Scripts\extensions\gameNameParser.js" />
     <Content Include="TG.Scripts\extensions\gameScriptLoader.js" />
     <Content Include="TG.Scripts\gameProvider.js" />
+    <Content Include="TG.Scripts\dialog.js" />
     <Content Include="TG.Scripts\notification.js" />
     <Content Include="TG.Scripts\userSettings.js" />
     <Content Include="TG.Scripts\table.js" />
@@ -228,6 +229,7 @@
     <Content Include="Views\Home\_roomTemplate.cshtml" />
     <Content Include="Views\Home\_tableTemplate.cshtml" />
     <Content Include="Views\Shared\_userSettings.cshtml" />
+    <Content Include="Views\Shared\_dialog.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="TG.Scripts\extensions\gameTemplateLoader.js" />
