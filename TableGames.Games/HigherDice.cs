@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using TableGames.Domain;
+using TableGames.Domain.Extensions;
 
 namespace TableGames.Games
 {
@@ -31,14 +32,10 @@ namespace TableGames.Games
         }
 
         public override object ToClient() {
-            return new {
+            var client = new {
                 playerCups = PlayerCups.Select(pc => pc.ToClient()),
-                table = new {
-                    activePlayerName = Table.ActivePlayer?.Name,
-                },
-                isEnded = IsEnded,
-                winnerNames = Winners.Select(p => p.Name)
             };
+            return client.Merge(base.ToClient());
         }
 
         private void rollDices(List<PlayerCup> playerCups) {

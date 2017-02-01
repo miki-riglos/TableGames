@@ -34,7 +34,15 @@ namespace TableGames.Domain
             }
         }
 
-        public abstract object ToClient();
+        public virtual object ToClient() {
+            return new {
+                table = new {
+                    activePlayerName = Table.ActivePlayer?.Name,
+                },
+                isEnded = IsEnded,
+                winnerNames = Winners.Select(p => p.Name)
+            };
+        }
 
         public virtual Dictionary<Player, object> GetPlayerGameStates() {
             return new Dictionary<Player, object>();

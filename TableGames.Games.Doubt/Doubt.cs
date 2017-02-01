@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using TableGames.Domain;
+using TableGames.Domain.Extensions;
 
 namespace TableGames.Games.Doubt
 {
@@ -99,21 +100,17 @@ namespace TableGames.Games.Doubt
         }
 
         public override object ToClient() {
-            return new {
+            var client = new {
                 playerCups = PlayerCups.Select(pc => pc.ToClient()),
                 quantity = Quantity,
                 dice = Dice.ToClient(),
                 hasLock = HasLock,
                 actualQuantity = ActualQuantity,
-                table = new {
-                    activePlayerName = Table.ActivePlayer?.Name,
-                },
-                isEnded = IsEnded,
-                winnerNames = Winners.Select(p => p.Name),
                 endActionName = EndAction?.Name,
                 diceLoserName = DiceLoser?.Name,
                 diceWinnerName = DiceWinner?.Name
             };
+            return client.Merge(base.ToClient());
         }
 
         public override Dictionary<Player, object> GetPlayerGameStates() {
@@ -124,13 +121,12 @@ namespace TableGames.Games.Doubt
         }
 
         public override object ToStats() {
-            return new {
-                isEnded = IsEnded,
-                winnerNames = Winners.Select(p => p.Name),
+            var stats = new {
                 endActionName = EndAction?.Name,
                 diceLoserName = DiceLoser?.Name,
                 diceWinnerName = DiceWinner?.Name
             };
+            return stats.Merge(base.ToStats());
         }
 
         private Dictionary<Player, DoubtPlayerBag> getPlayerBags() {

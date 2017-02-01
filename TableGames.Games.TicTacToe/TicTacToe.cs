@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using TableGames.Domain;
+using TableGames.Domain.Extensions;
 
 namespace TableGames.Games.TicTacToe
 {
@@ -20,15 +21,11 @@ namespace TableGames.Games.TicTacToe
         }
 
         public override object ToClient() {
-            return new {
+            var client = new {
                 board = Board.Select(ab => ab.ToClient()),
-                table = new {
-                    activePlayerName = Table.ActivePlayer?.Name,
-                },
-                isEnded = IsEnded,
-                winningBoxes = WinningBoxes.Select(ab => ab.ToClient()),
-                winnerNames = Winners.Select(p => p.Name)
+                winningBoxes = WinningBoxes.Select(ab => ab.ToClient())
             };
+            return client.Merge(base.ToClient());
         }
 
         public static List<int[]> WinningBoxCombinations = new List<int[]>() {

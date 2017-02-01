@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using Newtonsoft.Json.Linq;
+using System.Linq;
 using System.Reflection;
 
 namespace TableGames.Domain.Extensions
@@ -16,6 +17,14 @@ namespace TableGames.Domain.Extensions
             }
 
             return toObject;
+        }
+
+        public static JObject Merge(this object target, params object[] contents) {
+            var jObject = JObject.FromObject(target);
+            foreach (var content in contents) {
+                jObject.Merge(JObject.FromObject(content));
+            }
+            return jObject;
         }
     }
 }
