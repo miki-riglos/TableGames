@@ -36,7 +36,7 @@
                         var gameChangeParameters = action.getParameters();
                         gameConfig.sendChangeToServer(action.name, gameChangeParameters)
                                   .catch(function(err) {
-                                      gameConfig.notification.addError(err.message);
+                                      game.table.notification.addError(err.message);
                                   });
                     }
                 };

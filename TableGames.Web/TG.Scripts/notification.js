@@ -1,8 +1,9 @@
 ﻿define(['knockout'], function(ko) {
 
-    function Notification() {
+    function Notification(className) {
         var self = this;
 
+        self.className = className || 'tg-notification';
         self.alerts = ko.observableArray();
 
         self.addInfo = function(message) {

@@ -21,7 +21,7 @@
 </style>
 
 <template id="notificationTemplate">
-    <div class="tg-notification" data-bind="foreach: alerts">
+    <div data-bind="css: className, foreach: alerts">
         <div class="alert" data-bind="css: type === 'error' ? 'alert-danger' : 'alert-info'" role="alert">
             <button type="button" class="close" data-bind="click: $parent.removeAlert"><span aria-hidden="true">&times;</span></button>
             <span data-bind="text: message"></span>

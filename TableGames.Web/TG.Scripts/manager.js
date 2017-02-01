@@ -39,18 +39,18 @@
             if (!isSmall) {
                 self.isRoomListVisible(true);
             }
-        })
+        });
 
         self.hideRoomList = function() {
             if (self.isSmall()) {
                 self.isRoomListVisible(false);
             }
-        }
+        };
         self.showRoomList = function() {
             if (self.isSmall()) {
                 self.isRoomListVisible(true);
             }
-        }
+        };
 
         // main
         self.userPlayer = ko.computed(function() {

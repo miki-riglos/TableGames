@@ -1,4 +1,4 @@
-﻿define(['knockout', 'jquery', 'authentication', 'gameProvider', 'game!delay'], function(ko, $, Authentication, gameProvider, delay) {
+﻿define(['knockout', 'jquery', 'authentication', 'notification', 'gameProvider', 'game!delay'], function(ko, $, Authentication, Notification, gameProvider, delay) {
 
     function Table(tableState, room) {
         var self = this;
@@ -6,6 +6,8 @@
         var authentication = Authentication.instance;
         var gamePromise = $.when();
         var autoRestartGameSubscription = { dispose: function() { } };
+
+        self.notification = new Notification('tg-table-notification');
 
         var gameInfo = gameProvider.getGameInfo(tableState.gameName);
         self.gameInfo = gameInfo;
