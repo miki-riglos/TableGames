@@ -62,7 +62,7 @@
                     </button>
 
                     <!-- createTable-->
-                    <div class="btn-group pull-right hidden-md" role="group" data-bind="visible: canCreateTable, template: 'createTableTemplate'"></div>
+                    <div class="btn-group pull-right" role="group" data-bind="visible: canCreateTable() && $root.isSmall(), template: 'createTableTemplate'"></div>
 
                     <span class="navbar-brand" data-toggle="collapse" data-bind="attr: { 'data-target': '#' + clientId + '_body_container' }">
                         <span data-bind="text: hostName + '/' + name"></span>
