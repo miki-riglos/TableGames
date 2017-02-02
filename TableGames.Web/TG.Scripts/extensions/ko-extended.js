@@ -104,7 +104,9 @@
             ko.bindingHandlers['with'].init(element, valueAccessor, allBindings, viewModel, bindingContext);
             $(element).on('hidden.bs.modal', function(event) {
                 var dialog = ko.unwrap(valueAccessor());
-                dialog.hidden();
+                if (dialog) {
+                    dialog.hidden();
+                }
             });
         },
         update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
