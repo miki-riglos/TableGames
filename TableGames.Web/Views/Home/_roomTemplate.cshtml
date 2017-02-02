@@ -1,33 +1,25 @@
 ﻿<style>
-    .tg-room > .navbar {
-        border-top-width: 0px;
-        border-right-width: 0px;
-        border-left-width: 0px;
-        border-bottom-right-radius: 0px;
-        border-bottom-left-radius: 0px;
-        margin-bottom: 0;
+    .tg-room .panel-title {
+        font-size: 18px;
+        line-height: 30px;
+        color: #777;
     }
 
-        .tg-room > .navbar .btn-group.pull-right {
-            margin-top: 8px;
-            margin-right: 5px;
-        }
+     .tg-room .tg-room-name {
+        padding-right: 10px;
+     }
 
-        .tg-room > .navbar .navbar-brand[data-toggle="collapse"]::before {
-            font-family: 'Glyphicons Halflings';
-            font-size: 14px;
-            content: "\e080";
-        }
+    .tg-room .tg-room-name[data-toggle="collapse"]::before {
+        margin-left: -5px;
+        margin-right: 5px;
+        font-family: 'Glyphicons Halflings';
+        font-size: 14px;
+        content: "\e080";
+    }
 
-        .tg-room > .navbar .navbar-brand[data-toggle="collapse"].collapsed::before {
-            content: "\e114";
-        }
-
-        .tg-room > .navbar .btn-toolbar {
-            margin-top: 9px;
-            margin-bottom: 8px;
-        }
-
+    .tg-room .tg-room-name[data-toggle="collapse"].collapsed::before {
+        content: "\e114";
+    }
 
     .tg-room .panel-footer {
         line-height: 30px;
@@ -52,48 +44,38 @@
 
 <template id="roomTemplate">
     <div class="panel panel-default tg-room" data-bind="attr: { 'id': clientId }">
-        <div class="navbar navbar-default">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-bind="attr: { 'data-target': '#' + clientId + '_toolbar_container' }">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
+        <div class="panel-heading clearfix">
+            <span class="panel-title">
+                <span class="tg-room-name" data-toggle="collapse" data-bind="text: hostName + '/' + name, attr: { 'data-target': '#' + clientId + '_body_container' }"></span>
+                <span class="glyphicon glyphicon-forward" data-bind="visible: beeper.isBeeping" aria-hidden="true"></span>
+            </span>
+
+            <div class="btn-toolbar pull-right" role="toolbar">
+                <!-- createTable -->
+                <div class="btn-group" role="group" data-bind="visible: canCreateTable">
+                    <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-bind="enable: canCreateTable" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Open Table <span class="caret"></span>
                     </button>
-
-                    <!-- createTable-->
-                    <div class="btn-group pull-right" role="group" data-bind="visible: canCreateTable() && $root.isSmall(), template: 'createTableTemplate'"></div>
-
-                    <span class="navbar-brand" data-toggle="collapse" data-bind="attr: { 'data-target': '#' + clientId + '_body_container' }">
-                        <span data-bind="text: hostName + '/' + name"></span>
-                    </span>
-                    <span class="navbar-brand">
-                        <span class="glyphicon glyphicon-forward" data-bind="visible: beeper.isBeeping" aria-hidden="true"></span>
-                    </span>
+                    <ul class="dropdown-menu" data-bind="foreach: $root.gameNames">
+                        <li><a href="#" data-bind="text: $data, click: $root.createTable.bind($parent, $parent, $data)"></a></li>
+                    </ul>
                 </div>
 
-                <div class="navbar-collapse collapse" data-bind="attr: { 'id': clientId + '_toolbar_container' }">
-                    <div class="btn-toolbar pull-right" role="toolbar">
-                        <!-- createTable -->
-                        <div class="btn-group" role="group" data-bind="visible: canCreateTable() && !$root.isSmall(), template: 'createTableTemplate'"></div>
+                <!-- ko with: table -->
+                <button type="button" class="btn btn-sm btn-primary" data-bind="visible: canJoin, click: $root.joinTable">Join Table</button>
+                <button type="button" class="btn btn-sm btn-default" data-bind="visible: canLeave, click: $root.leaveTable">Leave Table</button>
+                <button type="button" class="btn btn-sm btn-primary" data-bind="visible: canStart, click: $root.startTable">Start Game</button>
+                <button type="button" class="btn btn-sm btn-primary" data-bind="visible: canRestartGame, click: $root.restartGame">Restart</button>
+                <button type="button" class="btn btn-sm btn-primary" data-toggle="collapse" data-bind="visible: status() !== 'Open', attr: { 'data-target': '#' + room.clientId + '_stats' }">Stats</button>
+                <!-- /ko -->
 
-                        <!-- ko with: table -->
-                        <button type="button" class="btn btn-primary" data-bind="visible: canJoin, click: $root.joinTable">Join Table</button>
-                        <button type="button" class="btn btn-default" data-bind="visible: canLeave, click: $root.leaveTable">Leave Table</button>
-                        <button type="button" class="btn btn-primary" data-bind="visible: canStart, click: $root.startTable">Start Game</button>
-                        <button type="button" class="btn btn-primary" data-bind="visible: canRestartGame, click: $root.restartGame">Restart</button>
-                        <button type="button" class="btn btn-primary" data-toggle="collapse" data-bind="visible: status() !== 'Open', attr: { 'data-target': '#' + room.clientId + '_stats' }">Stats</button>
-                        <!-- /ko -->
+                <!-- destroyTable -->
+                <button type="button" class="btn btn-sm btn-danger" data-bind="visible: canDestroyTable, click: $root.destroyTable">End</button>
 
-                        <!-- destroyTable -->
-                        <button type="button" class="btn btn-danger" data-bind="visible: canDestroyTable, click: $root.destroyTable">End Table</button>
-
-                        <!-- leaveRoom -->
-                        <button type="button" class="btn btn-primary" data-bind="click: $root.leaveRoom" title="Leave Room">
-                            <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
-                        </button>
-                    </div>
-                </div>
+                <!-- leaveRoom -->
+                <button type="button" class="btn btn-sm btn-primary" data-bind="click: $root.leaveRoom" title="Leave Room">
+                    <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+                </button>
             </div>
         </div>
 
@@ -101,11 +83,11 @@
             <div class="panel-body">
                 <div class="row">
                     <div class="col-sm-8">
-                        <!-- ko template: { name: 'tableTemplate', if: table, data: table } --><!-- /ko -->
+                    <!-- ko template: { name: 'tableTemplate', if: table, data: table } --><!-- /ko -->
                     </div>
 
                     <div class="col-sm-4">
-                        <!-- ko template: { name: 'chatTemplate', data: chat } --><!-- /ko -->
+                    <!-- ko template: { name: 'chatTemplate', data: chat } --><!-- /ko -->
                     </div>
                 </div>
             </div>
@@ -120,13 +102,4 @@
             </div>
         </div>
     </div>
-</template>
-
-<template id="createTableTemplate">
-    <button type="button" class="btn btn-default dropdown-toggle" data-bind="enable: canCreateTable" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Open Table <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu" data-bind="foreach: $root.gameNames">
-        <li><a href="#" data-bind="text: $data, click: $root.createTable.bind($parent, $parent, $data)"></a></li>
-    </ul>
 </template>
