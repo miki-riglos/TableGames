@@ -265,7 +265,7 @@
             if (self.attendedRooms.contains(room)) {
                 return hub.server.leaveRoom(room.hostName, room.name, authentication.userName());
             }
-            return $.Deferred().resolve();
+            return $.when();
         };
 
         hub.client.onRoomLeft = function(hostName, roomState, userName) {
@@ -398,7 +398,7 @@
         self.destroyTable = function(room) {
             if (authentication.userName() === room.hostName) {
                 Dialog.confirm('Are you sure you want to end active table?').then(function(option) {
-                    if (option.label === "Yes") {
+                    if (option.id === Dialog.confirm.YES) {
                         hub.server.destroyTable(room.hostName, room.name);
                     }
                 });

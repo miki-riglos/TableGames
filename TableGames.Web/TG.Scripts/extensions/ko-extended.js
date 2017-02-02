@@ -102,9 +102,9 @@
     ko.bindingHandlers.modalWith = {
         init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
             ko.bindingHandlers['with'].init(element, valueAccessor, allBindings, viewModel, bindingContext);
-            $(element).on('hidden.bs.modal', function(e) {
-                var current = valueAccessor();
-                current(null);
+            $(element).on('hidden.bs.modal', function(event) {
+                var dialog = ko.unwrap(valueAccessor());
+                dialog.hidden();
             });
         },
         update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
