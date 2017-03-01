@@ -20,6 +20,11 @@
         opacity: 0.25;
     }
 
+    .tg-doubt-playercups-activeplayer {
+        font-weight: bold;
+        color: #a94442;
+    } 
+
     .tg-doubt-usergame .tab-content {
         padding: 15px;
         border-left: 1px solid #ddd;
@@ -57,7 +62,7 @@
                         <span class="glyphicon glyphicon-plus-sign" data-bind="visible: cup.playerName === $parent.diceWinnerName()" aria-hidden="true"></span>
                     </span>
                     <span class="glyphicon glyphicon-lock tg-doubt-playercup-lock" data-bind="css: cup.lockStatus.toLowerCase()" aria-hidden="true"></span>
-                    <span data-bind="text: cup.playerName"></span>
+                    <span data-bind="text: cup.playerName, css: { 'tg-doubt-playercups-activeplayer': $parents[1].activePlayerName() === cup.playerName }"></span>
                 </div>
 
                 <!-- ko if: playerName !== $root.authentication.userName() || $parent.isEnded() -->

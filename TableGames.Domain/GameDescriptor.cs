@@ -23,7 +23,7 @@ namespace TableGames.Domain
             MinPlayers = 2;
             MaxPlayers = 10;
             AutoStartAfter = 3;
-            AutoRestartAfter = 4;
+            AutoRestartAfter = 30;
         }
     }
 }
