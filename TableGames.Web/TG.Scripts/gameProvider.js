@@ -32,6 +32,7 @@
                 var action = new ActionConstructor(gameConfig, game, gameConfig.table);
                 action.getParameters = action.getParameters || function() { return {}; };
                 action.execute = action.execute || function() {
+                    game.table.notification.clearAlerts();
                     if (game.table.isUserTurn()) {
                         var gameChangeParameters = action.getParameters();
                         gameConfig.sendChangeToServer(action.name, gameChangeParameters)

@@ -25,6 +25,10 @@
         self.removeAlert = function(alert) {
             self.alerts.remove(alert);
         };
+
+        self.clearAlerts = function() {
+            self.alerts.removeAll();
+        };
     }
 
     Notification.instance = new Notification();
