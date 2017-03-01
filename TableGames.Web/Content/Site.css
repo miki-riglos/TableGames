@@ -3,6 +3,11 @@
     padding-bottom: 20px;
 }
 
+.tg-navbar-login-name {
+    margin-right: 15px;
+    max-width: 120px;
+}
+
 .tg-collapse::before {
     margin-left: -5px;
     font-family: 'Glyphicons Halflings';

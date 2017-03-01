@@ -96,7 +96,7 @@
             <div class="tab-content">
                 <div role="tabpanel" class="tab-pane fade in active" data-bind="attr: { 'id': $parent.table.room.clientId + '_action_bet' }">
                     <!-- possible bets -->
-                    <button class="btn btn-xs btn-default pull-right" data-bind="popover: { target: '#' + $parent.table.room.clientId + '_action_bet_help'}" title="Possible bets" data-placement="left" data-trigger="focus">
+                    <button type="button" class="btn btn-xs btn-default pull-right" data-bind="popover: { target: '#' + $parent.table.room.clientId + '_action_bet_help'}" title="Possible bets" data-placement="left" data-trigger="focus">
                         <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
                     </button>
                     <div class="hide" data-bind="attr: { 'id': $parent.table.room.clientId + '_action_bet_help' }">
