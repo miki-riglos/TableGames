@@ -1,0 +1,63 @@
+﻿<style>
+    .tg-card {
+        display: inline-block;
+        width: 30px;
+        height: 40px;
+        margin: 2px 0;
+        padding: 8px 3px;
+        background-color: #fff;
+        border-radius: 4px;
+    }
+
+    .tg-card-back {
+        background-color: silver;
+        background-image: linear-gradient(45deg, blue 25%, transparent 25%, transparent 75%, blue 75%, blue), linear-gradient(-45deg, red 25%, transparent 25%, transparent 75%, red 75%, red);
+        background-size: 10px 10px;
+    }
+
+    .tg-card-opaque {
+        background-color: lightgray;
+    }
+
+    .tg-card-highlighted {
+        box-shadow: 0px 0px 10px 1px yellow;
+    }
+
+    .tg-card-rank, .tg-card-suit {
+        display: inline-block;
+        width: 40%;
+        text-align: left;
+    }
+
+    .tg-card-rank {
+        letter-spacing: -2px;
+        text-align: center;
+    }
+
+    .tg-card-hearts, .tg-card-diamonds {
+        color: red;
+    }
+
+    .tg-card-clubs .tg-card-suit::before {
+        content: '\2663';
+    }
+
+    .tg-card-hearts .tg-card-suit::before {
+        content: '\2665';
+    }
+
+    .tg-card-spades .tg-card-suit::before {
+        content: '\2660';
+    }
+
+    .tg-card-diamonds .tg-card-suit::before {
+        content: '\2666';
+    }
+</style>
+
+<template id="cardTemplate">
+    <div class="tg-card" data-bind="css: 'tg-card-' + suitName() + (isHighlighted() ? ' tg-card-highlighted' : '') + (!isExposed() && suit() ? ' tg-card-opaque' : '') + (!isExposed() && !suit() ? ' tg-card-back' : '')">
+        <span class="tg-card-rank" data-bind="text: rankSymbol"></span>
+        <span class="tg-card-suit"></span>
+    </div>
+</template>

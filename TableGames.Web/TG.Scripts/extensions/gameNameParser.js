@@ -1,8 +1,9 @@
 ﻿define(function() {
 
-    function gameNameParser(name) {
+    function gameNameParser(name, extension) {
         var parsed = {
-            fileName: name
+            fileName: name,
+            extension: extension
         };
 
         var parts = name.split('/');

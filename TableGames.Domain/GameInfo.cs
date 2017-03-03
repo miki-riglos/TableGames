@@ -57,19 +57,11 @@ namespace TableGames.Domain
             return game;
         }
 
-        public static string GetGameScript(string gameName, string fileName) {
-            return getGameResource(gameName, fileName, "js");
-        }
-
-        public static string GetGameTemplate(string gameName, string fileName) {
-            return getGameResource(gameName, fileName, "html");
-        }
-
-        private static ConcurrentDictionary<string, string> _gameResources = new ConcurrentDictionary<string, string>();
+        private static ConcurrentDictionary<string, byte[]> _gameResources = new ConcurrentDictionary<string, byte[]>();
 
 #if !DEBUG
-        private static string getGameResource(string gameName, string fileName, string fileExtension) {
-            string gameResource;
+        public static byte[] GetGameResource(string gameName, string fileName, string fileExtension) {
+            byte[] gameResource;
 
             var gameKey = $"{gameName}/{fileName}.{fileExtension}";
             if (_gameResources.TryGetValue(gameKey, out gameResource)) {
@@ -77,25 +69,26 @@ namespace TableGames.Domain
             }
 
             var gameAssembly = getGameAssembly(gameName);
-            var resourceName = gameAssembly.GetManifestResourceNames().First(name => name.EndsWith($"{fileName}.{fileExtension}"));
+            var resourceName = gameAssembly.GetManifestResourceNames().First(name => name.EndsWith($"{fileName.Replace('/', '.')}.{fileExtension}"));
+
             using (Stream stream = gameAssembly.GetManifestResourceStream(resourceName)) {
-                using (var reader = new StreamReader(stream)) {
-                    gameResource = reader.ReadToEnd();
-                }
+                gameResource = new byte[stream.Length];
+                stream.Read(gameResource, 0, gameResource.Length);
             }
 
             _gameResources.TryAdd(gameKey, gameResource);
 
             return gameResource;
         }
+
 #else
-        private static string getGameResource(string gameName, string fileName, string fileExtension) {
-            string gameResource;
+        public static byte[] GetGameResource(string gameName, string fileName, string fileExtension) {
+            byte[] gameResource;
             var gameAssembly = getGameAssembly(gameName);
             var resourcePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"../{gameAssembly.GetName().Name}/{fileName}.{fileExtension}");
-            using (StreamReader reader = new StreamReader(resourcePath)) {
-                gameResource = reader.ReadToEnd();
-            }
+
+            gameResource = File.ReadAllBytes(resourcePath);
+
             return gameResource;
         }
 #endif

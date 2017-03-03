@@ -44,8 +44,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Deck.cs" />
+    <Compile Include="Card.cs" />
     <Compile Include="Dice.cs" />
+    <Compile Include="HigherCard.cs" />
     <Compile Include="HigherDice.cs" />
+    <Compile Include="PlayerHand.cs" />
     <Compile Include="PlayerCup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -78,6 +82,21 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="card.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="card.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="playerHand.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="higherCard.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="higherCard.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

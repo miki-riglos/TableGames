@@ -1,0 +1,31 @@
+﻿<style>
+    .tg-highercard-playerhands .row {
+        padding-top: 2px;
+        padding-bottom: 2px;
+        background-color: #336600;
+    }
+
+    .tg-highercard-playerhands > .row + .row {
+        padding-top: 0;
+    }
+
+    .tg-highercard-playerhands .row .col-xs-4 {
+        color: #fff;
+    }
+</style>
+
+<template id="higherCardTemplate">
+    <div class="tg-highercard">
+        <div class="tg-highercard-playerhands" data-bind="foreach: { data: playerHands, as: 'hand' }">
+            <div class="row">
+                <div class="col-xs-4">
+                    <span data-bind="text: hand.playerName"></span>
+                </div>
+
+                <div class="col-xs-8" data-bind="template: { name: 'cardTemplate', foreach: hand.cards }"></div>
+            </div>
+        </div>
+    </div>
+</template>
+
+

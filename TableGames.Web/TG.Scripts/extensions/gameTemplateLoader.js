@@ -2,7 +2,8 @@
 
     return {
         load: function(name, req, onLoad, config) {
-            var fileUrl = '/GameTemplate?' + $.param(gameNameParser(name));
+            var fileUrl = '/GameResource?' + $.param(gameNameParser(name, "html"));
+
 
             req(['text!' + fileUrl], function(templateText) {
                 var $container = $(templateText);

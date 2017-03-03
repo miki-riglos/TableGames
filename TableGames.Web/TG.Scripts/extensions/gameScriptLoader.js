@@ -2,7 +2,7 @@
 
     return {
         load: function(name, req, onLoad, config) {
-            var fileUrl = '/GameScript?' + $.param(gameNameParser(name));
+            var fileUrl = '/GameResource?' + $.param(gameNameParser(name, "js"));
 
             req([fileUrl], function(game) {
                 onLoad(game);
