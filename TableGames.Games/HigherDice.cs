@@ -17,10 +17,10 @@ namespace TableGames.Games
             var maxDiceValue = PlayerCups.Select(pc => pc.Dices.Last().Value).Max();
             var maxPlayerCups = PlayerCups.Where(pc => pc.Dices.Last().Value == maxDiceValue).ToList();
 
-            while (maxPlayerCups.Count() > 1) {
+            while (maxPlayerCups.Count > 1) {
                 rollDices(maxPlayerCups);
                 maxDiceValue = maxPlayerCups.Select(pc => pc.Dices.Last().Value).Max();
-                maxPlayerCups = PlayerCups.Where(pc => pc.Dices.Last().Value == maxDiceValue).ToList();
+                maxPlayerCups = maxPlayerCups.Where(pc => pc.Dices.Last().Value == maxDiceValue).ToList();
             }
 
             var winnerPlayerCup = maxPlayerCups.First();

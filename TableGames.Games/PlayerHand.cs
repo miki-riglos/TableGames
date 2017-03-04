@@ -21,7 +21,7 @@ namespace TableGames.Games
         public virtual object ToClient() {
             return new {
                 playerName = Player.Name,
-                cards = Cards.Select(d => d.ToClient()),
+                cards = Cards.Select(c => c.ToClient()),
             };
         }
     }

@@ -16,13 +16,13 @@ namespace TableGames.Games
             PlayerHands = new List<PlayerHand>(Table.Players.Select(p => new PlayerHand(p)));
 
             dealCards(PlayerHands);
-            var maxCardValue = PlayerHands.Select(pc => pc.Cards.Last().Value).Max();
-            var maxPlayerHands = PlayerHands.Where(pc => pc.Cards.Last().Value == maxCardValue).ToList();
+            var maxCardValue = PlayerHands.Select(ph => ph.Cards.Last().Value).Max();
+            var maxPlayerHands = PlayerHands.Where(ph => ph.Cards.Last().Value == maxCardValue).ToList();
 
-            while (maxPlayerHands.Count() > 1) {
+            while (maxPlayerHands.Count > 1) {
                 dealCards(maxPlayerHands);
-                maxCardValue = maxPlayerHands.Select(pc => pc.Cards.Last().Value).Max();
-                maxPlayerHands = PlayerHands.Where(pc => pc.Cards.Last().Value == maxCardValue).ToList();
+                maxCardValue = maxPlayerHands.Select(ph => ph.Cards.Last().Value).Max();
+                maxPlayerHands = maxPlayerHands.Where(ph => ph.Cards.Last().Value == maxCardValue).ToList();
             }
 
             var winnerPlayerHand = maxPlayerHands.First();
@@ -35,7 +35,7 @@ namespace TableGames.Games
 
         public override object ToClient() {
             var client = new {
-                playerHands = PlayerHands.Select(pc => pc.ToClient()),
+                playerHands = PlayerHands.Select(ph => ph.ToClient()),
             };
             return client.Merge(base.ToClient());
         }
