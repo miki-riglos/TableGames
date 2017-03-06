@@ -42,9 +42,7 @@ namespace TableGames.Games
 
         private void dealCards(List<PlayerHand> playerHands) {
             foreach (var playerHand in playerHands) {
-                var card = Deck.Deal();
-                card.IsExposed = true;
-                playerHand.Cards.Add(card);
+                playerHand.Cards.Add(Deck.DealExposed());
             }
         }
     }

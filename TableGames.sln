@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableGames.Games.Doubt", "T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableGames.Games", "TableGames.Games\TableGames.Games.csproj", "{02B10A7E-AC22-4C5B-9C69-69AC1D635354}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableGames.Games.InBetween", "TableGames.Games.InBetween\TableGames.Games.InBetween.csproj", "{A51026B3-8D6D-4ED6-8079-6B4476EC5778}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{02B10A7E-AC22-4C5B-9C69-69AC1D635354}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02B10A7E-AC22-4C5B-9C69-69AC1D635354}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02B10A7E-AC22-4C5B-9C69-69AC1D635354}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A51026B3-8D6D-4ED6-8079-6B4476EC5778}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A51026B3-8D6D-4ED6-8079-6B4476EC5778}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A51026B3-8D6D-4ED6-8079-6B4476EC5778}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A51026B3-8D6D-4ED6-8079-6B4476EC5778}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

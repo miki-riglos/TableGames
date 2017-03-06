@@ -8,9 +8,13 @@
         self.updateDices = function(dicesState) {
             dicesState.forEach(function(diceState, index) {
                 var dice = self.dices()[index];
-                dice.value(diceState.value);
-                dice.isExposed(diceState.isExposed);
-                dice.isHighlighted(diceState.isHighlighted);
+                if (dice) {
+                    dice.value(diceState.value);
+                    dice.isExposed(diceState.isExposed);
+                    dice.isHighlighted(diceState.isHighlighted);
+                } else {
+                    self.dices.push(new Dice(diceState));
+                }
             });
         };
     }

@@ -21,15 +21,21 @@ namespace TableGames.Games.Doubt
         public Doubt(Table table) : base(table) {
             HasLock = false;
 
+            var playerBags = Table.GetBagItem("PlayerBags", () => Table.Players.ToDictionary(
+                p => p,
+                p => new DoubtPlayerBag() { DicesQuantity = 5, LockStatus = LockStatus.Available }
+            ));
+
             // transition lock status
-            foreach (var kvp in getPlayerBags()) {
+            foreach (var kvp in playerBags) {
                 if (kvp.Value.DicesQuantity == 1 && kvp.Value.LockStatus == LockStatus.Available) {
                     kvp.Value.LockStatus = LockStatus.Locking;
                     HasLock = true;
                 }
             }
 
-            PlayerCups = new List<DoubtPlayerCup>(getPlayerBags().Select(kvp => new DoubtPlayerCup(kvp.Key, kvp.Value)));
+            PlayerCups = new List<DoubtPlayerCup>(playerBags.Select(kvp => new DoubtPlayerCup(kvp.Key, kvp.Value)));
+
             Quantity = 0;
             Dice = new Dice() { IsExposed = true };
 
@@ -45,7 +51,7 @@ namespace TableGames.Games.Doubt
         }
 
         public void SetPlayerDicesQty(Player player, int delta) {
-            getPlayerBags()[player].DicesQuantity += delta;
+            PlayerCups.First(pc => pc.Player == player).DicesQuantity += delta;
             if (delta < 0) {
                 DiceLoser = player;
             }
@@ -56,7 +62,7 @@ namespace TableGames.Games.Doubt
         }
 
         public override bool IsEliminated(Player player) {
-            return getPlayerBags()[player].DicesQuantity <= 0;
+            return PlayerCups.First(pc => pc.Player == player).DicesQuantity <= 0;
         }
 
         public GameChangeResult End(GameAction endAction) {
@@ -65,17 +71,16 @@ namespace TableGames.Games.Doubt
 
             // transition lock status
             if (HasLock) {
-                var playerLocking = PlayerCups.First(pc => pc.LockStatus == LockStatus.Locking).Player;
-                getPlayerBags()[playerLocking].LockStatus = LockStatus.Unavailable;
+                PlayerCups.First(pc => pc.LockStatus == LockStatus.Locking).LockStatus = LockStatus.Unavailable;
             }
 
             // highlight matching dices
             foreach (var matchingDice in PlayerCups.SelectMany(pc => pc.Dices).Where(d => d.Value == Dice.Value || d.Value == 1)) {
                 matchingDice.IsHighlighted = true;
-            }            
+            }
 
             // check if table ends
-            var playersWithDices = getPlayerBags().Where(kvp => kvp.Value.DicesQuantity > 0).Select(kvp => kvp.Key);
+            var playersWithDices = PlayerCups.Where(pc => pc.DicesQuantity > 0).Select(pc => pc.Player);
             if (playersWithDices.Count() == 1) {
                 Table.End(playersWithDices);
             }
@@ -127,26 +132,6 @@ namespace TableGames.Games.Doubt
                 diceWinnerName = DiceWinner?.Name
             };
             return stats.Merge(base.ToStats());
-        }
-
-        private Dictionary<Player, DoubtPlayerBag> getPlayerBags() {
-            Dictionary<Player, DoubtPlayerBag> playerBags;
-            var bagKey = "PlayerBag";
-            if (!Table.Bag.ContainsKey(bagKey)) {
-                playerBags = Table.Players.ToDictionary(
-                    p => p, 
-                    p => new DoubtPlayerBag() {
-                        DicesQuantity = 5,
-                        LockStatus = LockStatus.Available
-                    }
-                );
-                Table.Bag.Add(bagKey, playerBags);
-            }
-            else {
-                playerBags = (Dictionary<Player, DoubtPlayerBag>)Table.Bag[bagKey];
-            }
-
-            return playerBags;
         }
     }
 

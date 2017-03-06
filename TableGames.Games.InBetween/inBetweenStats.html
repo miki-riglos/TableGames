@@ -1,0 +1,33 @@
+﻿<template id="doubtStatsTemplate">
+    <div class="panel panel-default collapse" data-bind="attr: { 'id': room.clientId + '_stats' }">
+        <div class="panel-heading">
+            <span>Stats</span>
+        </div>
+        <table class="table table-condensed">
+            <thead>
+                <tr>
+                    <th>
+                        <span>#</span>
+                    </th>
+                    <!-- ko foreach: { data: playerNames, as: 'playerName' } -->
+                    <th>
+                        <span data-bind="text: playerName, css: { 'tg-active': playerName === $parent.activePlayerName() }"></span>
+                    </th>
+                    <!-- /ko -->
+                </tr>
+            </thead>
+            <tbody data-bind="foreach: { data: stats, as: 'gameStats' }">
+                <tr>
+                    <td>
+                        <span data-bind="text: $index() + 1"></span>
+                    </td>
+                    <!-- ko foreach: { data: $parent.playerNames, as: 'playerName' } -->
+                    <td>
+                        TODO
+                    </td>
+                    <!-- /ko -->
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</template>

@@ -8,10 +8,14 @@
         self.updateCards = function(cardsState) {
             cardsState.forEach(function(cardState, index) {
                 var card = self.cards()[index];
-                card.suit(cardState.suit);
-                card.rank(cardState.rank);
-                card.isExposed(cardState.isExposed);
-                card.isHighlighted(cardState.isHighlighted);
+                if (card) {
+                    card.suit(cardState.suit);
+                    card.rank(cardState.rank);
+                    card.isExposed(cardState.isExposed);
+                    card.isHighlighted(cardState.isHighlighted);
+                } else {
+                    self.cards.push(new Card(cardState));
+                }
             });
         };
     }

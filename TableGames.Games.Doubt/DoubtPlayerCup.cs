@@ -12,11 +12,22 @@ namespace TableGames.Games.Doubt
 
     public class DoubtPlayerCup : PlayerCup
     {
-        public LockStatus LockStatus { get; set; }
+        private readonly DoubtPlayerBag _playerBag;
 
+        public LockStatus LockStatus {
+            get { return _playerBag.LockStatus; }
+            set { _playerBag.LockStatus = value; }
+        }
+
+        public int DicesQuantity {
+            get { return _playerBag.DicesQuantity; }
+            set { _playerBag.DicesQuantity = value; }
+        }
+       
         public DoubtPlayerCup(Player player, DoubtPlayerBag playerBag) : base(player) {
+            _playerBag = playerBag;
+
             Dices.AddRange(Enumerable.Range(1, playerBag.DicesQuantity).Select(i => new Dice(true)));
-            LockStatus = playerBag.LockStatus;
         }
 
         public new object ToClient() {

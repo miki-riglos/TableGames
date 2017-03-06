@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -134,6 +135,19 @@ namespace TableGames.Domain
                 }
             }
             return previousPlayer;
+        }
+
+        public T GetBagItem<T>(string bagKey, Func<T> defaultValueFactory) {
+            T bagItem;
+            if (!Bag.ContainsKey(bagKey)) {
+                bagItem = defaultValueFactory();
+                Bag.Add(bagKey, bagItem);
+            }
+            else {
+                bagItem = (T)Bag[bagKey];
+            }
+
+            return bagItem;
         }
 
         public GameChangeResult ChangeGame(string playerName, string actionName, JObject gameChangeParameters) {

@@ -1,0 +1,50 @@
+﻿<style>
+    .tg-inbetween-pot, .tg-inbetween-playerhands > .row {
+        padding-top: 2px;
+        padding-bottom: 2px;
+        min-height: 44px;
+        color: #fff;
+        background-color: #336600;
+    }
+
+        .tg-inbetween-playerhands > .row + .row {
+            padding-top: 0;
+        }
+</style>
+
+<template id="inBetweenTemplate">
+    <div class="tg-inbetween">
+        <div class="row tg-inbetween-pot">
+            <div class="col-xs-4">
+                <div>Pot</div>
+                <div data-bind="text: pot"></div>
+            </div>
+        </div>
+        <div class="tg-inbetween-playerhands" data-bind="foreach: { data: playerHands, as: 'hand' }">
+            <div class="row">
+                <div class="col-xs-4">
+                    <div data-bind="text: hand.playerName"></div>
+                    <div data-bind="text: hand.chips"></div>
+                </div>
+
+                <div class="col-xs-8" data-bind="template: { name: 'cardTemplate', foreach: hand.cards }"></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-4">
+                Chips: <span data-bind="text: actions.bet.chips"></span>
+            </div>
+            <div class="col-xs-4">
+                Bet: <span data-bind="text: actions.bet.amount"></span>
+                <!-- ko template: { name: 'dialTemplate', data: actions.bet.amount.dial } --><!-- /ko -->
+            </div>
+            <div class="col-xs-4">
+                <button type="button" class="btn btn-primary" data-bind="click: actions.bet.execute, enable: table.isUserTurn">Bet</button>
+            </div>
+        </div>
+
+    </div>
+</template>
+
+

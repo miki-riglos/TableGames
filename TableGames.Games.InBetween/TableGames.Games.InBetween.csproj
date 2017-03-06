@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{02B10A7E-AC22-4C5B-9C69-69AC1D635354}</ProjectGuid>
+    <ProjectGuid>{A51026B3-8D6D-4ED6-8079-6B4476EC5778}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TableGames.Games</RootNamespace>
-    <AssemblyName>TableGames.Games</AssemblyName>
+    <RootNamespace>TableGames.Games.InBetween</RootNamespace>
+    <AssemblyName>TableGames.Games.InBetween</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -44,60 +44,35 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Deck.cs" />
-    <Compile Include="Card.cs" />
-    <Compile Include="TablePot.cs" />
-    <Compile Include="Dice.cs" />
-    <Compile Include="HigherCard.cs" />
-    <Compile Include="HigherDice.cs" />
-    <Compile Include="PlayerHand.cs" />
-    <Compile Include="PlayerCup.cs" />
+    <Compile Include="InBetweenPlayerBag.cs" />
+    <Compile Include="InBetweenPlayerHand.cs" />
+    <Compile Include="InBetween.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="dial.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="dice.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="dice.js" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="higherDice.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="higherDice.js" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="playerCup.js" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TableGames.Domain\TableGames.Domain.csproj">
       <Project>{dfed5373-80e0-44a8-a49d-391179e64372}</Project>
       <Name>TableGames.Domain</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="delay.js" />
+    <ProjectReference Include="..\TableGames.Games\TableGames.Games.csproj">
+      <Project>{02b10a7e-ac22-4c5b-9c69-69ac1d635354}</Project>
+      <Name>TableGames.Games</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="card.html" />
+    <EmbeddedResource Include="inBetween.html" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="card.js" />
+    <EmbeddedResource Include="inBetween.js" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="playerHand.js" />
+    <EmbeddedResource Include="inBetweenStats.html" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="higherCard.js" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="higherCard.html" />
+    <EmbeddedResource Include="inBetweenPlayerHand.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

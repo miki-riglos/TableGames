@@ -42,6 +42,12 @@
             }
         }
 
+        public int ValueA1 {
+            get {
+                return (int)Rank;
+            }
+        }
+
         public Card(CardSuit suit, CardRank rank) {
             Suit = suit;
             Rank = rank;

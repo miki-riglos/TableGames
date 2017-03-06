@@ -26,6 +26,12 @@ namespace TableGames.Games
             return _cards.Pop();
         }
 
+        public Card DealExposed() {
+            var card = _cards.Pop();
+            card.IsExposed = true;
+            return card;
+        }
+
         private void shuffle(List<Card> cards) {
             int count = cards.Count;
             while (count > 1) {
