@@ -7,9 +7,14 @@ namespace TableGames.Games.InBetween
     {
         private readonly InBetweenPlayerBag _playerBag;
 
-        public int Chips {
-            get { return _playerBag.Chips; }
-            set { _playerBag.Chips = value; }
+        public int ChipsPurchased {
+            get { return _playerBag.Chips.Amount; }
+            set { _playerBag.Chips.Amount = value; }
+        }
+
+        public int ChipsBalance {
+            get { return _playerBag.Chips.Balance; }
+            set { _playerBag.Chips.Balance = value; }
         }
 
         public InBetweenPlayerHand(Player player, InBetweenPlayerBag playerBag) : base(player) {
@@ -20,7 +25,8 @@ namespace TableGames.Games.InBetween
             return new {
                 playerName = Player.Name,
                 cards = Cards.Select(c => c.ToClient()),
-                chips = Chips
+                chipsPurchased = ChipsPurchased,
+                chipsBalance = ChipsBalance
             };
         }
     }

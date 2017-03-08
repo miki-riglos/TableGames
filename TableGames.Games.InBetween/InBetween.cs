@@ -5,10 +5,10 @@ using TableGames.Domain.Extensions;
 
 namespace TableGames.Games.InBetween
 {
-    [GameDescriptor("In Between", InitialGameType = typeof(HigherCard))]
+    [GameDescriptor("In Between", InitialGameType = typeof(HigherCard), AutoRestartAfter = 0)]
     public class InBetween : Game
     {
-        private readonly TablePot _tablePot;    // pot wrapper to store in table bag by reference
+        private readonly Chips _chips;    // pot wrapper to store in table bag by reference
         private readonly List<Deck> _decks;
 
         public List<InBetweenPlayerHand> PlayerHands { get; set; }
@@ -18,20 +18,42 @@ namespace TableGames.Games.InBetween
         public Deck Deck {
             get { return _decks.Last(); }
         }
+
+        public int Bank {
+            get { return _chips.Amount; }
+            set { _chips.Amount = value; }
+        }
+
         public int Pot {
-            get { return _tablePot.Amount; }
-            set { _tablePot.Amount = value; }
+            get { return _chips.Balance; }
+            set { _chips.Balance = value; }
         }
 
         public InBetween(Table table) : base(table) {
-            _tablePot = Table.GetBagItem("TablePot", () => new TablePot(500));
+            _chips = Table.GetBagItem("TablePot", () => new Chips());
             _decks = Table.GetBagItem("TableDecks", () => new List<Deck>() { new Deck() });
+
+            if (Deck.Count < 3) {
+                _decks.Add(new Deck());
+            }
 
             var playerBags = Table.GetBagItem("PlayerBags", () => Table.Players.ToDictionary(
                 p => p,
-                p => new InBetweenPlayerBag() { Chips = 500 }
+                p => new InBetweenPlayerBag()
             ));
             PlayerHands = new List<InBetweenPlayerHand>(playerBags.Select(kvp => new InBetweenPlayerHand(kvp.Key, kvp.Value)));
+
+            // initial pot
+            if (Pot == 0) {
+                foreach (var playerHand in PlayerHands) {
+                    playerHand.ChipsPurchased = 500;
+                    playerHand.ChipsBalance = 500;
+                    Bank += 500;
+
+                    playerHand.ChipsBalance -= 10;
+                    Pot += 10;
+                }
+            }
 
             // first game of series
             if (Table.ActivePlayer == null) {
@@ -50,11 +72,12 @@ namespace TableGames.Games.InBetween
         }
 
         public override bool IsEliminated(Player player) {
-            return PlayerHands.First(ph => ph.Player == player).Chips <= 0;
+            return PlayerHands.First(ph => ph.Player == player).ChipsBalance <= 0;
         }
 
         public override object ToClient() {
             var client = new {
+                bank = Bank,
                 pot = Pot,
                 playerHands = PlayerHands.Select(pc => pc.ToClient()),
                 bet = Bet,
@@ -99,13 +122,13 @@ namespace TableGames.Games.InBetween
             if ((leftValue < middleValue && middleValue < rightValue) || (leftValue > middleValue && middleValue > rightValue)) {
                 _inBetween.Payment = amount;        // win
             }
-            else if (leftValue == middleValue && middleValue == rightValue) {
+            else if (leftValue == middleValue || middleValue == rightValue) {
                 _inBetween.Payment = -2 * amount;   // post lose
             }
             else {
                 _inBetween.Payment = -amount;       // simple lose
             }
-            _inBetween.ActiveHand.Chips += _inBetween.Payment;
+            _inBetween.ActiveHand.ChipsBalance += _inBetween.Payment;
             _inBetween.Pot -= _inBetween.Payment;
 
             _inBetween.IsEnded = true;

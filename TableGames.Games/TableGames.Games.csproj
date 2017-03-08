@@ -46,7 +46,7 @@
   <ItemGroup>
     <Compile Include="Deck.cs" />
     <Compile Include="Card.cs" />
-    <Compile Include="TablePot.cs" />
+    <Compile Include="Chips.cs" />
     <Compile Include="Dice.cs" />
     <Compile Include="HigherCard.cs" />
     <Compile Include="HigherDice.cs" />

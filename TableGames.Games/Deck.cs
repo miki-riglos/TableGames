@@ -10,6 +10,8 @@ namespace TableGames.Games
 
         private Stack<Card> _cards;
 
+        public int Count { get { return _cards.Count; } }
+
         public Deck() {
             var cards = new List<Card>();
             foreach (CardSuit suit in Enum.GetValues(typeof(CardSuit)).Cast<CardSuit>().Where(s => s != CardSuit.Unknown)) {

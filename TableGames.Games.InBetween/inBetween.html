@@ -1,4 +1,8 @@
 ﻿<style>
+    .tg-inbetween-pot {
+        font-size: 24px;
+    }
+
     .tg-inbetween-pot, .tg-inbetween-playerhands > .row {
         padding-top: 2px;
         padding-bottom: 2px;
@@ -10,37 +14,94 @@
         .tg-inbetween-playerhands > .row + .row {
             padding-top: 0;
         }
+
+    .tg-inbetween-playerhands {
+        position: relative;
+    }
+
+    .tg-inbetween-playerhand .tg-card {
+        position: absolute;
+        left: 10%;
+    }
+
+        .tg-inbetween-playerhand .tg-card:nth-child(2) {
+            left: 70%;
+        }
+
+        .tg-inbetween-playerhand .tg-card:nth-child(3) {
+            left: 40%;
+        }
+
+    .tg-inbetween-actions {
+        margin-top: 15px;
+    }
+
+        .tg-inbetween-actions .tab-content {
+            padding: 15px;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            border-radius: 0 0 5px 5px;
+        }
+
+        .tg-inbetween-actions .tg-inbetween-actions-actionbutton {
+            width: 100%;
+        }
 </style>
 
 <template id="inBetweenTemplate">
     <div class="tg-inbetween">
         <div class="row tg-inbetween-pot">
-            <div class="col-xs-4">
-                <div>Pot</div>
-                <div data-bind="text: pot"></div>
-            </div>
+            <div class="col-xs-5">Pot</div>
+            <div class="col-xs-2 text-right" data-bind="text: pot"></div>
         </div>
         <div class="tg-inbetween-playerhands" data-bind="foreach: { data: playerHands, as: 'hand' }">
             <div class="row">
-                <div class="col-xs-4">
+                <div class="col-xs-5">
+                    <span class="badge pull-right" data-bind="text: hand.chipsPurchased"></span>
                     <div data-bind="text: hand.playerName"></div>
-                    <div data-bind="text: hand.chips"></div>
                 </div>
+                <div class="col-xs-2 text-right" data-bind="text: hand.chipsBalance"></div>
 
-                <div class="col-xs-8" data-bind="template: { name: 'cardTemplate', foreach: hand.cards }"></div>
+                <div class="col-xs-5 tg-inbetween-playerhand" data-bind="template: { name: 'cardTemplate', foreach: hand.cards }"></div>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-xs-4">
-                Chips: <span data-bind="text: actions.bet.chips"></span>
-            </div>
-            <div class="col-xs-4">
-                Bet: <span data-bind="text: actions.bet.amount"></span>
-                <!-- ko template: { name: 'dialTemplate', data: actions.bet.amount.dial } --><!-- /ko -->
-            </div>
-            <div class="col-xs-4">
-                <button type="button" class="btn btn-primary" data-bind="click: actions.bet.execute, enable: table.isUserTurn">Bet</button>
+        <div class="tg-inbetween-actions">
+            <!-- action nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active">
+                    <a data-bind="attr: { 'href': '#' + table.room.clientId + '_action_bet' }" aria-controls="home" role="tab" data-toggle="tab">Bet</a>
+                </li>
+                <li role="presentation">
+                    <a data-bind="attr: { 'href': '#' + table.room.clientId + '_action_buy' }" aria-controls="profile" role="tab" data-toggle="tab">Buy</a>
+                </li>
+            </ul>
+
+            <!-- action tab panes -->
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane fade in active" data-bind="attr: { 'id': table.room.clientId + '_action_bet' }">
+                    <div class="row">
+                        <div class="col-xs-4">
+                            Chips: <span data-bind="text: actions.bet.chipsProjected"></span>
+                        </div>
+                        <div class="col-xs-4">
+                            Bet: <span data-bind="text: actions.bet.amount"></span>
+                            <!-- ko template: { name: 'dialTemplate', data: actions.bet.amount.dial } --><!-- /ko -->
+                        </div>
+                        <div class="col-xs-4">
+                            <button type="button" class="btn btn-primary tg-inbetween-actions-actionbutton" data-bind="click: actions.bet.execute, enable: table.isUserTurn">Bet</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div role="tabpanel" class="tab-pane fade" data-bind="attr: { 'id': table.room.clientId + '_action_buy' }">
+                    <div class="row">
+                        <div class="col-xs-offset-8 col-xs-4">
+                            <button type="button" class="btn btn-primary tg-inbetween-actions-actionbutton" data-bind="click: actions.bet.execute, enable: table.isUserTurn()">Buy</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 

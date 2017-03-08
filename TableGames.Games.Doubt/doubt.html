@@ -25,7 +25,7 @@
         color: #a94442;
     } 
 
-    .tg-doubt-usergame .tab-content {
+    .tg-doubt-actions .tab-content {
         padding: 15px;
         border-left: 1px solid #ddd;
         border-right: 1px solid #ddd;
@@ -33,7 +33,7 @@
         border-radius: 0 0 5px 5px;
     }
 
-    .tg-doubt-usergame-actionbutton {
+    .tg-doubt-actions-actionbutton {
         width: 100%;
     }
 </style>
@@ -78,30 +78,30 @@
         </div>
 
 
-        <div class="tg-doubt-usergame" data-bind="with: userGame">
+        <div class="tg-doubt-actions">
             <!-- action nav tabs -->
             <ul class="nav nav-tabs" role="tablist">
                 <li role="presentation" class="active">
-                    <a data-bind="attr: { 'href': '#' + $parent.table.room.clientId + '_action_bet' }" aria-controls="home" role="tab" data-toggle="tab">Bet</a>
+                    <a data-bind="attr: { 'href': '#' + table.room.clientId + '_action_bet' }" aria-controls="home" role="tab" data-toggle="tab">Bet</a>
                 </li>
                 <li role="presentation">
-                    <a data-bind="attr: { 'href': '#' + $parent.table.room.clientId + '_action_doubt' }" aria-controls="profile" role="tab" data-toggle="tab">Doubt</a>
+                    <a data-bind="attr: { 'href': '#' + table.room.clientId + '_action_doubt' }" aria-controls="profile" role="tab" data-toggle="tab">Doubt</a>
                 </li>
                 <li role="presentation">
-                    <a data-bind="attr: { 'href': '#' + $parent.table.room.clientId + '_action_match' }" aria-controls="messages" role="tab" data-toggle="tab">Match</a>
+                    <a data-bind="attr: { 'href': '#' + table.room.clientId + '_action_match' }" aria-controls="messages" role="tab" data-toggle="tab">Match</a>
                 </li>
             </ul>
 
             <!-- action tab panes -->
             <div class="tab-content">
-                <div role="tabpanel" class="tab-pane fade in active" data-bind="attr: { 'id': $parent.table.room.clientId + '_action_bet' }">
+                <div role="tabpanel" class="tab-pane fade in active" data-bind="attr: { 'id': table.room.clientId + '_action_bet' }">
                     <!-- possible bets -->
-                    <button type="button" class="btn btn-xs btn-default pull-right" data-bind="popover: { target: '#' + $parent.table.room.clientId + '_action_bet_help'}" title="Possible bets" data-placement="left" data-trigger="focus">
+                    <button type="button" class="btn btn-xs btn-default pull-right" data-bind="popover: { target: '#' + table.room.clientId + '_action_bet_help'}" title="Possible bets" data-placement="left" data-trigger="focus">
                         <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
                     </button>
-                    <div class="hide" data-bind="attr: { 'id': $parent.table.room.clientId + '_action_bet_help' }">
+                    <div class="hide" data-bind="attr: { 'id': table.room.clientId + '_action_bet_help' }">
                         <table class="table-condensed">
-                            <tbody data-bind="foreach: $parent.actions.bet.possibleBets">
+                            <tbody data-bind="foreach: actions.bet.possibleBets">
                                 <tr>
                                     <td data-bind="text: minQuantity + '+'"></td>
                                     <td data-bind="template: { name: 'diceTemplate', foreach: validDices }"></td>
@@ -112,36 +112,36 @@
 
                     <div class="row">
                         <div class="col-xs-4">
-                            Quantity: <span data-bind="text: $parent.actions.bet.quantity"></span>
-                            <!-- ko template: { name: 'dialTemplate', data: $parent.actions.bet.quantity.dial } --><!-- /ko -->
+                            Quantity: <span data-bind="text: actions.bet.quantity"></span>
+                            <!-- ko template: { name: 'dialTemplate', data: actions.bet.quantity.dial } --><!-- /ko -->
                         </div>
                         <div class="col-xs-4">
-                            <!-- ko template: { name: 'diceTemplate', data: $parent.actions.bet.dice } --><!-- /ko -->
-                            <!-- ko template: { name: 'dialTemplate', data: $parent.actions.bet.dice.dial } --><!-- /ko -->
+                            <!-- ko template: { name: 'diceTemplate', data: actions.bet.dice } --><!-- /ko -->
+                            <!-- ko template: { name: 'dialTemplate', data: actions.bet.dice.dial } --><!-- /ko -->
                         </div>
                         <div class="col-xs-4">
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" data-bind="checked: $parent.actions.bet.rollOthers, enable: $parent.table.isUserTurn" /> Roll others
+                                    <input type="checkbox" data-bind="checked: actions.bet.rollOthers, enable: table.isUserTurn" /> Roll others
                                 </label>
                             </div>
-                            <button type="button" class="btn btn-primary tg-doubt-usergame-actionbutton" data-bind="click: $parent.actions.bet.execute, enable: $parent.table.isUserTurn">Bet</button>
+                            <button type="button" class="btn btn-primary tg-doubt-actions-actionbutton" data-bind="click: actions.bet.execute, enable: table.isUserTurn">Bet</button>
                         </div>
                     </div>
                 </div>
 
-                <div role="tabpanel" class="tab-pane fade" data-bind="attr: { 'id': $parent.table.room.clientId + '_action_doubt' }">
+                <div role="tabpanel" class="tab-pane fade" data-bind="attr: { 'id': table.room.clientId + '_action_doubt' }">
                     <div class="row">
                         <div class="col-xs-offset-8 col-xs-4">
-                            <button type="button" class="btn btn-primary tg-doubt-usergame-actionbutton" data-bind="click: $parent.actions.doubt.execute, enable: $parent.table.isUserTurn() && $parent.hasBet()">Doubt</button>
+                            <button type="button" class="btn btn-primary tg-doubt-actions-actionbutton" data-bind="click: actions.doubt.execute, enable: table.isUserTurn() && hasBet()">Doubt</button>
                         </div>
                     </div>
                 </div>
 
-                <div role="tabpanel" class="tab-pane fade" data-bind="attr: { 'id': $parent.table.room.clientId + '_action_match' }">
+                <div role="tabpanel" class="tab-pane fade" data-bind="attr: { 'id': table.room.clientId + '_action_match' }">
                     <div class="row">
                         <div class="col-xs-offset-8 col-xs-4">
-                            <button type="button" class="btn btn-primary tg-doubt-usergame-actionbutton" data-bind="click: $parent.actions.match.execute, enable: $parent.table.isUserTurn() && $parent.hasBet() && $parent.actions.match.isUserAllowed()">Match</button>
+                            <button type="button" class="btn btn-primary tg-doubt-actions-actionbutton" data-bind="click: actions.match.execute, enable: table.isUserTurn() && hasBet() && actions.match.isUserAllowed()">Match</button>
                         </div>
                     </div>
                 </div>

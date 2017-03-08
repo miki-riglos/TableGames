@@ -3,18 +3,19 @@
     function InBetween(gameConfig, gameState, table) {
         var self = this;
 
+        self.bank = ko.observable(gameState.bank);
         self.pot = ko.observable(gameState.pot);
 
         self.playerHands = gameState.playerHands.map(function(playerHandState) { return new InBetweenPlayerHand(playerHandState); });
         self.playerHands.update = function(playerHandsState) {
             playerHandsState.forEach(function(playerHandState, index) {
                 self.playerHands[index].updateCards(playerHandState.cards);
-                self.playerHands[index].chips(playerHandState.chips);
+                self.playerHands[index].chipsPurchased(playerHandState.chipsPurchased);
+                self.playerHands[index].chipsBalance(playerHandState.chipsBalance);
             });
         };
 
         self.bet = ko.observable(gameState.bet);
-        self.payment = ko.observable(gameState.payment);
 
         table.activePlayerName(gameState.table.activePlayerName);
     }
@@ -48,7 +49,7 @@
             };
 
             // user chips
-            self.chips = ko.computed(function() { return userHand.chips() - self.amount(); });
+            self.chipsProjected = ko.computed(function() { return userHand.chipsBalance() - self.amount(); });
 
             self.getParameters = function() {
                 return {
@@ -59,7 +60,6 @@
             self.onExecuted = function(playerName, gameChangeResults) {
                 game.bet(gameChangeResults.bet);
                 game.playerHands.update(gameChangeResults.playerHands);
-                game.payment(gameChangeResults.payment);
                 game.pot(gameChangeResults.pot);
                 game.isEnded(gameChangeResults.isEnded);
                 table.status(gameChangeResults.table.status);
