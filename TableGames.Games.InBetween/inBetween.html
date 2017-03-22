@@ -47,6 +47,11 @@
         .tg-inbetween-actions .tg-inbetween-actions-actionbutton {
             width: 100%;
         }
+
+        .tg-inbetween-actions-bet-change {
+            vertical-align: top;
+            margin-top: 17px;
+        }
 </style>
 
 <template id="inBetweenTemplate">
@@ -54,6 +59,7 @@
         <div class="row tg-inbetween-pot">
             <div class="col-xs-5">Pot</div>
             <div class="col-xs-2 text-right" data-bind="text: pot"></div>
+            <div class="col-xs-2 text-right" data-bind="text: bank"></div>
         </div>
         <div class="tg-inbetween-playerhands" data-bind="foreach: { data: playerHands, as: 'hand' }">
             <div class="row">
@@ -82,15 +88,16 @@
             <div class="tab-content">
                 <div role="tabpanel" class="tab-pane fade in active" data-bind="attr: { 'id': table.room.clientId + '_action_bet' }">
                     <div class="row">
-                        <div class="col-xs-4">
-                            Chips: <span data-bind="text: actions.bet.chipsProjected"></span>
-                        </div>
-                        <div class="col-xs-4">
-                            Bet: <span data-bind="text: actions.bet.amount"></span>
+                        <div class="col-xs-8">
+                            <button type="button" class="btn btn-default tg-inbetween-actions-bet-change" data-bind="click: actions.bet.amount.setMinBet, enable: table.isUserTurn">Min</button>
                             <!-- ko template: { name: 'dialTemplate', data: actions.bet.amount.dial } --><!-- /ko -->
+                            <button type="button" class="btn btn-default tg-inbetween-actions-bet-change" data-bind="click: actions.bet.amount.setMaxBet, enable: table.isUserTurn">Max</button>
                         </div>
                         <div class="col-xs-4">
-                            <button type="button" class="btn btn-primary tg-inbetween-actions-actionbutton" data-bind="click: actions.bet.execute, enable: table.isUserTurn">Bet</button>
+                            <button type="button" class="btn btn-primary tg-inbetween-actions-actionbutton" data-bind="click: actions.bet.execute, enable: table.isUserTurn">
+                                Bet<br />
+                                <span data-bind="text: actions.bet.amount"></span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -98,7 +105,12 @@
                 <div role="tabpanel" class="tab-pane fade" data-bind="attr: { 'id': table.room.clientId + '_action_buy' }">
                     <div class="row">
                         <div class="col-xs-offset-8 col-xs-4">
-                            <button type="button" class="btn btn-primary tg-inbetween-actions-actionbutton" data-bind="click: actions.bet.execute, enable: table.isUserTurn()">Buy</button>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" data-bind="checked: actions.buy.returnChips, actions.buy.returnChips.enable" /> Return chips
+                                </label>
+                            </div>
+                            <button type="button" class="btn btn-primary tg-inbetween-actions-actionbutton" data-bind="click: actions.buy.execute, enable: table.isUserTurn()">Buy</button>
                         </div>
                     </div>
                 </div>

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using TableGames.Domain;
 using TableGames.Domain.Extensions;
@@ -8,7 +9,10 @@ namespace TableGames.Games.InBetween
     [GameDescriptor("In Between", InitialGameType = typeof(HigherCard), AutoRestartAfter = 0)]
     public class InBetween : Game
     {
-        private readonly Chips _chips;    // pot wrapper to store in table bag by reference
+        public const int LOT_AMOUNT = 500;
+        public const int MIN_BET_AMOUNT = 10;
+
+        private readonly Chips _chips;
         private readonly List<Deck> _decks;
 
         public List<InBetweenPlayerHand> PlayerHands { get; set; }
@@ -18,12 +22,10 @@ namespace TableGames.Games.InBetween
         public Deck Deck {
             get { return _decks.Last(); }
         }
-
         public int Bank {
             get { return _chips.Amount; }
             set { _chips.Amount = value; }
         }
-
         public int Pot {
             get { return _chips.Balance; }
             set { _chips.Balance = value; }
@@ -46,12 +48,12 @@ namespace TableGames.Games.InBetween
             // initial pot
             if (Pot == 0) {
                 foreach (var playerHand in PlayerHands) {
-                    playerHand.ChipsPurchased = 500;
-                    playerHand.ChipsBalance = 500;
-                    Bank += 500;
+                    playerHand.ChipsPurchased += LOT_AMOUNT;
+                    playerHand.ChipsBalance += LOT_AMOUNT;
+                    Bank += LOT_AMOUNT;
 
-                    playerHand.ChipsBalance -= 10;
-                    Pot += 10;
+                    playerHand.ChipsBalance -= MIN_BET_AMOUNT;
+                    Pot += MIN_BET_AMOUNT;
                 }
             }
 
@@ -107,12 +109,11 @@ namespace TableGames.Games.InBetween
         }
 
         public GameChangeResult Execute(int amount) {
-            //if (_inBetween.HasLock && _inBetween.HasBet) {
-            //    if (diceValue != _inBetween.Dice.Value) {
-            //        throw new TableGamesException("Dice value can't be changed when lock is in place.");
-            //    }
-            //}
-
+            var maxBetAmount = Math.Max(_inBetween.ActiveHand.ChipsBalance / 2, _inBetween.Pot);
+            if (amount > maxBetAmount) {
+                throw new TableGamesException("Invalid Bet amount.");
+            }
+            
             _inBetween.ActiveHand.Cards.Add(_inBetween.Deck.DealExposed());
 
             var leftValue = _inBetween.ActiveHand.Cards[0].ValueA1;
@@ -151,4 +152,40 @@ namespace TableGames.Games.InBetween
             return new GameChangeResult(gameState);
         }
     }
+
+    public class BuyAction : GameAction
+    {
+        public override string Name => "buy";
+
+        private InBetween _inBetween;
+
+        public BuyAction(InBetween inBetween) {
+            _inBetween = inBetween;
+        }
+
+        public GameChangeResult Execute(bool returnChips) {
+            if (returnChips) {
+                if (_inBetween.ActiveHand.ChipsBalance < InBetween.LOT_AMOUNT) {
+                    throw new TableGamesException($"Chips Balance is less than {InBetween.LOT_AMOUNT}");
+                }
+            }
+
+            var factor = returnChips ? -1 : 1;
+
+            _inBetween.ActiveHand.ChipsBalance += factor * InBetween.LOT_AMOUNT;
+            _inBetween.ActiveHand.ChipsPurchased += factor * InBetween.LOT_AMOUNT;
+            _inBetween.Bank += factor * InBetween.LOT_AMOUNT;
+
+            var gameState = new {
+                playerHands = _inBetween.PlayerHands.Select(pc => pc.ToClient()),
+                bank = _inBetween.Bank,
+                table = new {
+                    stats = _inBetween.Table.GetStats(),
+                }
+            };
+
+            return new GameChangeResult(gameState);
+        }
+    }
+
 }

@@ -6,8 +6,6 @@ namespace TableGames.Games
 {
     public class Deck
     {
-        private Random _random = new Random(Guid.NewGuid().GetHashCode());
-
         private Stack<Card> _cards;
 
         public int Count { get { return _cards.Count; } }
@@ -35,10 +33,11 @@ namespace TableGames.Games
         }
 
         private void shuffle(List<Card> cards) {
+            Random random = new Random(Guid.NewGuid().GetHashCode());
             int count = cards.Count;
             while (count > 1) {
                 count--;
-                int index = _random.Next(count + 1);
+                int index = random.Next(count + 1);
                 var value = cards[index];
                 cards[index] = cards[count];
                 cards[count] = value;
