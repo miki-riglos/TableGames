@@ -48,7 +48,7 @@
                 if (!game.table.isUserTurn()) {
                     game.table.room.beeper.beep();
                 }
-                game.actions[actionName].onExecuted(playerName, gameChangeResults);
+                return game.actions[actionName].onExecuted(playerName, gameChangeResults);
             };
 
             game.setUserGame = game.setUserGame || function(userGameState) { };

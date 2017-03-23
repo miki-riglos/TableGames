@@ -8,18 +8,18 @@
                 <tr>
                     <th>#</th>
                     <th>Player</th>
-                    <th>Bet</th>
-                    <th>Payment</th>
+                    <th class="text-right">Bet</th>
+                    <th class="text-right">Payment</th>
                 </tr>
             </thead>
             <tbody data-bind="foreach: { data: stats, as: 'gameStats' }">
-                <tr>
+                <tr data-bind="visible: gameStats.bet">
                     <td>
                         <span data-bind="text: $index() + 1"></span>
                     </td>
                     <td data-bind="text: gameStats.playerName"></td>
-                    <td data-bind="text: gameStats.bet"></td>
-                    <td data-bind="text: gameStats.payment"></td>
+                    <td class="text-right" data-bind="text: gameStats.bet"></td>
+                    <td class="text-right" data-bind="text: gameStats.payment"></td>
                 </tr>
             </tbody>
         </table>

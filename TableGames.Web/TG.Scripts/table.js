@@ -59,7 +59,7 @@
 
         self.changeGame = function(playerName, actionName, gameChangeResults) {
             gamePromise = gamePromise.then(function() {
-                self.game().change(playerName, actionName, gameChangeResults);
+                return self.game().change(playerName, actionName, gameChangeResults);
             });
         };
 
@@ -102,13 +102,13 @@
         // user game
         self.setUserGame = function(userGameState) {
             gamePromise = gamePromise.then(function() {
-                self.game().setUserGame(userGameState);
+                return self.game().setUserGame(userGameState);
             });
         };
 
         self.changeUserGame = function(actionName, userGameChangeResults) {
             gamePromise = gamePromise.then(function() {
-                self.game().changeUserGame(actionName, userGameChangeResults);
+                return self.game().changeUserGame(actionName, userGameChangeResults);
             });
         };
 
