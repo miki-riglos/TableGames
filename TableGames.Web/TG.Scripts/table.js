@@ -83,7 +83,7 @@
                                     autoRestartGameSubscription = game.isEnded.subscribe(function(isEnded) {
                                         if (isEnded) {
                                             delay.repeat(gameInfo.autoRestartAfter).then(function() {
-                                                if (room.table() === self) {    // if still current table
+                                                if (self.game() === game) {    // if still current game
                                                     manager.restartGame(self);
                                                 }
                                             });

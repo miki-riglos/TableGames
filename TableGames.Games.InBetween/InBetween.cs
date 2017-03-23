@@ -6,7 +6,7 @@ using TableGames.Domain.Extensions;
 
 namespace TableGames.Games.InBetween
 {
-    [GameDescriptor("In Between", InitialGameType = typeof(HigherCard), AutoRestartAfter = 0)]
+    [GameDescriptor("In Between", InitialGameType = typeof(HigherCard))]
     public class InBetween : Game
     {
         public const int LOT_AMOUNT = 500;
@@ -48,9 +48,11 @@ namespace TableGames.Games.InBetween
             // initial pot
             if (Pot == 0) {
                 foreach (var playerHand in PlayerHands) {
-                    playerHand.ChipsPurchased += LOT_AMOUNT;
-                    playerHand.ChipsBalance += LOT_AMOUNT;
-                    Bank += LOT_AMOUNT;
+                    if (playerHand.ChipsBalance <= 3 * MIN_BET_AMOUNT) {
+                        playerHand.ChipsPurchased += LOT_AMOUNT;
+                        playerHand.ChipsBalance += LOT_AMOUNT;
+                        Bank += LOT_AMOUNT;
+                    }
 
                     playerHand.ChipsBalance -= MIN_BET_AMOUNT;
                     Pot += MIN_BET_AMOUNT;
@@ -113,7 +115,8 @@ namespace TableGames.Games.InBetween
             if (amount > maxBetAmount) {
                 throw new TableGamesException("Invalid Bet amount.");
             }
-            
+
+            _inBetween.Bet = amount;
             _inBetween.ActiveHand.Cards.Add(_inBetween.Deck.DealExposed());
 
             var leftValue = _inBetween.ActiveHand.Cards[0].ValueA1;
