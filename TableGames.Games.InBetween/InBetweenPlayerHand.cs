@@ -17,6 +17,9 @@ namespace TableGames.Games.InBetween
             set { _playerBag.Chips.Balance = value; }
         }
 
+        public int Bet { get; set; }
+        public int Payment { get; set; }
+
         public InBetweenPlayerHand(Player player, InBetweenPlayerBag playerBag) : base(player) {
             _playerBag = playerBag;
         }
@@ -26,7 +29,9 @@ namespace TableGames.Games.InBetween
                 playerName = Player.Name,
                 cards = Cards.Select(c => c.ToClient()),
                 chipsPurchased = ChipsPurchased,
-                chipsBalance = ChipsBalance
+                chipsBalance = ChipsBalance,
+                bet = Bet,
+                payment = Payment
             };
         }
     }

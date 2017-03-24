@@ -5,8 +5,11 @@
 
         PlayerHand.call(self, playerHandState);
 
-        self.chipsPurchased = ko.observable(playerHandState.chipsPurchased);
-        self.chipsBalance = ko.observable(playerHandState.chipsBalance);
+        self.chipsPurchased = ko.observableRunner(playerHandState.chipsPurchased);
+        self.chipsBalance = ko.observableRunner(playerHandState.chipsBalance);
+
+        self.bet = ko.observableRunner(playerHandState.bet);
+        self.payment = ko.observable(playerHandState.payment);
     }
 
     return DoubtPlayerHand;

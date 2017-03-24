@@ -48,16 +48,19 @@
             width: 100%;
         }
 
-        .tg-inbetween-actions-bet-change {
-            vertical-align: top;
-            margin-top: 17px;
-        }
+    .tg-inbetween-actions-bet-change {
+        vertical-align: top;
+        margin-top: 17px;
+    }
 </style>
 
 <template id="inBetweenTemplate">
     <div class="tg-inbetween">
         <div class="row tg-inbetween-pot">
-            <div class="col-xs-5">Pot</div>
+            <div class="col-xs-5">
+                <span class="badge pull-right" data-bind="text: bank"></span>
+                <div>Pot</div>
+            </div>
             <div class="col-xs-2 text-right" data-bind="text: pot"></div>
         </div>
         <div class="tg-inbetween-playerhands" data-bind="foreach: { data: playerHands, as: 'hand' }">
@@ -66,7 +69,10 @@
                     <span class="badge pull-right" data-bind="text: hand.chipsPurchased"></span>
                     <div data-bind="text: hand.playerName"></div>
                 </div>
-                <div class="col-xs-2 text-right" data-bind="text: hand.chipsBalance"></div>
+                <div class="col-xs-2 text-right">
+                    <div data-bind="text: hand.chipsBalance"></div>
+                    <div data-bind="visible: hand.bet, text: hand.bet"></div>
+                </div>
 
                 <div class="col-xs-5 tg-inbetween-playerhand" data-bind="template: { name: 'cardTemplate', foreach: hand.cards }"></div>
             </div>

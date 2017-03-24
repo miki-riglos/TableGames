@@ -1,10 +1,10 @@
-﻿define(['knockout', 'tmpl!InBetween/inBetween', 'game!card', 'game!InBetween/inBetweenPlayerHand', 'tmpl!InBetween/inBetweenStats', 'tmpl!dial'], function(ko, inBetweenTemplateName, Card, InBetweenPlayerHand, inBetweenStatsTemplateName, dialTemplateName) {
+﻿define(['knockout', 'jquery', 'game!delay', 'tmpl!InBetween/inBetween', 'game!card', 'game!InBetween/inBetweenPlayerHand', 'tmpl!InBetween/inBetweenStats', 'tmpl!dial'], function(ko, $, delay, inBetweenTemplateName, Card, InBetweenPlayerHand, inBetweenStatsTemplateName, dialTemplateName) {
 
     function InBetween(gameConfig, gameState, table) {
         var self = this;
 
-        self.bank = ko.observable(gameState.bank);
-        self.pot = ko.observable(gameState.pot);
+        self.bank = ko.observableRunner(gameState.bank);
+        self.pot = ko.observableRunner(gameState.pot);
 
         self.playerHands = gameState.playerHands.map(function(playerHandState) { return new InBetweenPlayerHand(playerHandState); });
         self.playerHands.update = function(playerHandsState) {
@@ -12,10 +12,10 @@
                 self.playerHands[index].updateCards(playerHandState.cards);
                 self.playerHands[index].chipsPurchased(playerHandState.chipsPurchased);
                 self.playerHands[index].chipsBalance(playerHandState.chipsBalance);
+                self.playerHands[index].bet(playerHandState.bet);
+                self.playerHands[index].payment(playerHandState.payment);
             });
         };
-
-        self.bet = ko.observable(gameState.bet);
 
         table.activePlayerName(gameState.table.activePlayerName);
     }
@@ -40,7 +40,7 @@
                 up: {
                     execute: function() {
                         if (self.amount() < self.maxBet()) {
-                            self.amount(self.amount() +InBetween.MIN_BET_AMOUNT);
+                            self.amount(self.amount() + InBetween.MIN_BET_AMOUNT);
                         }
                     },
                     enable: table.isUserTurn
@@ -64,13 +64,62 @@
             };
 
             self.onExecuted = function(playerName, gameChangeResults) {
-                game.bet(gameChangeResults.bet);
-                game.playerHands.update(gameChangeResults.playerHands);
-                game.pot(gameChangeResults.pot);
-                game.isEnded(gameChangeResults.isEnded);
-                table.status(gameChangeResults.table.status);
-                table.activePlayerName(gameChangeResults.table.activePlayerName);
-                table.stats(gameChangeResults.table.stats);
+                var userHandChangeResults = ko.utils.arrayFirst(gameChangeResults.playerHands, function(ph) { return ph.playerName === game.table.activePlayerName(); });
+
+                var promise = $.when()
+                                .then(function() {  // update player bet, remove bet from player chips
+                                    var betPromise = userHand.bet.runTo(userHandChangeResults.bet);
+                                    var chipsPromise = userHand.chipsBalance.runTo(userHand.chipsBalance() - userHandChangeResults.bet);
+                                    return $.when(betPromise, chipsPromise);
+                                })
+                                .then(function() {
+                                    userHand.updateCards(userHandChangeResults.cards);
+                                    return delay();
+                                })
+                                .then(function() { // if win
+                                    if (userHandChangeResults.payment === userHandChangeResults.bet) {
+                                        // pot => bet
+                                        var potPromise = game.pot.runTo(gameChangeResults.pot);
+                                        var betPromise = userHand.bet.runTo(2 * userHandChangeResults.bet);
+                                        var winPromise = $.when(potPromise, betPromise).then(function() {
+                                            // bet => chips
+                                            var betPromise = userHand.bet.runTo(0);
+                                            var chipsPromise = userHand.chipsBalance.runTo(userHandChangeResults.chipsBalance);
+                                            return $.when(betPromise, chipsPromise);
+                                        });
+                                        return winPromise;
+                                    }
+                                })
+                                .then(function() { // if simple lose
+                                    if (userHandChangeResults.payment === -userHandChangeResults.bet) {
+                                        // bet => pot
+                                        var betPromise = userHand.bet.runTo(0);
+                                        var potPromise = game.pot.runTo(gameChangeResults.pot);
+                                        return $.when(potPromise, betPromise);
+                                    }
+                                })
+                                .then(function() { // if post lose
+                                    if (userHandChangeResults.payment === -2 * userHandChangeResults.bet) {
+                                        // chips => bet
+                                        var chipsPromise = userHand.chipsBalance.runTo(userHandChangeResults.chipsBalance);
+                                        var betPromise = userHand.bet.runTo(2 * userHandChangeResults.bet);
+                                        var losePromise = $.when(chipsPromise, betPromise).then(function() {
+                                            // bet => pot
+                                            var betPromise = userHand.bet.runTo(0);
+                                            var potPromise = game.pot.runTo(gameChangeResults.pot);
+                                            return $.when(betPromise, potPromise);
+                                        });
+                                        return losePromise;
+                                    }
+                                })
+                                .then(function() {
+                                    userHand.payment(userHandChangeResults.payment);
+                                    game.isEnded(gameChangeResults.isEnded);
+                                    table.status(gameChangeResults.table.status);
+                                    table.activePlayerName(gameChangeResults.table.activePlayerName);
+                                    table.stats(gameChangeResults.table.stats);
+                                });
+                return promise;
             };
         },
         function BuyAction(gameConfig, game, table) {
@@ -89,11 +138,17 @@
             };
 
             self.onExecuted = function(playerName, gameChangeResults) {
-                game.playerHands.update(gameChangeResults.playerHands);
-                game.bank(gameChangeResults.bank);
-                table.stats(gameChangeResults.table.stats);
-                // reset
-                self.returnChips(false);
+                var userHandChangeResults = ko.utils.arrayFirst(gameChangeResults.playerHands, function(ph) { return ph.playerName === game.table.activePlayerName(); });
+
+                var purchasedPromise = userHand.chipsPurchased.runTo(userHandChangeResults.chipsPurchased);
+                var chipsPromise = userHand.chipsBalance.runTo(userHandChangeResults.chipsBalance);
+                var bankPromise = game.bank.runTo(gameChangeResults.bank);
+
+                var promise = $.when(purchasedPromise, chipsPromise, bankPromise).then(function() {
+                    self.returnChips(false);    // reset returnChips checkbox
+                });
+
+                return promise;
             };
         }
     ];

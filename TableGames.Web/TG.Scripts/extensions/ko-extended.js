@@ -1,5 +1,41 @@
 ﻿define(['knockout'], function(ko) {
 
+    // extenders
+    ko.extenders.addRunTo = function(target) {
+        var increment;
+        var runningValue;
+
+        target.runTo = function(value) {
+            increment = (value - target()) / 9;
+            runningValue = target();
+
+            var promise = $.when();
+            for (var i = 1; i <= 8; i++) {
+                promise = promise.then(target.runTo.step);
+            }
+            promise = promise.then(function() {
+                target(value);
+            });
+            return promise;
+        };
+
+        target.runTo.step = function() {
+            runningValue += increment;
+
+            var dfd = $.Deferred();
+            var stepValue = Math.floor(runningValue);
+            target(stepValue);
+            setTimeout(function() { dfd.resolve(stepValue); }, 100);
+            return dfd.promise();
+        };
+
+        return target;
+    };
+
+    ko.observableRunner = function(initialValue) {
+        return ko.observable(initialValue).extend({ addRunTo: null });
+    };
+
     // observable array
     ko.observableArray.fn.first = function(predicate) {
         return ko.utils.arrayFirst(this(), predicate || function() { return true; });

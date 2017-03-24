@@ -16,9 +16,7 @@ namespace TableGames.Games.InBetween
         private readonly List<Deck> _decks;
 
         public List<InBetweenPlayerHand> PlayerHands { get; set; }
-        public int Bet { get; set; }
         public InBetweenPlayerHand ActiveHand { get; private set; }
-        public int Payment { get; set; }
         public Deck Deck {
             get { return _decks.Last(); }
         }
@@ -84,8 +82,6 @@ namespace TableGames.Games.InBetween
                 bank = Bank,
                 pot = Pot,
                 playerHands = PlayerHands.Select(pc => pc.ToClient()),
-                bet = Bet,
-                payment = Payment
             };
             return client.Merge(base.ToClient());
         }
@@ -93,8 +89,8 @@ namespace TableGames.Games.InBetween
         public override object ToStats() {
             var stats = new {
                 playerName = ActiveHand.Player.Name,
-                bet = Bet,
-                payment = Payment
+                bet = ActiveHand.Bet,
+                payment = ActiveHand.Payment
             };
             return stats.Merge(base.ToStats());
         }
@@ -116,7 +112,7 @@ namespace TableGames.Games.InBetween
                 throw new TableGamesException("Invalid Bet amount.");
             }
 
-            _inBetween.Bet = amount;
+            _inBetween.ActiveHand.Bet = amount;
             _inBetween.ActiveHand.Cards.Add(_inBetween.Deck.DealExposed());
 
             var leftValue = _inBetween.ActiveHand.Cards[0].ValueA1;
@@ -124,25 +120,24 @@ namespace TableGames.Games.InBetween
             var middleValue = _inBetween.ActiveHand.Cards[2].ValueA1;
 
             if ((leftValue < middleValue && middleValue < rightValue) || (leftValue > middleValue && middleValue > rightValue)) {
-                _inBetween.Payment = amount;        // win
+                _inBetween.ActiveHand.Payment = amount;        // win
+                _inBetween.ActiveHand.Cards[2].IsHighlighted = true;
             }
             else if (leftValue == middleValue || middleValue == rightValue) {
-                _inBetween.Payment = -2 * amount;   // post lose
+                _inBetween.ActiveHand.Payment = -2 * amount;   // post lose
             }
             else {
-                _inBetween.Payment = -amount;       // simple lose
+                _inBetween.ActiveHand.Payment = -amount;       // simple lose
             }
-            _inBetween.ActiveHand.ChipsBalance += _inBetween.Payment;
-            _inBetween.Pot -= _inBetween.Payment;
+            _inBetween.ActiveHand.ChipsBalance += _inBetween.ActiveHand.Payment;
+            _inBetween.Pot -= _inBetween.ActiveHand.Payment;
 
             _inBetween.IsEnded = true;
 
             _inBetween.Table.SetNextPlayer();
 
             var gameState = new {
-                bet = _inBetween.Bet,
                 playerHands = _inBetween.PlayerHands.Select(pc => pc.ToClient()),
-                payment = _inBetween.Payment,
                 pot = _inBetween.Pot,
                 isEnded = _inBetween.IsEnded,
                 table = new {
