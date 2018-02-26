@@ -1,7 +1,7 @@
 # Introduction
 This my pet project to develop a table games platform and to get familiarized with real time applications.
 Games state is stored in memory on the server and is pushed down to the clients whenever there is a change, some games have private state for each player.
-Objects holding state are very similar on the server and client. The UI is updated using data binding. 
+Objects holding state are very similar on the server and client. The UI is updated using data binding, promises are used for asynchronous operations and animations.
 
 # Components
 1.	ASP.NET MVC
